@@ -3,169 +3,245 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>رحلة رمضان - ألغاز</title>
+  <title>Ramadan Hub v2</title>
 
   <style>
     :root{
-      --bg1:#050814;
-      --bg2:#0a2140;
-      --text:#eaf3ff;
-      --muted:rgba(234,243,255,.72);
+      --bg1:#05070f;
+      --bg2:#071b2f;
+      --bg3:#220a25;
+
+      --text:#eef5ff;
+      --muted:rgba(238,245,255,.72);
+
+      --glass1: rgba(255,255,255,.12);
+      --glass2: rgba(255,255,255,.06);
       --stroke: rgba(255,255,255,.14);
 
-      --gold1:#f6d37a;
-      --gold2:#caa34a;
+      --a1:#66e2ff;
+      --a2:#f6d37a;
+      --a3:#ff6ad5;
+      --ok:#7dffb3;
+      --bad:#ff6b6b;
 
-      --pink1:#ff6ad5;
-      --pink2:#ff2ea6;
-
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow: 0 18px 70px rgba(0,0,0,.50);
+      --shadow2: 0 10px 40px rgba(0,0,0,.40);
     }
 
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    html, body { height:100%; }
     body{
       margin:0;
       font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1100px 800px at 75% 10%, rgba(246,211,122,.14), transparent 55%),
-        radial-gradient(900px 650px at 20% 85%, rgba(89,210,255,.12), transparent 60%),
-        linear-gradient(160deg, var(--bg1), var(--bg2));
+      color: var(--text);
       overflow:hidden;
+      background:
+        radial-gradient(1000px 700px at 80% 0%, rgba(255,106,213,.12), transparent 60%),
+        radial-gradient(950px 650px at 10% 90%, rgba(102,226,255,.12), transparent 60%),
+        radial-gradient(900px 650px at 60% 60%, rgba(246,211,122,.10), transparent 60%),
+        linear-gradient(140deg, var(--bg1), var(--bg2), var(--bg3));
     }
 
-    /* floating ramadan emojis background */
-    .emoji-sky{ position:fixed; inset:0; overflow:hidden; pointer-events:none; }
+    /* Fullscreen app */
+    .app{
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
+      padding: 18px 14px 70px;
+    }
+
+    /* Floating background emojis */
+    .emoji-sky{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      opacity: .95;
+    }
     .e{
       position:absolute;
       font-size: clamp(18px, 3.6vw, 34px);
-      opacity:.95;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,.35));
       animation: floatUp linear infinite;
       will-change: transform, opacity;
     }
     @keyframes floatUp{
-      from{ transform: translate3d(var(--dx1), 110vh, 0) rotate(var(--r)); opacity:0; }
-      12%{ opacity: .95; }
-      to{ transform: translate3d(var(--dx1), -25vh, 0) rotate(calc(var(--r) + 120deg)); opacity:0; }
+      from{ transform: translate3d(var(--dx), 110vh, 0) rotate(var(--r)); opacity:0; }
+      15%{ opacity: .95; }
+      to{ transform: translate3d(var(--dx), -25vh, 0) rotate(calc(var(--r) + 120deg)); opacity:0; }
     }
 
-    .vignette{ position:fixed; inset:0; pointer-events:none;
-      background: radial-gradient(circle at 50% 40%, transparent 35%, rgba(0,0,0,.62) 85%);
+    .vignette{
+      position:fixed; inset:0; pointer-events:none;
+      background: radial-gradient(circle at 50% 35%, transparent 35%, rgba(0,0,0,.62) 88%);
       mix-blend-mode: multiply;
     }
-    .shimmer{ position:fixed; inset:-40%; pointer-events:none;
-      background: conic-gradient(from 220deg,
-        transparent 0 18%,
-        rgba(246,211,122,.10) 20%,
-        transparent 26%,
-        rgba(89,210,255,.08) 32%,
-        transparent 40%,
-        rgba(255,95,209,.06) 46%,
-        transparent 60%,
-        rgba(246,211,122,.08) 72%,
-        transparent 100%);
-      filter: blur(26px);
-      opacity:.55;
-      animation: slowSpin 18s linear infinite;
-    }
-    @keyframes slowSpin{ to{ transform: rotate(360deg); } }
 
-    .wrap{
-      position:relative;
-      height:100%;
-      display:grid;
-      place-items:center;
-      padding: 18px 14px 64px;
+    .footer{
+      position:fixed;
+      left:0; right:0; bottom:10px;
+      text-align:center;
+      font-size: 13px;
+      color: rgba(238,245,255,.65);
+      text-shadow: 0 10px 25px rgba(0,0,0,.55);
+      pointer-events:none;
+      padding: 0 10px;
     }
-    .scene{
-      width:min(860px, 96vw);
+
+    /* Panels */
+    .panel{
+      width:min(980px, 96vw);
       display:none;
-      animation: fadeIn .45s ease both;
+      animation: in .38s ease both;
     }
-    .scene.active{ display:block; }
-    @keyframes fadeIn{
-      from{ opacity:0; transform: translate3d(0, 10px, 0) scale(.99); }
+    .panel.active{ display:block; }
+    @keyframes in{
+      from{ opacity:0; transform: translate3d(0, 12px, 0) scale(.99); }
       to{ opacity:1; transform: translate3d(0,0,0) scale(1); }
     }
 
-    /* cards */
     .card{
-      background: rgba(10, 16, 30, .62);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 22px;
+      background: linear-gradient(180deg, var(--glass1), var(--glass2));
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       padding: 18px 16px;
-      position:relative;
       overflow:hidden;
+      position:relative;
     }
-
-    .title{
-      margin:0;
-      font-size: clamp(22px, 4.8vw, 36px);
-      text-shadow: 0 10px 25px rgba(0,0,0,.35);
-      text-align:center;
-    }
-    .sub{
-      margin: 10px 0 0;
-      color: var(--muted);
-      line-height: 1.75;
-      font-size: clamp(14px, 3.7vw, 16px);
-      white-space: pre-wrap;
-    }
-
-    /* glass buttons */
-    .glass-row{ display:grid; gap:12px; margin-top:14px; }
-    .glass-btn{
-      width:100%;
-      border:none;
-      border-radius: 18px;
-      padding: 14px 16px;
-      cursor:pointer;
-      color: var(--text);
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(238,245,255,.82);
       font-weight: 900;
-      font-size: clamp(16px, 4vw, 18px);
-      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 16px 48px rgba(0,0,0,.35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position:relative;
-      overflow:hidden;
-      transition: transform .14s ease;
+      font-size: 12px;
+      letter-spacing: .2px;
     }
-    .glass-btn:active{ transform: scale(.99); }
 
-    /* buttons */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .brand{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .brand h1{
+      margin:0;
+      font-size: clamp(20px, 4.8vw, 34px);
+      letter-spacing: .2px;
+    }
+    .brand p{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
     .btn{
-      width:100%;
       border:none;
       border-radius: 16px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       font-weight: 1000;
-      font-size: clamp(16px, 4vw, 18px);
       cursor:pointer;
-      color:#140c06;
-      background: linear-gradient(135deg, var(--gold1), var(--gold2));
-      box-shadow: 0 14px 38px rgba(0,0,0,.35);
-    }
-    .btn.pink{
-      color:white;
-      background: linear-gradient(135deg, #ff6ad5, #ff2ea6);
-      filter: drop-shadow(0 0 18px rgba(255,80,200,.35));
+      color:#130c07;
+      background: linear-gradient(135deg, var(--a2), rgba(246,211,122,.65));
+      box-shadow: var(--shadow2);
+      transition: transform .12s ease;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn:active{ transform: scale(.99); }
+    .btn.ghost{
+      color: var(--text);
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.16);
+    }
+    .btn.pink{
+      color: white;
+      background: linear-gradient(135deg, var(--a3), rgba(255,106,213,.55));
+      filter: drop-shadow(0 0 16px rgba(255,106,213,.30));
+    }
+
+    /* Home grid */
+    .home-grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      margin-top: 10px;
+    }
+    @media (min-width: 760px){
+      .home-grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .tile{
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      box-shadow: var(--shadow2);
+      padding: 16px 14px;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition: transform .12s ease;
+    }
+    .tile:active{ transform: scale(.99); }
+    .tile::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(280px 140px at 30% 25%, rgba(102,226,255,.16), transparent 60%),
+        radial-gradient(280px 140px at 80% 70%, rgba(255,106,213,.14), transparent 60%),
+        radial-gradient(280px 140px at 60% 40%, rgba(246,211,122,.12), transparent 62%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .tile .t-head{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .tile .t-head h2{
+      margin:0;
+      font-size: 18px;
+      font-weight: 1000;
+    }
+    .tile .t-head .icon{
+      font-size: 22px;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
+    }
+    .tile p{
+      position:relative;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    /* Content layout inside sections */
+    .section-title{
+      margin: 10px 0 0;
+      font-size: 18px;
+      font-weight: 1000;
+    }
+    .muted{ color: var(--muted); line-height:1.7; }
 
     .row{ display:grid; gap:10px; margin-top:12px; }
-
     .field{
       width:100%;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.28);
+      background: rgba(0,0,0,.26);
       color: var(--text);
       padding: 12px;
       outline:none;
@@ -173,24 +249,39 @@
     }
     textarea.field{ min-height: 120px; resize: vertical; }
 
-    .hintline{
-      margin-top:10px;
-      font-size: 13px;
-      color: rgba(234,243,255,.70);
+    .msgline{
       min-height: 18px;
+      font-size: 13px;
+      color: rgba(238,245,255,.78);
     }
-    .ok{ color: rgba(125,255,179,.92); }
-    .bad{ color: rgba(255,130,130,.92); }
+    .msgline.ok{ color: rgba(125,255,179,.92); }
+    .msgline.bad{ color: rgba(255,107,107,.92); }
 
     body.flash-red{ animation: redFlash .65s ease-in-out; }
     @keyframes redFlash{
       55%{
-        background: radial-gradient(1200px 800px at 50% 40%, rgba(255,43,43,.30), transparent 55%),
+        background: radial-gradient(1200px 800px at 50% 40%, rgba(255,43,43,.26), transparent 55%),
                    linear-gradient(160deg, #210000, #0e0000) !important;
       }
     }
 
-    /* memory game (NO 3D) */
+    /* puzzles list */
+    .puzzle-box{
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      padding: 12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .puzzle-box h3{
+      margin:0 0 8px;
+      font-size: 15px;
+      font-weight: 1000;
+    }
+    .puzzle-box .muted{ font-size: 13px; }
+
+    /* Memory (NO 3D) */
     .grid16{
       display:grid;
       grid-template-columns: repeat(4, 1fr);
@@ -198,18 +289,16 @@
       margin-top: 12px;
     }
     .mcard{
-      height: 78px;
+      height: 76px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 14px 38px rgba(0,0,0,.26);
       cursor:pointer;
       position:relative;
       overflow:hidden;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       transition: transform .12s ease;
     }
     .mcard:active{ transform: scale(.99); }
@@ -219,413 +308,256 @@
       border-radius: 18px;
       transition: opacity .18s ease;
     }
-    .mfront{ font-weight: 1000; font-size: 22px; opacity:1; color: rgba(234,243,255,.85); }
+    .mfront{ font-weight: 1000; font-size: 22px; opacity:1; color: rgba(238,245,255,.85); }
     .mback{ font-size: 34px; opacity:0; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
     .mcard.revealed .mfront{ opacity:0; }
     .mcard.revealed .mback{ opacity:1; }
     .mcard.matched{ outline: 2px solid rgba(125,255,179,.35); cursor:default; }
 
-    /* emoji name puzzle */
-    .emoji-clue{
-      font-size: 34px;
-      text-align:center;
-      padding: 14px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
-      margin-top: 12px;
-    }
-
-    /* Simon */
-    .pads{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .pad{
-      height: 100px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
-      display:grid;
-      place-items:center;
-      font-size: 34px;
-      cursor:pointer;
-      user-select:none;
-      transition: transform .12s ease, filter .12s ease;
-    }
-    .pad:active{ transform: scale(.99); }
-    .pad.on{
-      filter: drop-shadow(0 0 18px rgba(246,211,122,.45));
-      outline: 2px solid rgba(246,211,122,.35);
-    }
-
-    /* Word build */
-    .tiles{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top: 12px;
-      justify-content:center;
-    }
-    .tile{
-      min-width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.22);
-      display:grid;
-      place-items:center;
-      font-size: 24px;
-      font-weight: 900;
-      cursor:pointer;
-      user-select:none;
-    }
-    .built{
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.24);
-      text-align:center;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: .4px;
-    }
-
-    /* Doors */
-    .doors{
+    /* XO */
+    .xo-board{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 12px;
+      margin-top:12px;
     }
-    .door{
-      height: 130px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      user-select:none;
-      padding: 10px;
-      text-align:center;
-      line-height:1.4;
-    }
-    .door .dicon{ font-size: 34px; margin-bottom: 6px; }
-    .door:active{ transform: scale(.99); }
-
-    /* XO */
-    .xo-board{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:12px; }
     .xo-cell{
-      height: 90px;
+      height: 88px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
+      box-shadow: 0 14px 38px rgba(0,0,0,.26);
       display:grid;
       place-items:center;
       font-size: 34px;
-      font-weight: 900;
+      font-weight: 1000;
       cursor:pointer;
       user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
     .xo-cell:active{ transform: scale(.99); }
     .xo-cell.disabled{ cursor:default; opacity:.85; }
-
-    /* black emoji puzzle screen */
-    body.darkmode{ background: #06060b !important; }
-    body.darkmode .emoji-sky, body.darkmode .shimmer, body.darkmode .vignette{ display:none; }
-    .emoji-boxes{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .ebox{
-      height: 110px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      box-shadow: 0 18px 50px rgba(0,0,0,.55);
-    }
-    .ebox span{ font-size: 40px; animation: bob 1.6s ease-in-out infinite; }
-    @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
-
-    /* final sequence puzzle */
-    .seq{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
-    .seqbtn{
-      height: 72px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.28);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      font-size: 30px;
-      user-select:none;
-      transition: transform .14s ease;
-    }
-    .seqbtn:active{ transform: scale(.99); }
-
-    .footer{
-      position:fixed;
-      left:0; right:0; bottom:10px;
-      text-align:center;
-      font-size: 13px;
-      color: rgba(234,243,255,.65);
-      text-shadow: 0 10px 25px rgba(0,0,0,.55);
-      pointer-events:none;
-      padding: 0 10px;
-    }
   </style>
 </head>
 
 <body>
   <div class="emoji-sky" id="emojiSky" aria-hidden="true"></div>
-  <div class="shimmer" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
 
-  <main class="wrap">
+  <div class="app">
 
-    <!-- 1) Who -->
-    <section class="scene active" id="sc-who">
+    <!-- HOME -->
+    <section class="panel active" id="p-home">
       <div class="card">
-        <h1 class="title">انت مين؟</h1>
-        <p class="sub" style="text-align:center">اختار… بس اختار بعناية 😈</p>
-        <div class="glass-row">
-          <button class="glass-btn" data-next="sc-pass1">معرفش.</button>
-          <button class="glass-btn" data-next="sc-pass1">انا لقيت نفسي هنا.</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2) Password -->
-    <section class="scene" id="sc-pass1">
-      <div class="card">
-        <h1 class="title">لغز ١</h1>
-        <p class="sub">كلمة السر: حاجة بتعمليها كل يوم… ومش بتعملي غيرها 😭</p>
-
-        <div class="row">
-          <input class="field" id="pass1" placeholder="اكتبي كلمة السر..." autocomplete="off" />
-          <button class="btn" id="btnPass1" type="button">تحقّق</button>
-          <div class="hintline" id="err1"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Ramadan Note (Reusable) -->
-    <section class="scene" id="sc-note">
-      <div class="card">
-        <h1 class="title">🌙 رمضان كريم</h1>
-        <div class="sub" id="noteText" style="max-height:55vh; overflow:auto; padding-left:6px"></div>
-        <div class="row">
-          <button class="btn pink" id="noteBtn" type="button">استمرار</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3) Memory Intro -->
-    <section class="scene" id="sc-mem-intro">
-      <div class="card">
-        <h1 class="title">لغز ٢</h1>
-        <p class="sub">لعبة مطابقة 4×4 — لازم تلاقي كل زوج (😂 مع 😂 …) عشان تكمل.</p>
-        <button class="btn" id="btnStartMemory" type="button">ابدأ اللعبة</button>
-      </div>
-    </section>
-
-    <!-- 4) Memory -->
-    <section class="scene" id="sc-memory">
-      <div class="card">
-        <h1 class="title">طابقي الأزواج</h1>
-        <p class="sub">اقلبي كارتين… لو نفس الإيموجي يثبتوا. لو مختلفين يرجعوا تاني.</p>
-
-        <div class="grid16" id="memoryGrid"></div>
-
-        <div class="row">
-          <div class="hintline" id="memStatus">تم: 0 / 8</div>
-          <button class="btn pink" id="btnMemContinue" type="button" style="display:none">استمرار</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5) New Puzzle A: Girl name by emojis -->
-    <section class="scene" id="sc-ename">
-      <div class="card">
-        <h1 class="title">لغز ٣</h1>
-        <p class="sub">اسم بنت… بس بالإيموجي. اكتبي الاسم الصح 👀</p>
-
-        <div class="emoji-clue" id="enameClue">💡 ✨ 🌙</div>
-
-        <div class="row">
-          <input class="field" id="enameInput" placeholder="اكتبي الاسم هنا..." autocomplete="off" />
-          <button class="btn" id="btnEnameCheck" type="button">تحقّق</button>
-          <button class="btn" id="btnEnameHint" type="button">تلميح</button>
-          <div class="hintline" id="enameMsg"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6) New Puzzle B: Simon sequence -->
-    <section class="scene" id="sc-simon">
-      <div class="card">
-        <h1 class="title">لغز ٤</h1>
-        <p class="sub">احفظي الترتيب وكرريه… (صعب بس ينفع) 😈</p>
-
-        <div class="pads" id="pads">
-          <div class="pad" data-i="0">🌙</div>
-          <div class="pad" data-i="1">⭐</div>
-          <div class="pad" data-i="2">🕌</div>
-          <div class="pad" data-i="3">✨</div>
-        </div>
-
-        <div class="row">
-          <button class="btn" id="btnSimonStart" type="button">ابدأ / اعرض الترتيب</button>
-          <button class="btn" id="btnSimonReplay" type="button" style="display:none">إعادة عرض</button>
-          <div class="hintline" id="simonMsg"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7) New Puzzle C: Word build -->
-    <section class="scene" id="sc-word">
-      <div class="card">
-        <h1 class="title">لغز ٥</h1>
-        <p class="sub">كوّني كلمة من الحروف… (الكلمة: مرتبطة برمضان) 👿</p>
-
-        <div class="tiles" id="tiles"></div>
-        <div class="built" id="built">...</div>
-
-        <div class="row">
-          <button class="btn" id="btnWordBack" type="button">مسح آخر حرف</button>
-          <button class="btn" id="btnWordReset" type="button">إعادة</button>
-          <button class="btn" id="btnWordHint" type="button">تلميح</button>
-          <div class="hintline" id="wordMsg"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 8) New Puzzle D: Doors logic -->
-    <section class="scene" id="sc-doors">
-      <div class="card">
-        <h1 class="title">لغز ٦</h1>
-        <p class="sub">اختاري الباب الصح… بس خلي بالك: “جملة واحدة بس” من دول صح 👀</p>
-
-        <div class="doors">
-          <div class="door" data-door="1">
-            <div class="dicon">🚪</div>
-            <div>الباب الصح <b>ليس هذا</b>.</div>
+        <div class="topbar">
+          <div class="brand">
+            <h1>Ramadan Hub</h1>
+            <p>اختر القسم اللي عايزه — كله شغال على الموبايل Fullscreen ✨</p>
           </div>
-          <div class="door" data-door="2">
-            <div class="dicon">🚪</div>
-            <div>الباب الصح <b>هو هذا</b>.</div>
+          <span class="chip">الشاشة الرئيسية</span>
+        </div>
+
+        <div class="home-grid">
+          <div class="tile" data-go="p-puzzles">
+            <div class="t-head">
+              <h2>الالغاز</h2>
+              <div class="icon">🧩</div>
+            </div>
+            <p>مجموعة ألغاز متنوعة (بدون كروت ولا كلام بعده).</p>
           </div>
-          <div class="door" data-door="3">
-            <div class="dicon">🚪</div>
-            <div>الباب الصح <b>ليس الثاني</b>.</div>
+
+          <div class="tile" data-go="p-mind">
+            <div class="t-head">
+              <h2>العاب العقل</h2>
+              <div class="icon">🧠</div>
+            </div>
+            <p>مطابقة 4×4 + XO ضد كمبيوتر.</p>
+          </div>
+
+          <div class="tile" data-go="p-messages">
+            <div class="t-head">
+              <h2>خانة الرسائل ( للاستخدام الضروري فقط )</h2>
+              <div class="icon">✉️</div>
+            </div>
+            <p>اكتبي رسالة وإرسليها.</p>
+          </div>
+
+          <div class="tile" data-go="p-info">
+            <div class="t-head">
+              <h2>المعلومات العامه</h2>
+              <div class="icon">ℹ️</div>
+            </div>
+            <p>قريباً…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PUZZLES -->
+    <section class="panel" id="p-puzzles">
+      <div class="card">
+        <div class="topbar">
+          <button class="btn ghost" data-back>رجوع</button>
+          <span class="chip">الشاشة الرئيسية</span>
+        </div>
+
+        <h2 class="section-title">الالغاز</h2>
+        <p class="muted">كل لغز هنا مستقل. مفيش كروت تهنئة بعدها — زي ما طلبت.</p>
+
+        <!-- Puzzle 1 -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لغز 1 — كلمة السر</h3>
+          <p class="muted">اكتبي كلمة من: النوم / نوم / بنام</p>
+
+          <div class="row">
+            <input class="field" id="pz1" placeholder="اكتبي الإجابة..." autocomplete="off" />
+            <button class="btn" id="pz1Btn" type="button">تحقّق</button>
+            <div class="msgline" id="pz1Msg"></div>
           </div>
         </div>
 
-        <div class="row">
-          <button class="btn" id="btnDoorsHint" type="button">تلميح</button>
-          <div class="hintline" id="doorsMsg"></div>
+        <!-- Puzzle 2 -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لغز 2 — اسم بنت بالإيموجي</h3>
+          <div class="muted">💡 ✨ 🌙</div>
+
+          <div class="row">
+            <input class="field" id="pz2" placeholder="اسم البنت..." autocomplete="off" />
+            <button class="btn" id="pz2Btn" type="button">تحقّق</button>
+            <button class="btn ghost" id="pz2Hint" type="button">تلميح</button>
+            <div class="msgline" id="pz2Msg"></div>
+          </div>
+        </div>
+
+        <!-- Puzzle 3 -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لغز 3 — ترتيب الرموز</h3>
+          <p class="muted">اضغطي بالترتيب: 🌙 ثم ⭐ ثم 🕌</p>
+
+          <div class="row">
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+              <button class="btn ghost" data-seq="moon" type="button">🌙</button>
+              <button class="btn ghost" data-seq="star" type="button">⭐</button>
+              <button class="btn ghost" data-seq="mosque" type="button">🕌</button>
+            </div>
+            <button class="btn ghost" id="pz3Hint" type="button">تلميح</button>
+            <div class="msgline" id="pz3Msg"></div>
+          </div>
+        </div>
+
+        <!-- Puzzle 4 -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لغز 4 — أبواب المنطق</h3>
+          <p class="muted">اختاري الباب الصح (شرط: جملة واحدة فقط تكون صح).</p>
+
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:10px;">
+            <button class="btn ghost" data-door="1" type="button">🚪<br><small>الباب الصح ليس هذا</small></button>
+            <button class="btn ghost" data-door="2" type="button">🚪<br><small>الباب الصح هو هذا</small></button>
+            <button class="btn ghost" data-door="3" type="button">🚪<br><small>الباب الصح ليس الثاني</small></button>
+          </div>
+
+          <div class="row">
+            <button class="btn ghost" id="pz4Hint" type="button">تلميح</button>
+            <div class="msgline" id="pz4Msg"></div>
+          </div>
+        </div>
+
+        <!-- Puzzle 5 -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لغز 5 — كوّن كلمة</h3>
+          <p class="muted">كوّن كلمة: <b>الرحمة</b> (اختاري حروفها بالترتيب الصح)</p>
+
+          <div class="row">
+            <div id="tiles" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
+            <div id="built" style="text-align:center; font-weight:1000; font-size:18px; padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.22);">...</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <button class="btn ghost" id="pz5Back" type="button">مسح آخر حرف</button>
+              <button class="btn ghost" id="pz5Reset" type="button">إعادة</button>
+            </div>
+            <button class="btn ghost" id="pz5Hint" type="button">تلميح</button>
+            <div class="msgline" id="pz5Msg"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MIND GAMES -->
+    <section class="panel" id="p-mind">
+      <div class="card">
+        <div class="topbar">
+          <button class="btn ghost" data-back>رجوع</button>
+          <span class="chip">الشاشة الرئيسية</span>
+        </div>
+
+        <h2 class="section-title">العاب العقل</h2>
+        <p class="muted">اختار اللعبة اللي تحبها.</p>
+
+        <!-- Memory -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>لعبة المطابقة 4×4</h3>
+          <p class="muted">الإيموجيز بتتوزع عشوائي كل مرة.</p>
+
+          <div class="row">
+            <button class="btn" id="memStart" type="button">ابدأ / إعادة</button>
+            <div class="grid16" id="memoryGrid"></div>
+            <div class="msgline" id="memStatus">تم: 0 / 8</div>
+          </div>
+        </div>
+
+        <!-- XO -->
+        <div class="puzzle-box" style="margin-top:12px">
+          <h3>XO ضد كمبيوتر</h3>
+          <p class="muted">إنت: ❌ — الكمبيوتر: ⭕</p>
+
+          <div class="xo-board" id="xoBoard"></div>
+          <div class="msgline" id="xoStatus">دورك.</div>
+
+          <div class="row">
+            <button class="btn" id="xoRestart" type="button">إعادة</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 9) XO -->
-    <section class="scene" id="sc-xo">
+    <!-- MESSAGES -->
+    <section class="panel" id="p-messages">
       <div class="card">
-        <h1 class="title">لغز ٧</h1>
-        <p class="sub">XO ضد كمبيوتر صعب بدرجة بسيطة. إنتِ: ❌ — الكمبيوتر: ⭕</p>
-
-        <div class="xo-board" id="xoBoard"></div>
-        <div class="hintline" id="xoStatus">دورك.</div>
-
-        <div class="row">
-          <button class="btn" id="xoRestart" type="button">إعادة</button>
+        <div class="topbar">
+          <button class="btn ghost" data-back>رجوع</button>
+          <span class="chip">الشاشة الرئيسية</span>
         </div>
-      </div>
-    </section>
 
-    <!-- 10) Message -->
-    <section class="scene" id="sc-message">
-      <div class="card">
-        <h1 class="title">رسالتك ✍️</h1>
-        <p class="sub">كل اللي هتكتبينه هنا هيوصلني. اكتبي أي حاجة…</p>
+        <h2 class="section-title">خانة الرسائل ( للاستخدام الضروري فقط )</h2>
+        <p class="muted">اكتبي رسالة واضغطي إرسال — هتوصل على البريد المرتبط بـ Formspree.</p>
 
         <form class="row" id="msgForm" action="https://formspree.io/f/mykdkqza" method="POST">
           <textarea class="field" name="message" id="msgText" placeholder="اكتبي رسالتك هنا..." required></textarea>
           <input type="hidden" name="page" id="msgPage" />
-          <input type="hidden" name="_subject" value="رسالة من رحلة الألغاز" />
+          <input type="hidden" name="_subject" value="رسالة من Ramadan Hub v2" />
           <input type="text" name="_gotcha" style="display:none" />
           <button class="btn pink" id="msgSend" type="submit">إرسال</button>
-          <div class="hintline" id="msgHint"></div>
+          <div class="msgline" id="msgHint"></div>
         </form>
       </div>
     </section>
 
-    <!-- 11) Black emoji puzzle -->
-    <section class="scene" id="sc-emoji">
+    <!-- INFO -->
+    <section class="panel" id="p-info">
       <div class="card">
-        <h1 class="title">لغز ٨</h1>
-        <p class="sub">شاشة سودة… 3 مربعات… اختاري الصح.</p>
-
-        <div class="emoji-boxes">
-          <div class="ebox" data-ans="no"><span>📌</span></div>
-          <div class="ebox" data-ans="no"><span>🧸</span></div>
-          <div class="ebox" data-ans="yes"><span>💡</span></div>
+        <div class="topbar">
+          <button class="btn ghost" data-back>رجوع</button>
+          <span class="chip">الشاشة الرئيسية</span>
         </div>
 
-        <div class="row">
-          <div class="hintline" id="emojiMsg"></div>
-        </div>
+        <h2 class="section-title">المعلومات العامه</h2>
+        <p class="muted">قريباً...</p>
       </div>
     </section>
 
-    <!-- 12) Final -->
-    <section class="scene" id="sc-final">
-      <div class="card">
-        <h1 class="title">آخر لغز 😈</h1>
-        <p class="sub">اضغطي الرموز بالترتيب الصح عشان يفتح.</p>
+  </div>
 
-        <div class="seq">
-          <div class="seqbtn" data-k="moon">🌙</div>
-          <div class="seqbtn" data-k="star">⭐</div>
-          <div class="seqbtn" data-k="mosque">🕌</div>
-        </div>
-
-        <div class="row">
-          <button class="btn" id="btnHint" type="button">تلميح</button>
-          <div class="hintline" id="finalHint"></div>
-          <div class="hintline bad" id="finalErr"></div>
-          <button class="btn pink" id="btnFinish" type="button" style="display:none">استمرار</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 13) End -->
-    <section class="scene" id="sc-end">
-      <div class="card">
-        <h1 class="title">خلصت 🎊</h1>
-        <p class="sub">انتي كده كسرتي الأقفال كلها… رمضان كريم ✨</p>
-        <button class="btn" id="btnRestartAll" type="button">إعادة من الأول</button>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="footer">صُنع بواسطة : بني ادم براس فرخه .</footer>
+  <footer class="footer">صُنع بواسطة : بني ادم براس فرخه v2 .</footer>
 
   <script>
     /***********************
@@ -644,55 +576,6 @@
       document.body.classList.add("flash-red");
       setTimeout(()=>document.body.classList.remove("flash-red"), 700);
     }
-
-    /***********************
-     * Background emojis
-     ***********************/
-    const emojiSky = document.getElementById("emojiSky");
-    const RAMADAN_EMOJIS = ["🌙","☪️","✨","🕌","⭐","🎇","💛","🌟","🥮","🕯️","📿"];
-    const EMOJI_COUNT = Math.min(26, Math.max(18, Math.floor(window.innerWidth/48)));
-    for(let i=0;i<EMOJI_COUNT;i++){
-      const el = document.createElement("span");
-      el.className = "e";
-      el.textContent = pick(RAMADAN_EMOJIS);
-      el.style.left = rand(2,98) + "vw";
-      el.style.setProperty("--r", rand(-35,35) + "deg");
-      el.style.setProperty("--dx1", rand(-18,18).toFixed(1) + "px");
-      el.style.animationDuration = rand(9.5, 16.5).toFixed(2) + "s";
-      el.style.animationDelay = rand(-12, 0).toFixed(2) + "s";
-      emojiSky.appendChild(el);
-    }
-
-    /***********************
-     * Scene navigation + Ramadan note
-     ***********************/
-    const scenes = [...document.querySelectorAll(".scene")];
-    function go(id){
-      scenes.forEach(s => s.classList.toggle("active", s.id === id));
-      window.scrollTo(0,0);
-      document.body.classList.toggle("darkmode", id === "sc-emoji");
-    }
-
-    document.querySelectorAll(".glass-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=> go(btn.dataset.next));
-    });
-
-    const noteText = document.getElementById("noteText");
-    const noteBtn  = document.getElementById("noteBtn");
-    let noteNext = "sc-end";
-    function showNote(text, nextId){
-      noteText.innerHTML = text;
-      noteNext = nextId;
-      go("sc-note");
-    }
-    noteBtn.addEventListener("click", ()=> go(noteNext));
-
-    /***********************
-     * Puzzle 1 (password)
-     ***********************/
-    const pass1 = document.getElementById("pass1");
-    const err1 = document.getElementById("err1");
-
     function normalizeArabic(s){
       return (s||"").toLowerCase().trim()
         .replace(/\s+/g,"")
@@ -703,37 +586,204 @@
         .replace(/ة/g,"ه")
         .replace(/[ـًٌٍَُِّْ]/g,"");
     }
-    const ACCEPT1 = ["النوم","نوم","بنام"].map(normalizeArabic);
 
-    function checkPass1(){
-      err1.textContent = "";
-      const v = normalizeArabic(pass1.value);
-      if(ACCEPT1.includes(v)){
-        showNote(
-          `".. ونحن نستقبل شهر الخير، أردت أن أبدأه بكلمة <b>شكراً</b>.<br>
-          شكراً لصدقكِ وللطاقة الحلوة اللي بتسيبيها في أي مكان.<br><br>
-          <b>رمضان مبارك</b> عليكِ وعلى أهلكِ.. وكل سنة وإنتِ طيبة 💛"`,
-          "sc-mem-intro"
-        );
-      }else{
-        flashRed();
-        err1.textContent = "غلط… جرّبي تاني (محاولات لا نهائية) 😈";
-        err1.className = "hintline bad";
-        pass1.focus();
-        pass1.select?.();
-      }
+    /***********************
+     * background emojis
+     ***********************/
+    const emojiSky = document.getElementById("emojiSky");
+    const RAMADAN_EMOJIS = ["🌙","☪️","✨","🕌","⭐","🎇","💛","🌟","🥮","🕯️","📿"];
+    const EMOJI_COUNT = Math.min(28, Math.max(18, Math.floor(window.innerWidth/44)));
+    for(let i=0;i<EMOJI_COUNT;i++){
+      const el = document.createElement("span");
+      el.className = "e";
+      el.textContent = pick(RAMADAN_EMOJIS);
+      el.style.left = rand(2,98) + "vw";
+      el.style.setProperty("--r", rand(-35,35) + "deg");
+      el.style.setProperty("--dx", rand(-18,18).toFixed(1) + "px");
+      el.style.animationDuration = rand(9.5, 16.5).toFixed(2) + "s";
+      el.style.animationDelay = rand(-12, 0).toFixed(2) + "s";
+      emojiSky.appendChild(el);
     }
-    document.getElementById("btnPass1").addEventListener("click", checkPass1);
-    pass1.addEventListener("keydown",(e)=>{
-      if(e.key==="Enter"){ e.preventDefault(); checkPass1(); }
+
+    /***********************
+     * navigation
+     ***********************/
+    const panels = [...document.querySelectorAll(".panel")];
+    function go(id){
+      panels.forEach(p => p.classList.toggle("active", p.id === id));
+      window.scrollTo(0,0);
+    }
+    document.querySelectorAll("[data-go]").forEach(el=>{
+      el.addEventListener("click", ()=> go(el.dataset.go));
+    });
+    document.querySelectorAll("[data-back]").forEach(el=>{
+      el.addEventListener("click", ()=> go("p-home"));
     });
 
     /***********************
-     * Memory game (random emojis)
+     * PUZZLES
      ***********************/
+    // PZ1
+    const pz1 = document.getElementById("pz1");
+    const pz1Msg = document.getElementById("pz1Msg");
+    const ACCEPT1 = ["النوم","نوم","بنام"].map(normalizeArabic);
+    document.getElementById("pz1Btn").addEventListener("click", ()=>{
+      const v = normalizeArabic(pz1.value);
+      if(ACCEPT1.includes(v)){
+        pz1Msg.textContent = "صح ✅";
+        pz1Msg.className = "msgline ok";
+      }else{
+        flashRed();
+        pz1Msg.textContent = "غلط… جرّبي تاني 😈";
+        pz1Msg.className = "msgline bad";
+      }
+    });
+
+    // PZ2 (نور)
+    const pz2 = document.getElementById("pz2");
+    const pz2Msg = document.getElementById("pz2Msg");
+    const ENAME_ACCEPT = ["نور","نورا","نوره"].map(normalizeArabic);
+    document.getElementById("pz2Btn").addEventListener("click", ()=>{
+      const v = normalizeArabic(pz2.value);
+      if(ENAME_ACCEPT.includes(v)){
+        pz2Msg.textContent = "صح ✅ (نور)";
+        pz2Msg.className = "msgline ok";
+      }else{
+        flashRed();
+        pz2Msg.textContent = "مش هي… ركزي في معنى الإيموجيز 👀";
+        pz2Msg.className = "msgline bad";
+      }
+    });
+    document.getElementById("pz2Hint").addEventListener("click", ()=>{
+      pz2Msg.textContent = "تلميح: معنى الاسم = الضوء.";
+      pz2Msg.className = "msgline";
+    });
+
+    // PZ3 sequence
+    const pz3Msg = document.getElementById("pz3Msg");
+    const seqTarget = ["moon","star","mosque"];
+    let seq = [];
+    document.querySelectorAll("[data-seq]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const k = b.dataset.seq;
+        seq.push(k);
+
+        for(let i=0;i<seq.length;i++){
+          if(seq[i] !== seqTarget[i]){
+            flashRed();
+            pz3Msg.textContent = "غلط… من الأول 😈";
+            pz3Msg.className = "msgline bad";
+            seq = [];
+            return;
+          }
+        }
+        if(seq.length === seqTarget.length){
+          pz3Msg.textContent = "اتفتح ✅";
+          pz3Msg.className = "msgline ok";
+          seq = [];
+        }else{
+          pz3Msg.textContent = `تمام… كملي (${seq.length}/3)`;
+          pz3Msg.className = "msgline";
+        }
+      });
+    });
+    document.getElementById("pz3Hint").addEventListener("click", ()=>{
+      pz3Msg.textContent = "تلميح: ابدئي بالليل… بعده اللمعة… آخر حاجة مكان الصلاة.";
+      pz3Msg.className = "msgline";
+    });
+
+    // PZ4 doors (correct = 1)
+    const pz4Msg = document.getElementById("pz4Msg");
+    const CORRECT_DOOR = 1;
+    document.querySelectorAll("[data-door]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const n = Number(b.dataset.door);
+        if(n === CORRECT_DOOR){
+          pz4Msg.textContent = "صح ✅ (الباب الأول)";
+          pz4Msg.className = "msgline ok";
+        }else{
+          flashRed();
+          pz4Msg.textContent = "غلط… فكري في شرط (جملة واحدة بس صح).";
+          pz4Msg.className = "msgline bad";
+        }
+      });
+    });
+    document.getElementById("pz4Hint").addEventListener("click", ()=>{
+      pz4Msg.textContent = "تلميح: افترضي كل باب إنه الصح وشوفي كام جملة هتبقى صح.";
+      pz4Msg.className = "msgline";
+    });
+
+    // PZ5 word build (الرحمة)
+    const tilesEl = document.getElementById("tiles");
+    const builtEl = document.getElementById("built");
+    const pz5Msg = document.getElementById("pz5Msg");
+    const TARGET_WORD = "الرحمة";
+    let built = "";
+    let tiles = [];
+
+    function setupWord(){
+      built = "";
+      builtEl.textContent = "...";
+      pz5Msg.textContent = "";
+      pz5Msg.className = "msgline";
+
+      tiles = shuffle(TARGET_WORD.split(""));
+      renderTiles();
+    }
+    function renderTiles(){
+      tilesEl.innerHTML = "";
+      tiles.forEach((ch, idx)=>{
+        const t = document.createElement("button");
+        t.type = "button";
+        t.className = "btn ghost";
+        t.style.borderRadius = "16px";
+        t.style.padding = "12px 0";
+        t.style.minWidth = "64px";
+        t.textContent = ch;
+        t.addEventListener("click", ()=>{
+          built += ch;
+          tiles.splice(idx,1);
+          builtEl.textContent = built || "...";
+          renderTiles();
+          checkWord();
+        });
+        tilesEl.appendChild(t);
+      });
+    }
+    function checkWord(){
+      if(built.length === TARGET_WORD.length){
+        if(built === TARGET_WORD){
+          pz5Msg.textContent = "صح ✅ (الرحمة)";
+          pz5Msg.className = "msgline ok";
+        }else{
+          flashRed();
+          pz5Msg.textContent = "غلط… جرّبي إعادة 😈";
+          pz5Msg.className = "msgline bad";
+        }
+      }
+    }
+    document.getElementById("pz5Back").addEventListener("click", ()=>{
+      if(!built.length) return;
+      const last = built[built.length-1];
+      built = built.slice(0,-1);
+      tiles.push(last);
+      builtEl.textContent = built || "...";
+      renderTiles();
+    });
+    document.getElementById("pz5Reset").addEventListener("click", setupWord);
+    document.getElementById("pz5Hint").addEventListener("click", ()=>{
+      pz5Msg.textContent = "تلميح: كلمة مرتبطة برمضان معناها (اللطف والمغفرة).";
+      pz5Msg.className = "msgline";
+    });
+    setupWord();
+
+    /***********************
+     * MIND GAMES
+     ***********************/
+    // Memory
     const memoryGrid = document.getElementById("memoryGrid");
     const memStatus = document.getElementById("memStatus");
-    const btnMemContinue = document.getElementById("btnMemContinue");
+    const memStart = document.getElementById("memStart");
 
     const MEM_POOL = [
       "😂","🤣","😭","🥲","😈","🙈","😎","🤝",
@@ -741,32 +791,25 @@
       "🐔","🍌","🐪","💡","📌","🧸","🎇","📿",
       "😡","😱","🤍","💀","👀","🤡","🥳","🧠"
     ];
-
     function pickUnique(pool, n){
       const copy = pool.slice();
       shuffle(copy);
       return copy.slice(0, n);
     }
-
-    let memFirst = null, memLock = false, memMatched = 0;
+    let memFirst=null, memLock=false, memMatched=0;
 
     function buildMemory(){
       memoryGrid.innerHTML = "";
-      memFirst = null;
-      memLock = false;
-      memMatched = 0;
-      btnMemContinue.style.display = "none";
-      memStatus.textContent = `تم: 0 / 8`;
-
+      memFirst=null; memLock=false; memMatched=0;
+      memStatus.textContent = "تم: 0 / 8";
       const chosen = pickUnique(MEM_POOL, 8);
       const deck = shuffle([...chosen, ...chosen]);
 
-      deck.forEach((emo)=>{
+      deck.forEach(emo=>{
         const c = document.createElement("div");
         c.className = "mcard";
         c.dataset.emo = emo;
         c.innerHTML = `<div class="mfront">❔</div><div class="mback">${emo}</div>`;
-
         c.addEventListener("click", ()=>{
           if(memLock) return;
           if(c.classList.contains("matched")) return;
@@ -775,7 +818,6 @@
           c.classList.add("revealed");
 
           if(!memFirst){ memFirst = c; return; }
-
           const a = memFirst, b = c;
           memFirst = null;
 
@@ -784,9 +826,6 @@
             b.classList.add("matched");
             memMatched++;
             memStatus.textContent = `تم: ${memMatched} / 8`;
-            if(memMatched === 8){
-              btnMemContinue.style.display = "block";
-            }
           }else{
             memLock = true;
             setTimeout(()=>{
@@ -796,246 +835,12 @@
             }, 520);
           }
         });
-
         memoryGrid.appendChild(c);
       });
     }
+    memStart.addEventListener("click", buildMemory);
 
-    document.getElementById("btnStartMemory").addEventListener("click", ()=>{
-      buildMemory();
-      go("sc-memory");
-    });
-
-    // ✅ هنا الحل: بعد ما يدوس "استمرار" يظهر الكارت (note) وبعدين يكمل
-    btnMemContinue.addEventListener("click", ()=>{
-      showNote(
-        `اسِيل .. اسم أسيل يحمل مكانة خاصة لأنه ورد في وصف النبي ﷺ بأنه كان "أسيل الخد اسم أسيل يحمل مكانة خاصة لأنه ورد في وصف النبي محمد صلى الله عليه وسلم. فقد وُصف بأنه كان "أسيل الخد"، أي أن خديه كانا ناعمين ومستويين (غير ممتلئين بلحم كثير وليسا بارزي الوجنتين بشكل حاد)، مما يضفي على الاسم طابعاً جمالياً ومحبباً.
-✨ صفات حاملة اسم أسيل (حسب علم النفس)
-غالباً ما تتسم صاحبة هذا الاسم بعدة صفات، منها:
-1. الرقة والأنوثة: يعكس الاسم طبيعة هادئة وناعمة.
-2. قوة الشخصية: رغم رقتها، غالباً ما تكون واثقة من نفسها وتتحمل المسؤولية.
-3. الذكاء والتميز: تميل للتفكير العميق واتخاذ قرارات صائبة.
-4. حب الهدوء: تبتعد عادة عن الضوضاء والمشاكل وتفضل الأجواء المستقرة".<br><br>
-         وفي رمضان… كل كلمة حلوة بتفرق… فـ شكراً على اللطف، وعلى الهدوء، وعلى إن وجودك بيطمن 💛`,
-        "sc-ename"
-      );
-    });
-
-    /***********************
-     * Puzzle 3: Emoji girl name
-     ***********************/
-    const enameInput = document.getElementById("enameInput");
-    const enameMsg = document.getElementById("enameMsg");
-
-    const ENAME_ACCEPT = ["نور","نورا","نوره"].map(normalizeArabic);
-
-    function checkEname(){
-      enameMsg.textContent = "";
-      const v = normalizeArabic(enameInput.value);
-      if(ENAME_ACCEPT.includes(v)){
-        showNote(
-          `👏👏 شاطرة!<br>
-           الاسم هو "نور"… لأن رمضان كله <b>نور</b> وطمأنينة ✨🌙<br><br>
-           شكراً إنك كمّلتي… إنتِ ذوق.`,
-          "sc-simon"
-        );
-      }else{
-        flashRed();
-        enameMsg.textContent = "مش هي… ركزي في معنى الإيموجيز 😈";
-        enameMsg.className = "hintline bad";
-      }
-    }
-    document.getElementById("btnEnameCheck").addEventListener("click", checkEname);
-    enameInput.addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); checkEname(); }});
-    document.getElementById("btnEnameHint").addEventListener("click", ()=>{
-      enameMsg.textContent = "تلميح: معنى الاسم = الضوء.";
-      enameMsg.className = "hintline";
-    });
-
-    /***********************
-     * Puzzle 4: Simon
-     ***********************/
-    const pads = [...document.querySelectorAll(".pad")];
-    const simonMsg = document.getElementById("simonMsg");
-    const btnSimonStart = document.getElementById("btnSimonStart");
-    const btnSimonReplay = document.getElementById("btnSimonReplay");
-
-    let simonSeq = [];
-    let simonPos = 0;
-    let simonPlaying = false;
-    let simonReady = false;
-
-    function flashPad(i){
-      return new Promise(res=>{
-        pads[i].classList.add("on");
-        setTimeout(()=>{
-          pads[i].classList.remove("on");
-          setTimeout(res, 130);
-        }, 320);
-      });
-    }
-
-    async function playSeq(){
-      simonPlaying = true;
-      simonReady = false;
-      simonMsg.textContent = "شاهدي الترتيب…";
-      for(const i of simonSeq){
-        await flashPad(i);
-      }
-      simonPlaying = false;
-      simonReady = true;
-      simonPos = 0;
-      simonMsg.textContent = "دورك… كرري الترتيب.";
-      btnSimonReplay.style.display = "block";
-    }
-
-    function startSimon(){
-      simonSeq = Array.from({length:6}, ()=> Math.floor(Math.random()*4)); // صعب
-      playSeq();
-    }
-
-    btnSimonStart.addEventListener("click", ()=>{
-      if(simonPlaying) return;
-      startSimon();
-    });
-    btnSimonReplay.addEventListener("click", ()=>{
-      if(simonPlaying || !simonSeq.length) return;
-      playSeq();
-    });
-
-    pads.forEach(p=>{
-      p.addEventListener("click", async ()=>{
-        if(!simonReady || simonPlaying) return;
-        const i = Number(p.dataset.i);
-
-        // feedback صغير
-        p.classList.add("on");
-        setTimeout(()=>p.classList.remove("on"), 160);
-
-        if(i === simonSeq[simonPos]){
-          simonPos++;
-          if(simonPos === simonSeq.length){
-            simonReady = false;
-            showNote(
-              `🔥 جامدة! الذاكرة عندك فول أوبشن.<br><br>
-               في رمضان… اللطف بيبان في التفاصيل… شكراً على إنك مركّزة ومكملة 💛`,
-              "sc-word"
-            );
-          }
-        }else{
-          flashRed();
-          simonMsg.textContent = "غلط… من الأول 😈 اضغطي (إعادة عرض).";
-          simonMsg.className = "hintline bad";
-          simonReady = true;
-          simonPos = 0;
-        }
-      });
-    });
-
-    /***********************
-     * Puzzle 5: Word build (target: الرحمة)
-     ***********************/
-    const tilesEl = document.getElementById("tiles");
-    const builtEl = document.getElementById("built");
-    const wordMsg = document.getElementById("wordMsg");
-
-    const TARGET_WORD = "الرحمة";
-    let availableTiles = [];
-    let built = "";
-
-    function setupWord(){
-      built = "";
-      builtEl.textContent = "...";
-      wordMsg.textContent = "";
-      wordMsg.className = "hintline";
-
-      availableTiles = shuffle(TARGET_WORD.split(""));
-      renderTiles();
-    }
-
-    function renderTiles(){
-      tilesEl.innerHTML = "";
-      availableTiles.forEach((ch, idx)=>{
-        const t = document.createElement("div");
-        t.className = "tile";
-        t.textContent = ch;
-        t.addEventListener("click", ()=>{
-          built += ch;
-          availableTiles.splice(idx,1);
-          builtEl.textContent = built || "...";
-          renderTiles();
-          checkWord();
-        });
-        tilesEl.appendChild(t);
-      });
-    }
-
-    function checkWord(){
-      if(built.length === TARGET_WORD.length){
-        if(built === TARGET_WORD){
-          showNote(
-            `✅ صح! "<b>الرحمة</b>"… ودي أكتر حاجة بنحسها في رمضان.<br><br>
-             شكرًا على إنك بتكملي… وجودك مُريح 💛`,
-            "sc-doors"
-          );
-        }else{
-          flashRed();
-          wordMsg.textContent = "الترتيب غلط… جرّبي تاني 😈";
-          wordMsg.className = "hintline bad";
-        }
-      }
-    }
-
-    document.getElementById("btnWordBack").addEventListener("click", ()=>{
-      if(!built.length) return;
-      const last = built[built.length-1];
-      built = built.slice(0,-1);
-      availableTiles.push(last);
-      builtEl.textContent = built || "...";
-      renderTiles();
-    });
-    document.getElementById("btnWordReset").addEventListener("click", setupWord);
-    document.getElementById("btnWordHint").addEventListener("click", ()=>{
-      wordMsg.textContent = "تلميح: كلمة معناها (التعامل بلطف + مغفرة + طيبة).";
-      wordMsg.className = "hintline";
-    });
-
-    // initialize word puzzle once scene opens (we’ll call setupWord before going)
-    // We'll call it right before entering sc-word via note (already does), but safe:
-    setupWord();
-
-    /***********************
-     * Puzzle 6: Doors logic
-     ***********************/
-    const doorsMsg = document.getElementById("doorsMsg");
-    const CORRECT_DOOR = 1; // حسب منطق "جملة واحدة فقط صح"
-
-    document.querySelectorAll(".door").forEach(d=>{
-      d.addEventListener("click", ()=>{
-        doorsMsg.textContent = "";
-        const n = Number(d.dataset.door);
-        if(n === CORRECT_DOOR){
-          showNote(
-            `🚪✅ صح! (الباب الأول هو الحل).<br><br>
-             رمضان كريم… وشكراً إنك ذكية كفاية تكسري اللغز ده 😈💛`,
-            "sc-xo"
-          );
-        }else{
-          flashRed();
-          doorsMsg.textContent = "غلط… فكري في شرط (جملة واحدة بس صح) 👀";
-          doorsMsg.className = "hintline bad";
-        }
-      });
-    });
-
-    document.getElementById("btnDoorsHint").addEventListener("click", ()=>{
-      doorsMsg.textContent = "تلميح: جرّبي تفترضي الباب الصح… وشوفي كام جملة هتبقى صح.";
-      doorsMsg.className = "hintline";
-    });
-
-    /***********************
-     * XO game (win -> note -> message form)
-     ***********************/
+    // XO
     const xoBoardEl = document.getElementById("xoBoard");
     const xoStatus = document.getElementById("xoStatus");
     const xoRestart = document.getElementById("xoRestart");
@@ -1055,7 +860,6 @@
       if(b.every(Boolean)) return "draw";
       return null;
     }
-
     function score(b){
       const w = winner(b);
       if(w==="⭕") return 10;
@@ -1115,7 +919,6 @@
         xoBoardEl.appendChild(cell);
       });
     }
-
     function afterMove(){
       renderXO();
       let w = winner(xo);
@@ -1131,34 +934,31 @@
         else xoStatus.textContent = "دورك.";
       }, 360);
     }
-
     function endXO(w){
       xoOver = true;
       if(w === "❌"){
-        showNote(
-          `🎉 فزتي! خلاص كده… رمضان كريم عليكِ 💛<br><br>
-           جاية المرحلة اللي تكتبي فيها اللي في قلبك…`,
-          "sc-message"
-        );
+        xoStatus.textContent = "فزت ✅";
+        xoStatus.className = "msgline ok";
       }else if(w === "⭕"){
-        xoStatus.textContent = "الكمبيوتر كسب… جرّبي تاني 😈";
+        xoStatus.textContent = "الكمبيوتر كسب 😈";
+        xoStatus.className = "msgline bad";
       }else{
-        xoStatus.textContent = "تعادل… عايزين فوز 😭";
+        xoStatus.textContent = "تعادل";
+        xoStatus.className = "msgline";
       }
     }
-
     function resetXO(){
       xo = Array(9).fill(null);
       xoOver = false;
       xoStatus.textContent = "دورك.";
+      xoStatus.className = "msgline";
       renderXO();
     }
-
     xoRestart.addEventListener("click", resetXO);
     resetXO();
 
     /***********************
-     * Formspree submit -> note -> black emoji
+     * MESSAGES (Formspree)
      ***********************/
     const msgForm = document.getElementById("msgForm");
     const msgText = document.getElementById("msgText");
@@ -1209,155 +1009,28 @@
         if(!res.ok){
           const m = data?.error || data?.message || "مرفوض";
           msgHint.textContent = `فشل الإرسال (${res.status}): ${m}`;
-          msgHint.className = "hintline bad";
+          msgHint.className = "msgline bad";
           flashRed();
           msgSend.disabled = false;
           return;
         }
 
-        msgSend.disabled = false;
         msgHint.textContent = "تم الإرسال ✅";
-        msgHint.className = "hintline ok";
-
-        showNote(
-          `وصلت ✅<br><br>
-           شكراً على الرسالة… وربنا يجعل رمضان دايمًا بداية خير وراحة ليكِ 💛`,
-          "sc-emoji"
-        );
+        msgHint.className = "msgline ok";
+        msgSend.disabled = false;
 
       }catch(err){
         msgHint.textContent = "فشل اتصال/حظر من إضافة. جرّبي Incognito.";
-        msgHint.className = "hintline bad";
+        msgHint.className = "msgline bad";
         flashRed();
         msgSend.disabled = false;
       }
     });
 
     /***********************
-     * Black emoji puzzle -> note -> final
+     * Start defaults
      ***********************/
-    const emojiMsg = document.getElementById("emojiMsg");
-    document.querySelectorAll(".ebox").forEach(box=>{
-      box.addEventListener("click", ()=>{
-        if(box.dataset.ans === "yes"){
-          emojiMsg.textContent = "صح ✅";
-          emojiMsg.className = "hintline ok";
-          showNote(
-            `آخر واحد… رمضان كريم 💛<br>
-             شكراً إنك وصلتي للآخر…`,
-            "sc-final"
-          );
-        }else{
-          flashRed();
-          emojiMsg.textContent = "غلط… جرّبي تاني 😈";
-          emojiMsg.className = "hintline bad";
-        }
-      });
-    });
-
-    /***********************
-     * Final sequence puzzle -> end
-     ***********************/
-    const seq = [];
-    const finalHint = document.getElementById("finalHint");
-    const finalErr = document.getElementById("finalErr");
-    const btnHint = document.getElementById("btnHint");
-    const btnFinish = document.getElementById("btnFinish");
-    const TARGET = ["moon","star","mosque"];
-
-    function resetSeq(){
-      seq.length = 0;
-      finalErr.textContent = "";
-      btnFinish.style.display = "none";
-    }
-
-    document.querySelectorAll(".seqbtn").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        finalErr.textContent = "";
-        seq.push(b.dataset.k);
-
-        for(let i=0;i<seq.length;i++){
-          if(seq[i] !== TARGET[i]){
-            finalErr.textContent = "الترتيب غلط… من الأول 😈";
-            flashRed();
-            resetSeq();
-            return;
-          }
-        }
-
-        if(seq.length === TARGET.length){
-          btnFinish.style.display = "block";
-          finalHint.textContent = "اتفتح ✅";
-          finalHint.className = "hintline ok";
-        }else{
-          finalHint.textContent = `تمام… كملي (${seq.length}/3)`;
-          finalHint.className = "hintline";
-        }
-      });
-    });
-
-    btnHint.addEventListener("click", ()=>{
-      finalHint.textContent = "ابدأي بالليل… بعده اللمعة… آخر حاجة مكان الصلاة.";
-      finalHint.className = "hintline";
-    });
-
-    btnFinish.addEventListener("click", ()=>{
-      showNote(
-        `🎊 خلصت الرحلة!<br><br>
-         رمضان كريم… وشكراً على الوقت الحلو 💛`,
-        "sc-end"
-      );
-    });
-
-    /***********************
-     * Restart
-     ***********************/
-    document.getElementById("btnRestartAll").addEventListener("click", ()=>{
-      pass1.value = "";
-      err1.textContent = "";
-
-      // memory
-      memFirst = null; memLock = false; memMatched = 0;
-      btnMemContinue.style.display = "none";
-      memStatus.textContent = "تم: 0 / 8";
-      memoryGrid.innerHTML = "";
-
-      // name
-      enameInput.value = "";
-      enameMsg.textContent = "";
-
-      // simon
-      simonSeq = [];
-      simonPos = 0;
-      simonPlaying = false;
-      simonReady = false;
-      simonMsg.textContent = "";
-      btnSimonReplay.style.display = "none";
-
-      // word
-      setupWord();
-
-      // xo
-      resetXO();
-
-      // msg
-      msgText.value = "";
-      msgHint.textContent = "";
-      msgSend.disabled = false;
-
-      // emoji
-      emojiMsg.textContent = "";
-
-      // final
-      finalHint.textContent = "";
-      finalErr.textContent = "";
-      resetSeq();
-
-      go("sc-who");
-    });
-
-    // start at who
-    go("sc-who");
+    // start memory empty until user presses start
   </script>
 </body>
 </html>
