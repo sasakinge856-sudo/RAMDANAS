@@ -2,1984 +2,1447 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0f1e" />
-  <title>Neon Hub v3</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>الموقع v2.4</title>
   <style>
-    /* =========================
-       THEME TOKENS (default)
-       ========================= */
+    /* ===== Reset / Fix "تزق يمين" ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%; margin:0; overflow-x:hidden}
+    img,svg,canvas{max-width:100%; display:block}
+    button,input,textarea{font:inherit}
     :root{
-      --bgA:#070a14; --bgB:#081a2e; --bgC:#2a0b2a;
-      --txt:#eef4ff; --mut:rgba(238,244,255,.72);
-      --glass1: rgba(255,255,255,.12);
-      --glass2: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.14);
-      --c1:#67f0ff; --c2:#b06cff; --c3:#ff5fd1; --c4:#ffd36f;
-      --ok:#7dffb3; --bad:#ff6b6b;
-      --shadow: 0 18px 70px rgba(0,0,0,.55);
-      --shadow2: 0 10px 40px rgba(0,0,0,.45);
-      --r: 26px;
-      --tileRadius: 24px;
-      --tilePad: 16px;
-      --fontScale: 1;
+      --bg0:#050814;
+      --bg1:#0a1233;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.14);
+      --txt:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --accentA:#ffd666;
+      --accentB:#22d3ee;
+      --accentC:#a855f7;
+      --danger:#ff3b5c;
+      --ok:#2cff9f;
+      --radius:22px;
+      --shadow:0 30px 80px rgba(0,0,0,.35);
+      --glow:0 0 30px rgba(255,214,102,.16), 0 0 90px rgba(34,211,238,.10);
+      --font: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
     }
 
-    /* =========================
-       THEMES (4)
-       ========================= */
-    body[data-theme="aura"]{
-      --bgA:#050710; --bgB:#09244a; --bgC:#0b0f1e;
-      --c1:#7af7ff; --c2:#6cfab4; --c3:#ff6ad5; --c4:#ffe27a;
-      --glass1: rgba(255,255,255,.10);
-      --glass2: rgba(255,255,255,.05);
-    }
-    body[data-theme="sunset"]{
-      --bgA:#12040a; --bgB:#2b0722; --bgC:#1d0e30;
-      --c1:#ff9a5a; --c2:#ff5fd1; --c3:#a67bff; --c4:#ffd36f;
-      --glass1: rgba(255,255,255,.11);
-      --glass2: rgba(255,255,255,.06);
-    }
-    body[data-theme="ice"]{
-      --bgA:#02060b; --bgB:#052035; --bgC:#041117;
-      --c1:#7bd3ff; --c2:#85ffd6; --c3:#7b9bff; --c4:#b8f7ff;
-      --glass1: rgba(255,255,255,.09);
-      --glass2: rgba(255,255,255,.04);
-      --stroke: rgba(255,255,255,.12);
-    }
-    /* Theme 4 changes layout + style */
-    body[data-theme="chaos"]{
-      --bgA:#07020a; --bgB:#18061f; --bgC:#040814;
-      --c1:#ff4df3; --c2:#5bffec; --c3:#ffe56f; --c4:#9d7bff;
-      --tileRadius: 28px;
-      --tilePad: 18px;
-      --fontScale: 1.03;
-    }
-
-    /* =========================
-       Base
-       ========================= */
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      font-family:var(--font);
       color:var(--txt);
-      overflow:hidden;
-      font-size: calc(16px * var(--fontScale));
-
       background:
-        radial-gradient(900px 650px at 15% 85%, color-mix(in oklab, var(--c1) 18%, transparent), transparent 60%),
-        radial-gradient(900px 650px at 85% 15%, color-mix(in oklab, var(--c2) 18%, transparent), transparent 60%),
-        radial-gradient(900px 650px at 55% 60%, color-mix(in oklab, var(--c3) 14%, transparent), transparent 60%),
-        linear-gradient(140deg, var(--bgA), var(--bgB), var(--bgC));
-    }
-
-    /* Fullscreen fix (no inner black gaps) */
-    .app{
-      position:fixed;
-      inset:0;
-      height: 100svh;
-      height: 100dvh;
-      display:flex;
-      justify-content:center;
-      align-items:stretch;
+        radial-gradient(1200px 700px at 12% 18%, rgba(255,214,102,.12), transparent 60%),
+        radial-gradient(900px 600px at 90% 30%, rgba(168,85,247,.13), transparent 60%),
+        radial-gradient(900px 600px at 45% 100%, rgba(34,211,238,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height: 100svh;
+      min-height: 100vh;
       padding:
-        calc(10px + env(safe-area-inset-top))
-        12px
-        calc(10px + env(safe-area-inset-bottom));
-      overscroll-behavior: none;
+        calc(12px + env(safe-area-inset-top))
+        calc(12px + env(safe-area-inset-right))
+        calc(12px + env(safe-area-inset-bottom))
+        calc(12px + env(safe-area-inset-left));
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
     }
 
-    /* Floating emojis */
-    .sky{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
-    .e{
+    /* ===== Background float emojis ===== */
+    .float-layer{
+      position:fixed; inset:0; pointer-events:none; overflow:hidden; opacity:.9;
+    }
+    .emoji{
       position:absolute;
-      font-size: clamp(16px, 3.8vw, 34px);
-      opacity:.95;
-      filter: drop-shadow(0 12px 20px rgba(0,0,0,.35));
-      animation: rise linear infinite;
-      will-change: transform, opacity;
+      font-size:clamp(18px, 3.8vw, 30px);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      animation: drift linear infinite;
+      transform: translate3d(0,0,0);
+      opacity:.85;
     }
-    @keyframes rise{
-      from{ transform: translate3d(var(--dx), 110svh, 0) rotate(var(--r)); opacity:0; }
-      15%{ opacity:.95; }
-      to{ transform: translate3d(var(--dx), -25svh, 0) rotate(calc(var(--r) + 140deg)); opacity:0; }
-    }
-    .vignette{
-      position:fixed; inset:0; pointer-events:none;
-      background: radial-gradient(circle at 50% 38%, transparent 34%, rgba(0,0,0,.62) 88%);
-      mix-blend-mode: multiply;
+    @keyframes drift{
+      from { transform: translate3d(var(--x), 110svh, 0) rotate(0deg); }
+      to   { transform: translate3d(var(--x), -20svh, 0) rotate(360deg); }
     }
 
-    /* Panels / Cards fill height */
-    .panel{
-      width: min(980px, 96vw);
-      height: 100%;
-      display:none;
-      animation: pop .32s ease both;
-    }
-    .panel.active{ display:block; }
-    @keyframes pop{
-      from{ opacity:0; transform: translate3d(0, 14px, 0) scale(.99); }
-      to{ opacity:1; transform: translate3d(0,0,0) scale(1); }
-    }
-
-    .card{
-      height: 100%;
+    /* ===== App shell ===== */
+    .app{
+      width:min(980px, 100%);
+      margin-inline:auto;
+      position:relative;
+      z-index:2;
       display:flex;
       flex-direction:column;
-      border-radius: var(--r);
-      border:1px solid var(--stroke);
-      background: linear-gradient(180deg, var(--glass1), var(--glass2));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      overflow:hidden;
-      position:relative;
+      gap:12px;
+      flex:1;
     }
 
-    .header{
+    header{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 14px 14px 10px;
-      flex: 0 0 auto;
+      padding:12px 14px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
     }
-
     .brand{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      min-width: 0;
+      display:flex; flex-direction:column; gap:2px;
     }
     .brand h1{
       margin:0;
-      font-size: clamp(18px, 4.8vw, 32px);
+      font-size:clamp(16px, 4vw, 20px);
       letter-spacing:.2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
     .brand p{
       margin:0;
-      color: var(--mut);
-      font-size: 13px;
-      line-height: 1.4;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.4;
     }
 
-    .chip{
-      display:inline-flex;
-      align-items:center;
+    .pill{
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.25);
+      padding:8px 10px;
+      border-radius:999px;
+      display:flex;
       gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      color: rgba(238,244,255,.82);
-      font-weight: 900;
-      font-size: 12px;
-      letter-spacing:.2px;
-      flex: 0 0 auto;
+      align-items:center;
+      color:rgba(255,255,255,.86);
+      font-size:12.5px;
       white-space:nowrap;
     }
 
-    /* content scroll INSIDE card */
-    .content{
-      padding: 10px 14px 14px;
-      flex: 1;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+    main{
+      flex:1;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow), var(--glow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 0; /* مهم عشان scroll يشتغل جوه */
     }
 
-    /* Buttons */
-    .btn{
-      border:none;
-      cursor:pointer;
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-weight: 1000;
-      color:#0b0710;
-      background: linear-gradient(135deg, var(--c4), color-mix(in oklab, var(--c4) 55%, transparent));
-      box-shadow: var(--shadow2);
-      transition: transform .12s ease, filter .12s ease;
-      -webkit-tap-highlight-color: transparent;
+    .page{
+      display:none;
+      padding:14px;
+      overflow:auto;
+      min-height:0;
     }
-    .btn:active{ transform: scale(.99); }
-    .btn.ghost{
-      color: var(--txt);
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: none;
-    }
-    .btn.pink{
-      color: white;
-      background: linear-gradient(135deg, var(--c3), color-mix(in oklab, var(--c3) 55%, transparent));
-      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c3) 28%, transparent));
-    }
-    .btn.cyan{
-      color:#061017;
-      background: linear-gradient(135deg, var(--c1), color-mix(in oklab, var(--c1) 55%, transparent));
-      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c1) 22%, transparent));
-    }
-    .btn.violet{
-      color:#0c0714;
-      background: linear-gradient(135deg, var(--c2), color-mix(in oklab, var(--c2) 55%, transparent));
-      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c2) 22%, transparent));
-    }
+    .page.active{ display:block; }
 
-    /* Home grid (theme 4 changes layout) */
-    .grid{
+    .grid4{
       display:grid;
-      gap:14px;
-      grid-template-columns: 1fr;
-      margin-top: 10px;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
     }
-    @media (min-width: 760px){
-      .grid{ grid-template-columns: 1fr 1fr; }
-    }
-    body[data-theme="chaos"] .grid{
-      grid-template-columns: 1fr;
-      gap: 12px;
+    @media (min-width:760px){
+      .grid4{ grid-template-columns: repeat(4, minmax(0,1fr)); }
     }
 
     .tile{
-      border-radius: var(--tileRadius);
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      box-shadow: var(--shadow2);
-      padding: var(--tilePad) 14px;
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(0,0,0,.20);
+      border-radius:18px;
+      padding:14px 12px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.25);
       cursor:pointer;
       position:relative;
       overflow:hidden;
-      transition: transform .12s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tile:active{ transform: scale(.99); }
-    .tile::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(280px 140px at 25% 25%, color-mix(in oklab, var(--c1) 22%, transparent), transparent 60%),
-        radial-gradient(280px 140px at 85% 70%, color-mix(in oklab, var(--c3) 18%, transparent), transparent 60%),
-        radial-gradient(280px 140px at 60% 40%, color-mix(in oklab, var(--c2) 16%, transparent), transparent 62%);
-      opacity:.9;
-      pointer-events:none;
-    }
-    .tile .row{
-      position:relative;
+      transition: transform .15s ease, filter .15s ease;
+      min-height: 92px;
       display:flex;
-      align-items:center;
+      flex-direction:column;
       justify-content:space-between;
-      gap: 10px;
-    }
-    .tile h2{
-      margin:0;
-      font-size: 18px;
-      font-weight: 1000;
-    }
-    .tile p{
-      position:relative;
-      margin:10px 0 0;
-      color: var(--mut);
-      font-size: 14px;
-      line-height:1.65;
-    }
-    .icon{
-      font-size: 24px;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
-    }
-
-    /* Pager */
-    .pager{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin: 10px 0 12px;
-      flex: 0 0 auto;
-    }
-    .page-title{
-      font-weight: 1000;
-      font-size: 14px;
-      color: rgba(238,244,255,.90);
-      text-align:center;
-      flex: 1 1 auto;
-      min-width: 0;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .nums{
-      display:flex;
       gap:8px;
-      overflow:auto;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-      scrollbar-width: none;
     }
-    .nums::-webkit-scrollbar{ display:none; }
-
-    .num{
-      flex: 0 0 auto;
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      color: var(--txt);
-      font-weight: 1000;
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, outline-color .12s ease;
+    .tile:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+    .tile .t{
+      font-weight:800;
+      font-size:15px;
     }
-    .num:active{ transform: scale(.99); }
-    .num.active{
-      outline: 2px solid color-mix(in oklab, var(--c1) 35%, transparent);
-      background: linear-gradient(180deg, color-mix(in oklab, var(--c1) 18%, transparent), rgba(0,0,0,.22));
+    .tile .d{
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.4;
+    }
+    .tile::after{
+      content:"";
+      position:absolute; inset:-60px -60px auto auto;
+      width:140px; height:140px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,214,102,.35), rgba(34,211,238,.10), transparent 65%);
+      transform: rotate(25deg);
+      opacity:.9;
     }
 
-    /* Typewriter box */
-    .box{
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      padding: 16px 14px;
-      box-shadow: 0 12px 44px rgba(0,0,0,.30);
-      margin-bottom: 12px;
-    }
-    .type{
-      margin:0;
-      font-size: clamp(16px, 4.2vw, 20px);
-      line-height: 1.85;
-      font-weight: 900;
-      white-space: pre-wrap;
-    }
-    .cursor{
-      display:inline-block;
-      width: 10px;
-      margin-right: 6px;
-      border-right: 2px solid rgba(238,244,255,.75);
-      animation: blink .9s step-end infinite;
-    }
-    @keyframes blink{ 50%{ opacity:0; } }
-
-    /* Quiz */
-    .q{
-      margin:0 0 10px;
-      font-size: 16px;
-      font-weight: 1000;
-      line-height: 1.65;
-    }
-    .opts{
-      display:grid;
-      gap:10px;
-    }
-    .opt{
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.20);
-      color: var(--txt);
-      padding: 12px 12px;
-      font-weight: 900;
-      text-align:right;
-      cursor:pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease;
-    }
-    .opt:active{ transform: scale(.99); }
-    .opt.correct{ outline: 2px solid color-mix(in oklab, var(--ok) 35%, transparent); background: color-mix(in oklab, var(--ok) 10%, rgba(0,0,0,.18)); }
-    .opt.wrong{ outline: 2px solid color-mix(in oklab, var(--bad) 35%, transparent); background: color-mix(in oklab, var(--bad) 10%, rgba(0,0,0,.18)); }
-
-    .msgline{ min-height: 18px; font-size: 13px; color: rgba(238,244,255,.78); margin-top:10px; }
-    .msgline.ok{ color: rgba(125,255,179,.92); }
-    .msgline.bad{ color: rgba(255,107,107,.92); }
-
-    body.flash-red{ animation: redFlash .65s ease-in-out; }
-    @keyframes redFlash{
-      55%{
-        background: radial-gradient(1200px 800px at 50% 40%, rgba(255,43,43,.24), transparent 55%),
-                   linear-gradient(160deg, #210000, #0e0000) !important;
-      }
-    }
-
-    /* Games menu buttons */
-    .game-grid{
-      display:grid;
-      gap:10px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 760px){
-      .game-grid{ grid-template-columns: 1fr 1fr; }
-    }
-
-    /* Canvas games */
-    .game-wrap{
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      padding: 12px;
-      box-shadow: 0 12px 44px rgba(0,0,0,.28);
-    }
-    canvas{
-      width:100%;
-      height:auto;
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
-      display:block;
-      touch-action: none;
-    }
-    .controls{
+    .btnRow{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:12px;
+    }
+    .btn{
+      border:0;
+      cursor:pointer;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:800;
+      color:#0b1020;
+      background: linear-gradient(90deg, var(--accentA), var(--accentB));
+      box-shadow: 0 14px 40px rgba(255, 214, 102,.18);
+      transition: transform .15s ease, filter .15s ease;
+      min-width:140px;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+    .btn:active{ transform: translateY(0px) scale(.98); }
+
+    .btnGhost{
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.16);
+      color:rgba(255,255,255,.88);
+      box-shadow:none;
+      min-width:auto;
+    }
+
+    .sectionTitle{
+      margin:0 0 10px;
+      font-size:clamp(18px, 4.5vw, 22px);
+      line-height:1.2;
+    }
+    .muted{ color:var(--muted); margin:0; line-height:1.6; font-size:13.5px; }
+
+    .card{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.20);
+      border-radius:18px;
+      padding:12px;
+      margin-top:12px;
+    }
+
+    /* ===== Bottom nav ===== */
+    nav{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+    .navBtn{
+      flex:1;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      color:rgba(255,255,255,.88);
+      border-radius:16px;
+      padding:10px 8px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12.5px;
+      transition: transform .15s ease, filter .15s ease;
+      text-align:center;
+      user-select:none;
+    }
+    .navBtn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .navBtn.active{
+      border-color: rgba(255,214,102,.5);
+      box-shadow: 0 0 0 4px rgba(255,214,102,.12);
+    }
+
+    /* ===== Quiz ===== */
+    .qBox{ display:grid; gap:10px; }
+    .qHead{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      font-size:12px;
+      color:rgba(255,255,255,.85);
+    }
+    .question{
+      font-weight:900;
+      font-size:15px;
+      line-height:1.5;
+    }
+    .choices{ display:grid; gap:8px; }
+    .choice{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .choice:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .choice.correct{ border-color: rgba(44,255,159,.55); box-shadow: 0 0 0 4px rgba(44,255,159,.10); }
+    .choice.wrong{ border-color: rgba(255,59,92,.55); box-shadow: 0 0 0 4px rgba(255,59,92,.10); }
+    .qFooter{ display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+
+    /* ===== Memory game ===== */
+    .memGrid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
       margin-top:10px;
     }
-    .kbd{
-      border-radius: 14px;
+    .memCard{
+      aspect-ratio: 1/1;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      padding: 10px 12px;
-      color: rgba(238,244,255,.85);
-      font-weight: 900;
-      font-size: 13px;
-      line-height: 1.5;
-      flex: 1 1 auto;
-      min-width: 180px;
-    }
-
-    /* XO board */
-    .xo-board{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .xo-cell{
-      height: 86px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.26);
-      display:grid;
-      place-items:center;
-      font-size: 34px;
-      font-weight: 1000;
+      background:rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
       cursor:pointer;
       user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .xo-cell:active{ transform: scale(.99); }
-    .xo-cell.disabled{ cursor:default; opacity:.85; }
-
-    /* Memory */
-    .grid16{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    .mcard{
-      height: 74px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 14px 38px rgba(0,0,0,.26);
-      cursor:pointer;
+      font-size: 28px;
+      transition: transform .12s ease, filter .12s ease;
       position:relative;
       overflow:hidden;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease;
     }
-    .mcard:active{ transform: scale(.99); }
-    .mfront, .mback{
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      border-radius: 18px;
-      transition: opacity .18s ease;
-    }
-    .mfront{ font-weight: 1000; font-size: 22px; opacity:1; color: rgba(238,245,255,.85); }
-    .mback{ font-size: 34px; opacity:0; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
-    .mcard.revealed .mfront{ opacity:0; }
-    .mcard.revealed .mback{ opacity:1; }
-    .mcard.matched{ outline: 2px solid color-mix(in oklab, var(--ok) 35%, transparent); cursor:default; }
+    .memCard:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .memCard.flipped{ background: rgba(255,255,255,.08); }
+    .memCard.matched{ border-color: rgba(44,255,159,.55); background: rgba(44,255,159,.10); cursor:default; }
 
-    /* Modal messages */
-    .modal{
-      position:fixed;
-      inset:0;
-      display:none;
-      place-items:end center;
-      padding: 14px;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 50;
+    /* ===== TicTacToe ===== */
+    .xoGrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+      max-width: 360px;
     }
-    .modal.show{ display:grid; }
-
-    .sheet{
-      width:min(720px, 96vw);
-      border-radius: 28px;
+    .xoCell{
+      aspect-ratio: 1/1;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
-      background:
-        radial-gradient(700px 320px at 15% 0%, color-mix(in oklab, var(--c1) 18%, transparent), transparent 60%),
-        radial-gradient(700px 320px at 85% 25%, color-mix(in oklab, var(--c3) 18%, transparent), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      box-shadow: var(--shadow);
-      overflow:hidden;
+      background:rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      font-size:32px;
+      font-weight:1000;
     }
 
+    /* ===== Canvas games ===== */
+    .canvasWrap{
+      width:min(520px, 100%);
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      overflow:hidden;
+      background:rgba(0,0,0,.22);
+    }
+    canvas{ width:100%; height:auto; }
+
+    /* ===== Form ===== */
     .field{
       width:100%;
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.24);
-      color: var(--txt);
-      padding: 12px 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25);
+      color:var(--txt);
+      border-radius:14px;
+      padding:12px 12px;
       outline:none;
-      font-size: 16px;
+    }
+    .field:focus{
+      border-color: rgba(255,214,102,.55);
+      box-shadow: 0 0 0 4px rgba(255,214,102,.14);
     }
     textarea.field{ min-height: 140px; resize: vertical; }
+    .status{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.22);
+      display:none;
+      word-break: break-word;
+    }
+    .status.show{ display:block; }
 
-    .footer{
-      text-align:center;
-      font-size: 13px;
-      color: rgba(238,244,255,.65);
-      padding: 12px 10px 0;
+    /* ===== Themes ===== */
+    .themePicker{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    .themeBtn{
+      border-radius:18px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      cursor:pointer;
+      user-select:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .swatches{ display:flex; gap:8px; }
+    .sw{ width:18px; height:18px; border-radius:999px; border:1px solid rgba(255,255,255,.18); }
+    .layoutAlt header, .layoutAlt main, .layoutAlt nav{
+      border-radius: 14px;
+    }
+    .layoutAlt .tile{
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+    }
+    .layoutAlt nav{
+      position: sticky;
+      bottom: 0;
     }
   </style>
 </head>
 
-<body data-theme="aura">
-  <div class="sky" id="sky" aria-hidden="true"></div>
-  <div class="vignette" aria-hidden="true"></div>
+<body>
+  <div class="float-layer" id="floatLayer" aria-hidden="true"></div>
 
-  <div class="app">
-    <!-- HOME -->
-    <section class="panel active" id="home">
-      <div class="card">
-        <div class="header">
-          <div class="brand">
-            <h1>Neon Hub</h1>
-            <p>تحديث الألعاب + ثيمات + أسئلة كتير + ألغاز…</p>
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <h1>النسخة v2.4</h1>
+        <p>صُنع بواسطة: بني ادم براس فرخه v2</p>
+      </div>
+      <div class="pill" id="pill">✨ جاهز</div>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section class="page" data-route="home">
+        <h2 class="sectionTitle">اختار قسم 👇</h2>
+        <p class="muted">لو أي قسم مش بيفتح عندك قبل كده، ده الإصدار الجديد معمول Router ثابت عشان مفيش صفحات “تختفي”.</p>
+
+        <div class="grid4" style="margin-top:12px;">
+          <div class="tile" data-go="#jokes">
+            <div class="t">نكت</div>
+            <div class="d">نكت جديدة + صفحات</div>
           </div>
-          <span class="chip">الشاشة الرئيسية</span>
+          <div class="tile" data-go="#general">
+            <div class="t">معلومات عامة</div>
+            <div class="d">أسئلة MCQ + نتيجة</div>
+          </div>
+          <div class="tile" data-go="#countries">
+            <div class="t">أسئلة عن الدول</div>
+            <div class="d">عواصم/أعلام/قارات</div>
+          </div>
+          <div class="tile" data-go="#prep3">
+            <div class="t">تالتة إعدادي</div>
+            <div class="d">ترم تاني + مواد</div>
+          </div>
         </div>
 
-        <div class="content">
-          <div class="grid" id="homeGrid">
-            <div class="tile" data-open="jokes">
-              <div class="row">
-                <h2>نكت بيض</h2>
-                <div class="icon">🥚</div>
-              </div>
-              <p>نكت جديدة — صفحات بأرقام + رجوع/التالي.</p>
+        <div class="card">
+          <p class="muted">
+            👾 الألعاب هتلاقيها من زر <b>الألعاب</b> تحت، والرسائل من <b>الرسائل</b>.
+          </p>
+        </div>
+      </section>
+
+      <!-- GAMES -->
+      <section class="page" data-route="games">
+        <h2 class="sectionTitle">الألعاب 🎮</h2>
+        <p class="muted">اختار لعبة — كل لعبة في صفحة لوحدها (ده بيمنع مشاكل التهيئة).</p>
+
+        <div class="grid4" style="margin-top:12px;">
+          <div class="tile" data-go="#game-xo"><div class="t">XO</div><div class="d">ضد كمبيوتر (صعب بسيط)</div></div>
+          <div class="tile" data-go="#game-mem"><div class="t">مطابقة</div><div class="d">4×4 ايموجيز عشوائي</div></div>
+          <div class="tile" data-go="#game-dino"><div class="t">ديناصور</div><div class="d">اقفز وتفادى</div></div>
+          <div class="tile" data-go="#game-frog"><div class="t">الضفدع</div><div class="d">3 خانات + أبواب جاية</div></div>
+        </div>
+
+        <div class="card">
+          <p class="muted">لو لعبة علّقت: اضغط <b>إعادة تشغيل</b> داخل صفحتها.</p>
+        </div>
+      </section>
+
+      <!-- XO -->
+      <section class="page" data-route="game-xo">
+        <h2 class="sectionTitle">XO ضد الكمبيوتر ❌⭕</h2>
+        <p class="muted">أنت ❌ والكمبيوتر ⭕</p>
+        <div class="card">
+          <div id="xoStatus" class="muted">دورك</div>
+          <div class="xoGrid" id="xoGrid"></div>
+          <div class="btnRow">
+            <button class="btn btnGhost" id="xoReset">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMORY -->
+      <section class="page" data-route="game-mem">
+        <h2 class="sectionTitle">لعبة المطابقة 🧠</h2>
+        <p class="muted">اقلب كارتين… لو نفس الإيموجي: Match ✅</p>
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="memMoves">Moves: 0</div>
+            <div class="badge" id="memMatches">Matches: 0/8</div>
+          </div>
+          <div class="memGrid" id="memGrid"></div>
+          <div class="btnRow">
+            <button class="btn btnGhost" id="memReset">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DINO -->
+      <section class="page" data-route="game-dino">
+        <h2 class="sectionTitle">لعبة الديناصور 🦖</h2>
+        <p class="muted">اضغط/المس عشان تقفز. هدفك أعلى سكور.</p>
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="dinoScore">Score: 0</div>
+            <div class="badge" id="dinoState">جاهز</div>
+          </div>
+          <div class="canvasWrap"><canvas id="dinoCanvas" width="520" height="200"></canvas></div>
+          <div class="btnRow">
+            <button class="btn btnGhost" id="dinoRestart">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FROG -->
+      <section class="page" data-route="game-frog">
+        <h2 class="sectionTitle">لعبة الضفدع 🐸🚪</h2>
+        <p class="muted">3 خانات. حرّك الضفدع فوق/تحت لتفادي الأبواب اللي جاية من اليمين.</p>
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="frogScore">Score: 0</div>
+            <div class="badge" id="frogState">جاهز</div>
+          </div>
+          <div class="canvasWrap"><canvas id="frogCanvas" width="520" height="220"></canvas></div>
+          <div class="btnRow">
+            <button class="btn btnGhost" id="frogUp">⬆️ فوق</button>
+            <button class="btn btnGhost" id="frogDown">⬇️ تحت</button>
+            <button class="btn btnGhost" id="frogRestart">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- JOKES -->
+      <section class="page" data-route="jokes">
+        <h2 class="sectionTitle">النكت 😂</h2>
+        <p class="muted">نكت جديدة (متقسّمة صفحات). استخدم رجوع/التالي.</p>
+        <div class="card" id="jokesCard"></div>
+      </section>
+
+      <!-- GENERAL QUIZ -->
+      <section class="page" data-route="general">
+        <h2 class="sectionTitle">أسئلة معلومات عامة 🧩</h2>
+        <div class="card" id="generalQuiz"></div>
+      </section>
+
+      <!-- COUNTRIES QUIZ -->
+      <section class="page" data-route="countries">
+        <h2 class="sectionTitle">أسئلة عن الدول 🌍</h2>
+        <div class="card" id="countriesQuiz"></div>
+      </section>
+
+      <!-- PREP3 -->
+      <section class="page" data-route="prep3">
+        <h2 class="sectionTitle">تالتة إعدادي – الترم التاني 📚</h2>
+        <p class="muted">اختار المادة. الأسئلة دي تدريبية (MCQ) وممكن تزودها بسهولة.</p>
+
+        <div class="grid4" style="margin-top:12px;">
+          <div class="tile" data-go="#prep3-ar"><div class="t">عربي</div><div class="d">تدريبات سريعة</div></div>
+          <div class="tile" data-go="#prep3-en"><div class="t">إنجليزي</div><div class="d">Vocab / Reading</div></div>
+          <div class="tile" data-go="#prep3-math"><div class="t">رياضيات</div><div class="d">جبر/هندسة</div></div>
+          <div class="tile" data-go="#prep3-sci"><div class="t">علوم</div><div class="d">تفاعلات/وراثة</div></div>
+          <div class="tile" data-go="#prep3-ss"><div class="t">دراسات</div><div class="d">تاريخ/جغرافيا</div></div>
+          <div class="tile" data-go="#prep3-rel"><div class="t">دين</div><div class="d">قيم وسلوك</div></div>
+          <div class="tile" data-go="#prep3-it"><div class="t">كمبيوتر</div><div class="d">خوارزميات/Flowchart</div></div>
+          <div class="tile" data-go="#home"><div class="t">رجوع</div><div class="d">للشاشة الرئيسية</div></div>
+        </div>
+
+        <div class="card">
+          <p class="muted">لو كان عندك “مش بيفتح” قبل كده: هنا كل مادة صفحة منفصلة شغّالة.</p>
+        </div>
+      </section>
+
+      <!-- PREP3 SUBJECT PAGES -->
+      <section class="page" data-route="prep3-ar"><h2 class="sectionTitle">عربي – ترم تاني</h2><div class="card" id="prep3_ar"></div></section>
+      <section class="page" data-route="prep3-en"><h2 class="sectionTitle">إنجليزي – ترم تاني</h2><div class="card" id="prep3_en"></div></section>
+      <section class="page" data-route="prep3-math"><h2 class="sectionTitle">رياضيات – ترم تاني</h2><div class="card" id="prep3_math"></div></section>
+      <section class="page" data-route="prep3-sci"><h2 class="sectionTitle">علوم – ترم تاني</h2><div class="card" id="prep3_sci"></div></section>
+      <section class="page" data-route="prep3-ss"><h2 class="sectionTitle">دراسات – ترم تاني</h2><div class="card" id="prep3_ss"></div></section>
+      <section class="page" data-route="prep3-rel"><h2 class="sectionTitle">دين – ترم تاني</h2><div class="card" id="prep3_rel"></div></section>
+      <section class="page" data-route="prep3-it"><h2 class="sectionTitle">كمبيوتر – ترم تاني</h2><div class="card" id="prep3_it"></div></section>
+
+      <!-- MESSAGES -->
+      <section class="page" data-route="messages">
+        <h2 class="sectionTitle">الرسائل (ضروري فقط) ✉️</h2>
+        <p class="muted">الرسالة هتوصل لك عن طريق Formspree.</p>
+
+        <div class="card">
+          <form id="msgForm" action="https://formspree.io/f/mykdkqza" method="POST">
+            <label class="muted">الإيميل (اختياري)</label>
+            <input class="field" type="email" name="email" placeholder="example@mail.com" autocomplete="email" />
+            <div style="height:10px"></div>
+            <label class="muted">الرسالة</label>
+            <textarea class="field" name="message" placeholder="اكتب هنا…" required></textarea>
+            <div class="btnRow">
+              <button class="btn" type="submit">إرسال</button>
+              <button class="btn btnGhost" type="button" id="msgClear">مسح</button>
             </div>
+            <div class="status" id="msgStatus"></div>
+          </form>
 
-            <div class="tile" data-open="gk">
-              <div class="row">
-                <h2>اسئلة معلومات عامه</h2>
-                <div class="icon">🧠</div>
-              </div>
-              <p>أكتر من 20 سؤال — تفاعلي.</p>
-            </div>
-
-            <div class="tile" data-open="countries">
-              <div class="row">
-                <h2>اسئله عن الدول</h2>
-                <div class="icon">🌍</div>
-              </div>
-              <p>أكتر من 20 سؤال جديد عن دول/عواصم/قارات.</p>
-            </div>
-
-            <div class="tile" data-open="themes">
-              <div class="row">
-                <h2>الثيمات</h2>
-                <div class="icon">🎨</div>
-              </div>
-              <p>4 ثيمات تغيّر شكل الموقع (واحد يغيّر الديزاين/الترتيب كمان).</p>
-            </div>
-          </div>
-
-          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-            <button class="btn cyan" id="openGames" type="button">🎮 الألعاب</button>
-            <button class="btn violet" id="openRiddles" type="button">🧩 ألغاز زيادة</button>
-            <button class="btn pink" id="openMessages" type="button">✉️ الرسائل(للضروره)</button>
-          </div>
-
-          <div class="footer">صُنع بواسطة : بني ادم براس فرخه v2.2 .</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- JOKES -->
-    <section class="panel" id="jokes">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>نكت بيض (جديدة)</h1>
-            <p>رقم + رجوع/التالي…</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
-
-        <div class="content">
-          <div class="pager">
-            <button class="btn ghost" id="jPrev">◀</button>
-            <div class="page-title" id="jTitle">صفحة</div>
-            <button class="btn ghost" id="jNext">▶</button>
-          </div>
-          <div class="nums" id="jNums"></div>
-
-          <div class="box">
-            <p class="type" id="jText"></p>
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn pink" type="button" id="jReplay">↻ إعادة كتابة</button>
-            <button class="btn cyan" type="button" id="jMsg">✉️ رسالة</button>
+          <div class="card" style="margin-top:12px;">
+            <p class="muted">
+              لو الإرسال بيفشل: ادخل Formspree وتأكد إن الفورم Verified، وإن الدومين مسموح (Allowed Domains).
+            </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- GK -->
-    <section class="panel" id="gk">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>معلومات عامة</h1>
-            <p>أكتر من 20 سؤال — اختيارات.</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
+      <!-- THEMES -->
+      <section class="page" data-route="themes">
+        <h2 class="sectionTitle">الثيمات 🎨</h2>
+        <p class="muted">اختار ثيم — فيه ثيم بيغيّر شكل الواجهة كله.</p>
+        <div class="themePicker" id="themePicker"></div>
+      </section>
+    </main>
 
-        <div class="content">
-          <div class="pager">
-            <button class="btn ghost" id="gPrev">◀</button>
-            <div class="page-title" id="gTitle">سؤال</div>
-            <button class="btn ghost" id="gNext">▶</button>
-          </div>
-          <div class="nums" id="gNums"></div>
-
-          <div class="box">
-            <p class="q" id="gQ"></p>
-            <div class="opts" id="gOpts"></div>
-            <div class="msgline" id="gMsg"></div>
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn cyan" type="button" id="gReset">🧼 تصفير</button>
-            <button class="btn pink" type="button" id="gMsgBtn">✉️ رسالة</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- COUNTRIES -->
-    <section class="panel" id="countries">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>أسئلة الدول</h1>
-            <p>أكتر من 20 سؤال جديد.</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
-
-        <div class="content">
-          <div class="pager">
-            <button class="btn ghost" id="cPrev">◀</button>
-            <div class="page-title" id="cTitle">سؤال</div>
-            <button class="btn ghost" id="cNext">▶</button>
-          </div>
-          <div class="nums" id="cNums"></div>
-
-          <div class="box">
-            <p class="q" id="cQ"></p>
-            <div class="opts" id="cOpts"></div>
-            <div class="msgline" id="cMsg"></div>
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn cyan" type="button" id="cReset">🧼 تصفير</button>
-            <button class="btn pink" type="button" id="cMsgBtn">✉️ رسالة</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- THEMES -->
-    <section class="panel" id="themes">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>الثيمات</h1>
-            <p>4 ثيمات — واحد منهم يغير الديزاين والترتيب.</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
-
-        <div class="content">
-          <div class="box">
-            <p class="q">اختار ثيم:</p>
-            <div class="opts" style="gap:12px;">
-              <button class="opt" type="button" data-theme="aura">AURA — نيون رايق ✨</button>
-              <button class="opt" type="button" data-theme="sunset">SUNSET — وردي/ذهبي 🌅</button>
-              <button class="opt" type="button" data-theme="ice">ICE — بارد/هادئ ❄️</button>
-              <button class="opt" type="button" data-theme="chaos">CHAOS — يغيّر شكل وترتيب الصفحة 🔥</button>
-            </div>
-            <div class="msgline" id="tMsg"></div>
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn cyan" id="tBackHome" type="button">🏠 الرئيسية</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- RIDDLES -->
-    <section class="panel" id="riddles">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>ألغاز زيادة</h1>
-            <p>صفحات + أرقام + رجوع/التالي.</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
-
-        <div class="content">
-          <div class="pager">
-            <button class="btn ghost" id="rPrev">◀</button>
-            <div class="page-title" id="rTitle">لغز</div>
-            <button class="btn ghost" id="rNext">▶</button>
-          </div>
-          <div class="nums" id="rNums"></div>
-
-          <div class="box">
-            <p class="q" id="rQ"></p>
-            <div class="opts" id="rOpts"></div>
-            <div class="msgline" id="rMsg"></div>
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn cyan" type="button" id="rReset">🧼 تصفير</button>
-            <button class="btn pink" type="button" id="rMsgBtn">✉️ رسالة</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GAMES MENU -->
-    <section class="panel" id="games">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-home>⟵</button>
-          <div class="brand">
-            <h1>🎮 الألعاب</h1>
-            <p>كل لعبة في صفحة لوحدها.</p>
-          </div>
-          <span class="chip">الشاشة الرئيسية</span>
-        </div>
-
-        <div class="content">
-          <div class="game-grid">
-            <button class="btn cyan" type="button" data-game="xo">❌⭕ لعبة XO</button>
-            <button class="btn pink" type="button" data-game="memory">🃏 لعبة المطابقة</button>
-            <button class="btn violet" type="button" data-game="dino">🦖 لعبة الديناصور</button>
-            <button class="btn" type="button" data-game="frog">🐸 لعبة الضفدع</button>
-          </div>
-
-          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-            <button class="btn pink" type="button" id="gMsg2">✉️ رسالة</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- XO GAME -->
-    <section class="panel" id="xo">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-back="games">⟵</button>
-          <div class="brand">
-            <h1>❌⭕ XO ضد كمبيوتر</h1>
-            <p>إنت ❌ — الكمبيوتر ⭕</p>
-          </div>
-          <span class="chip">الألعاب</span>
-        </div>
-
-        <div class="content">
-          <div class="box">
-            <div class="xo-board" id="xoBoard"></div>
-            <div class="msgline" id="xoStatus">دورك.</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-              <button class="btn cyan" id="xoRestart" type="button">↻ إعادة</button>
-              <button class="btn pink" type="button" id="xoMsg">✉️ رسالة</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MEMORY GAME -->
-    <section class="panel" id="memory">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-back="games">⟵</button>
-          <div class="brand">
-            <h1>🃏 المطابقة 4×4</h1>
-            <p>كل مرة توزيع عشوائي.</p>
-          </div>
-          <span class="chip">الألعاب</span>
-        </div>
-
-        <div class="content">
-          <div class="box">
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-              <button class="btn cyan" id="memStart" type="button">ابدأ / إعادة</button>
-              <button class="btn pink" id="memMsg" type="button">✉️ رسالة</button>
-            </div>
-            <div class="grid16" id="memoryGrid"></div>
-            <div class="msgline" id="memStatus">تم: 0 / 8</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DINO GAME -->
-    <section class="panel" id="dino">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-back="games">⟵</button>
-          <div class="brand">
-            <h1>🦖 الديناصور</h1>
-            <p>اضغط/المس للقفز.</p>
-          </div>
-          <span class="chip">الألعاب</span>
-        </div>
-
-        <div class="content">
-          <div class="game-wrap">
-            <canvas id="dinoCanvas" width="900" height="320"></canvas>
-            <div class="controls">
-              <button class="btn cyan" id="dinoStart" type="button">ابدأ</button>
-              <button class="btn pink" id="dinoReset" type="button">إعادة</button>
-              <button class="btn ghost" id="dinoMsg" type="button">✉️ رسالة</button>
-            </div>
-            <div class="kbd">التحكم: لمس/Space = قفز. الهدف: اتجنب العوائق.</div>
-            <div class="msgline" id="dinoStatus"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FROG GAME -->
-    <section class="panel" id="frog">
-      <div class="card">
-        <div class="header">
-          <button class="btn ghost" data-back="games">⟵</button>
-          <div class="brand">
-            <h1>🐸 الضفدع ضد الأبواب</h1>
-            <p>حرّك الضفدع فوق/تحت لتفادي الأبواب.</p>
-          </div>
-          <span class="chip">الألعاب</span>
-        </div>
-
-        <div class="content">
-          <div class="game-wrap">
-            <canvas id="frogCanvas" width="900" height="360"></canvas>
-            <div class="controls">
-              <button class="btn cyan" id="frogStart" type="button">ابدأ</button>
-              <button class="btn pink" id="frogReset" type="button">إعادة</button>
-              <button class="btn ghost" id="frogMsg" type="button">✉️ رسالة</button>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:10px;">
-              <button class="btn ghost" id="frogUp" type="button">⬆️</button>
-              <button class="btn ghost" id="frogDown" type="button">⬇️</button>
-            </div>
-
-            <div class="kbd">التحكم: ⬆️⬇️ أو سحب لأعلى/لأسفل. الهدف: ابعد عن الأبواب اللي جاية من اليمين.</div>
-            <div class="msgline" id="frogStatus"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    <nav>
+      <div class="navBtn" data-go="#home">الرئيسية</div>
+      <div class="navBtn" data-go="#games">الألعاب</div>
+      <div class="navBtn" data-go="#messages">الرسائل</div>
+      <div class="navBtn" data-go="#themes">الثيمات</div>
+    </nav>
   </div>
 
-  <!-- Messages Modal -->
-  <div class="modal" id="modal">
-    <div class="sheet">
-      <div class="header">
-        <button class="btn ghost" id="closeModal">✖</button>
-        <div class="brand">
-          <h1>✉️ الرسائل</h1>
-          <p>ممنوع الازعاج☺️</p>
-        </div>
-        <span class="chip">الشاشة الرئيسية</span>
-      </div>
+<script>
+/* =========================
+   Utilities + Router
+========================= */
+const $ = (s, p=document)=>p.querySelector(s);
+const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
+const pill = $("#pill");
+const app = $("#app");
 
-      <div class="content">
-        <form id="msgForm" style="display:grid; gap:10px;">
-          <textarea class="field" id="msgText" name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
-          <input type="hidden" name="page" id="msgPage">
-          <input type="hidden" name="_subject" value="Message from Neon Hub v3">
-          <input type="text" name="_gotcha" style="display:none">
-          <button class="btn pink" id="msgSend" type="submit">إرسال</button>
-          <div class="msgline" id="msgHint"></div>
-        </form>
-      </div>
+function setPill(txt){ pill.textContent = txt; }
+
+const ROUTES = new Set($$(".page").map(p => p.dataset.route));
+
+function routeFromHash(){
+  const raw = (location.hash || "#home").replace("#","");
+  return ROUTES.has(raw) ? raw : "home";
+}
+
+function showRoute(route){
+  $$(".page").forEach(p => p.classList.toggle("active", p.dataset.route === route));
+  $$(".navBtn").forEach(b => b.classList.toggle("active", (b.getAttribute("data-go")||"") === "#"+route));
+  setPill("📍 " + route);
+  onEnterRoute(route);
+}
+
+window.addEventListener("hashchange", ()=> showRoute(routeFromHash()));
+
+document.addEventListener("click", (e)=>{
+  const go = e.target.closest("[data-go]")?.getAttribute("data-go");
+  if(!go) return;
+  location.hash = go;
+});
+
+showRoute(routeFromHash());
+
+/* =========================
+   Floating Emojis
+========================= */
+const floatLayer = $("#floatLayer");
+const floatEmojis = ["🪐","🎮","✨","💎","🧠","🌈","🎭","🧩","🔥","🍭","💫","🛸","🟣","🟦","🟨"];
+function spawnEmojis(count){
+  floatLayer.innerHTML = "";
+  for(let i=0;i<count;i++){
+    const el = document.createElement("div");
+    el.className = "emoji";
+    el.textContent = floatEmojis[(Math.random()*floatEmojis.length)|0];
+    const left = Math.random()*100;
+    const duration = 9 + Math.random()*11;
+    const delay = -Math.random()*duration;
+    el.style.left = left+"vw";
+    el.style.setProperty("--x", (left-50)+"vw");
+    el.style.animationDuration = duration+"s";
+    el.style.animationDelay = delay+"s";
+    el.style.top = (90 + Math.random()*20)+"vh";
+    floatLayer.appendChild(el);
+  }
+}
+spawnEmojis(innerWidth<420?14:20);
+addEventListener("resize", ()=>spawnEmojis(innerWidth<420?14:20));
+
+/* =========================
+   Themes (4) + one layout overhaul
+========================= */
+const THEMES = [
+  { id:"neo", name:"Neo Glow", desc:"نيون + لمعة", vars:{ "--bg0":"#050814","--bg1":"#0a1233","--accentA":"#ffd666","--accentB":"#22d3ee","--accentC":"#a855f7" }, layoutAlt:false },
+  { id:"berry", name:"Berry Night", desc:"موڤ + وردي", vars:{ "--bg0":"#0a0214","--bg1":"#210a33","--accentA":"#ff6bd6","--accentB":"#7dd3fc","--accentC":"#f97316" }, layoutAlt:true },
+  { id:"mint", name:"Mint Storm", desc:"نعناع + أزرق", vars:{ "--bg0":"#02131a","--bg1":"#05343a","--accentA":"#2cff9f","--accentB":"#22d3ee","--accentC":"#60a5fa" }, layoutAlt:false },
+  { id:"gold", name:"Golden Dust", desc:"ذهبي دافي", vars:{ "--bg0":"#120b02","--bg1":"#2a1706","--accentA":"#ffd666","--accentB":"#f59e0b","--accentC":"#22d3ee" }, layoutAlt:true },
+];
+
+function applyTheme(id){
+  const t = THEMES.find(x=>x.id===id) || THEMES[0];
+  for(const k in t.vars) document.documentElement.style.setProperty(k, t.vars[k]);
+  app.classList.toggle("layoutAlt", !!t.layoutAlt);
+  localStorage.setItem("themeId", t.id);
+  setPill("🎨 " + t.name);
+}
+applyTheme(localStorage.getItem("themeId") || "neo");
+
+const themePicker = $("#themePicker");
+themePicker.innerHTML = THEMES.map(t=>{
+  const sws = Object.values(t.vars).slice(0,3).map(v=>`<span class="sw" style="background:${v}"></span>`).join("");
+  return `
+    <div class="themeBtn" data-theme="${t.id}">
+      <b>${t.name}</b>
+      <div class="swatches">${sws}</div>
+      <div class="muted" style="font-size:12.5px">${t.desc}${t.layoutAlt ? " — (شكل مختلف)" : ""}</div>
     </div>
-  </div>
+  `;
+}).join("");
 
-  <script>
-    /*************************
-     * CONFIG
-     *************************/
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/mykdkqza";
+themePicker.addEventListener("click",(e)=>{
+  const id = e.target.closest(".themeBtn")?.dataset.theme;
+  if(id) applyTheme(id);
+});
 
-    /*************************
-     * Helpers
-     *************************/
-    function rand(min,max){ return Math.random()*(max-min)+min; }
-    function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-    function shuffle(arr){
-      for(let i=arr.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [arr[i],arr[j]]=[arr[j],arr[i]];
-      }
-      return arr;
-    }
-    function flashRed(){
-      document.body.classList.add("flash-red");
-      setTimeout(()=>document.body.classList.remove("flash-red"), 700);
-    }
+/* =========================
+   Reusable Quiz Engine
+========================= */
+function shuffle(a){
+  const arr = a.slice();
+  for(let i=arr.length-1;i>0;i--){
+    const j = (Math.random()*(i+1))|0;
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
 
-    /*************************
-     * Floating emojis (theme-aware)
-     *************************/
-    const sky = document.getElementById("sky");
-    function buildSky(){
-      sky.innerHTML = "";
-      const theme = document.body.dataset.theme || "aura";
-      const sets = {
-        aura:   ["✨","🫧","💫","🔮","🎧","🎯","🧠","⚡","🌈","🪐","🧪","🧩"],
-        sunset: ["🌅","🔥","🎆","🍓","🍒","✨","💗","🎭","🎈","🎯","🧁","🫶"],
-        ice:    ["❄️","🧊","🌨️","🪽","🫧","💎","🌙","⭐","🧠","🧪","🔷","🫧"],
-        chaos:  ["🌀","💥","🎲","⚡","👾","🧨","🎭","🧠","🍩","🪐","🧩","🦖"]
-      };
-      const EMOJI = sets[theme] || sets.aura;
-      const count = Math.min(30, Math.max(18, Math.floor(window.innerWidth/42)));
-      for(let i=0;i<count;i++){
-        const el = document.createElement("span");
-        el.className = "e";
-        el.textContent = pick(EMOJI);
-        el.style.left = rand(2,98) + "vw";
-        el.style.setProperty("--r", rand(-35,35) + "deg");
-        el.style.setProperty("--dx", rand(-18,18).toFixed(1) + "px");
-        el.style.animationDuration = rand(9.5, 16.5).toFixed(2) + "s";
-        el.style.animationDelay = rand(-12, 0).toFixed(2) + "s";
-        sky.appendChild(el);
-      }
-    }
+function mountQuiz(el, questions, opts={}){
+  let idx = 0, score = 0;
+  const q = shuffle(questions);
+  const title = opts.title || "";
+  const showProgress = opts.progress ?? true;
 
-    /*************************
-     * Router
-     *************************/
-    const panels = [...document.querySelectorAll(".panel")];
-    function go(id){
-      panels.forEach(p=>p.classList.toggle("active", p.id === id));
-      window.scrollTo(0,0);
-    }
-    document.querySelectorAll("[data-home]").forEach(b=> b.addEventListener("click", ()=> go("home")));
-    document.querySelectorAll("[data-open]").forEach(t=>{
-      t.addEventListener("click", ()=> {
-        const id = t.dataset.open;
-        if(id==="jokes"){ renderJokes(jIndex); }
-        if(id==="gk"){ renderGK(gIndex); }
-        if(id==="countries"){ renderCountries(cIndex); }
-        go(id);
+  function render(){
+    const item = q[idx];
+    const choices = item.choices.map((c,i)=>({text:c, i})); // keep indices
+    const shuffledChoices = shuffle(choices);
+
+    el.innerHTML = `
+      ${title ? `<div class="badge" style="margin-bottom:10px">${title}</div>` : ""}
+      <div class="qBox">
+        <div class="qHead">
+          ${showProgress ? `<div class="badge">سؤال ${idx+1} / ${q.length}</div>` : `<div></div>`}
+          <div class="badge">النتيجة: ${score}</div>
+        </div>
+
+        <div class="question">${item.q}</div>
+
+        <div class="choices">
+          ${shuffledChoices.map(ch=>`
+            <div class="choice" data-ans="${ch.i}">${ch.text}</div>
+          `).join("")}
+        </div>
+
+        <div class="qFooter">
+          <button class="btn btnGhost" id="qPrev" ${idx===0?"disabled":""}>رجوع</button>
+          <button class="btn btnGhost" id="qReset">إعادة</button>
+          <button class="btn" id="qNext">${idx===q.length-1 ? "إنهاء" : "التالي"}</button>
+        </div>
+
+        <p class="muted" id="qHint" style="margin:0"></p>
+      </div>
+    `;
+
+    const hint = $("#qHint", el);
+
+    $$(".choice", el).forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        // lock choices
+        $$(".choice", el).forEach(x=>x.style.pointerEvents="none");
+
+        const picked = +ch.dataset.ans;
+        const correct = item.answer;
+
+        if(picked === correct){
+          ch.classList.add("correct");
+          score++;
+          hint.textContent = "✅ صح";
+        } else {
+          ch.classList.add("wrong");
+          const correctEl = $$(".choice", el).find(x => +x.dataset.ans === correct);
+          if(correctEl) correctEl.classList.add("correct");
+          hint.textContent = "❌ غلط";
+        }
       });
     });
-    document.getElementById("openGames").addEventListener("click", ()=> go("games"));
-    document.getElementById("openRiddles").addEventListener("click", ()=> { renderRiddles(rIndex); go("riddles"); });
 
-    document.querySelectorAll("[data-back]").forEach(b=>{
-      b.addEventListener("click", ()=> go(b.dataset.back));
+    $("#qPrev", el).addEventListener("click", ()=>{
+      if(idx>0){ idx--; render(); }
     });
 
-    /*************************
-     * Typewriter
-     *************************/
-    let twTimer = null;
-    function typewrite(el, text, speed=14){
-      if(twTimer) clearInterval(twTimer);
-      el.innerHTML = "";
-      const cur = document.createElement("span");
-      cur.className = "cursor";
-      el.appendChild(cur);
-      let i=0;
-      twTimer = setInterval(()=>{
-        if(i >= text.length){
-          clearInterval(twTimer);
-          twTimer = null;
-          cur.remove();
-          el.textContent = text;
-          return;
-        }
-        cur.insertAdjacentText("beforebegin", text[i]);
-        i++;
-      }, speed);
-    }
+    $("#qReset", el).addEventListener("click", ()=>{
+      idx = 0; score = 0;
+      const fresh = shuffle(questions);
+      q.length = 0; q.push(...fresh);
+      render();
+    });
 
-    /*************************
-     * Pager helpers
-     *************************/
-    function buildNums(container, total, active, onPick){
-      container.innerHTML = "";
-      for(let i=0;i<total;i++){
-        const b = document.createElement("button");
-        b.className = "num" + (i===active ? " active":"");
-        b.type = "button";
-        b.textContent = (i+1);
-        b.addEventListener("click", ()=> onPick(i));
-        container.appendChild(b);
-      }
-    }
-
-    /*************************
-     * JOKES (new set)
-     *************************/
-    const jokes = [
-      "مرة واحد اشترى شمسية… رجعها قال: دي بتعمل ظل بس!",
-      "مرة واحد سأل القلم: بتكتب إزاي؟ قاله: على حسب المزاج… أنا رصاص!",
-      "مرة بطارية قالت للتانية: أنا تعبانة… قالتلها: اشحني نفسك.",
-      "مرة واحد فتح الكتاب… لقى الصفحة بتقول: اقفلني أنا لسه مش جاهزة.",
-      "مرة كوباية شاي اتأخرت… قالوا: أكيد محطوط في “زحمة النعناع”.",
-      "مرة زرار اتوتر… قال: أنا كده مضغوط زيادة.",
-      "مرة واي فاي قال للموبايل: قرب… أنا بحب العلاقات القريبة.",
-      "مرة مسطرة اتخانقت… قالت: أنا اللي بحدد الحدود!",
-      "مرة واحد جاب مراية… بص فيها قال: دي بتقلدني!",
-      "مرة ساعة قالت: أنا مش متأخرة… أنا بس واقفة أفكر.",
-      "مرة سلك شاحن اتجوز… خلف “باور بنك” صغير.",
-      "مرة واحد راح يشتري سكر… قالوله: عادي ولا دايت؟ قال: هات اللي بيضحك.",
-      "مرة تلاجة قالت: أنا بردانة… قالولها: إنتي أساسًا شغلك تبريدي!",
-      "مرة فازة وقعت… قالت: مش أنا… الجاذبية!",
-      "مرة واحد قال للنور: ليه مطفي؟ قاله: يوم راحة نفسية.",
-      "مرة كرسي قال: أخيرًا حد “يسندني”."
-    ];
-    let jIndex = 0;
-    const jTitle = document.getElementById("jTitle");
-    const jText  = document.getElementById("jText");
-    const jNums  = document.getElementById("jNums");
-
-    function renderJokes(idx){
-      jIndex = idx;
-      jTitle.textContent = `صفحة ${idx+1} / ${jokes.length}`;
-      buildNums(jNums, jokes.length, idx, (i)=> renderJokes(i));
-      typewrite(jText, jokes[idx], 12);
-    }
-    document.getElementById("jPrev").addEventListener("click", ()=> renderJokes((jIndex-1 + jokes.length)%jokes.length));
-    document.getElementById("jNext").addEventListener("click", ()=> renderJokes((jIndex+1)%jokes.length));
-    document.getElementById("jReplay").addEventListener("click", ()=> renderJokes(jIndex));
-    document.getElementById("jMsg").addEventListener("click", openModal);
-
-    /*************************
-     * Quiz Engine
-     *************************/
-    function renderQuiz({data, index, qEl, optsEl, msgEl, titleEl, numsEl, onSetIndex, getPicked, setPicked}){
-      const item = data[index];
-      titleEl.textContent = `صفحة ${index+1} / ${data.length}`;
-      buildNums(numsEl, data.length, index, (i)=> onSetIndex(i));
-      qEl.textContent = item.q;
-      optsEl.innerHTML = "";
-      msgEl.textContent = "";
-      const picked = getPicked(index);
-
-      item.options.forEach((opt, i)=>{
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "opt";
-        b.textContent = opt;
-
-        if(picked !== null){
-          if(i === item.answer) b.classList.add("correct");
-          if(i === picked && picked !== item.answer) b.classList.add("wrong");
-          b.disabled = true;
-          b.style.cursor = "default";
-        }
-
-        b.addEventListener("click", ()=>{
-          setPicked(index, i);
-          onSetIndex(index);
+    $("#qNext", el).addEventListener("click", ()=>{
+      if(idx === q.length-1){
+        el.innerHTML = `
+          <div class="qBox">
+            <div class="badge">النتيجة النهائية: ${score} / ${q.length}</div>
+            <div class="card">
+              <p class="muted">عايز تعيد؟ اضغط الزر.</p>
+              <div class="btnRow">
+                <button class="btn" id="again">إعادة</button>
+                <button class="btn btnGhost" data-go="#home">الرئيسية</button>
+              </div>
+            </div>
+          </div>
+        `;
+        $("#again", el).addEventListener("click", ()=>{
+          idx=0; score=0;
+          const fresh = shuffle(questions);
+          q.length=0; q.push(...fresh);
+          render();
         });
-
-        optsEl.appendChild(b);
-      });
-
-      if(picked !== null){
-        const ok = (picked === item.answer);
-        msgEl.textContent = ok ? "صح ✅" : `غلط ❌ — الصح: ${item.options[item.answer]}`;
-        msgEl.className = "msgline " + (ok ? "ok":"bad");
-      }else{
-        msgEl.className = "msgline";
+      } else {
+        idx++;
+        render();
       }
-    }
-
-    /*************************
-     * GK (24 questions)
-     *************************/
-    const gk = [
-      { q:"كم عدد كواكب المجموعة الشمسية؟", options:["7","8","9","10"], answer:1 },
-      { q:"أكبر محيط على الأرض هو؟", options:["الأطلسي","الهادئ","الهندي","المتجمد"], answer:1 },
-      { q:"أقرب كوكب للشمس؟", options:["الزهرة","المريخ","عطارد","الأرض"], answer:2 },
-      { q:"أطول سورة في القرآن؟", options:["آل عمران","البقرة","النساء","الأنعام"], answer:1 },
-      { q:"درجة غليان الماء تقريباً؟", options:["90°","100°","110°","120°"], answer:1 },
-      { q:"العنصر الكيميائي O هو؟", options:["ذهب","أكسجين","أوزون","حديد"], answer:1 },
-      { q:"أكبر كوكب في المجموعة الشمسية؟", options:["زحل","المشتري","أورانوس","نبتون"], answer:1 },
-      { q:"أسرع حيوان بري؟", options:["النمر","الفهد","الغزال","الذئب"], answer:1 },
-      { q:"عدد أضلاع المثلث؟", options:["2","3","4","5"], answer:1 },
-      { q:"عاصمة اليابان؟", options:["كيوتو","طوكيو","أوساكا","ناغويا"], answer:1 },
-      { q:"أكبر قارة مساحة؟", options:["أفريقيا","آسيا","أوروبا","أمريكا الشمالية"], answer:1 },
-      { q:"لغة البرازيل الرسمية؟", options:["الإسبانية","البرتغالية","الفرنسية","الإنجليزية"], answer:1 },
-      { q:"أصغر دولة مساحة (شائعًا)؟", options:["مالطا","الفاتيكان","سنغافورة","قطر"], answer:1 },
-      { q:"مخترع المصباح الكهربائي (شائعًا)؟", options:["نيوتن","أديسون","داروين","جراهام بيل"], answer:1 },
-      { q:"عدد أيام السنة الكبيسة؟", options:["365","366","364","360"], answer:1 },
-      { q:"أكبر عضو في جسم الإنسان؟", options:["القلب","الجلد","الكبد","الرئة"], answer:1 },
-      { q:"أقرب نجم للأرض بعد الشمس؟", options:["الشعرى","ألفا سنتوري","سهيل","سماك"], answer:1 },
-      { q:"عملة الاتحاد الأوروبي؟", options:["جنيه","يورو","دولار","ين"], answer:1 },
-      { q:"السداسي له كم ضلع؟", options:["5","6","7","8"], answer:1 },
-      { q:"أبرد كوكب (شائعًا)؟", options:["نبتون","أورانوس","زحل","المريخ"], answer:1 },
-      { q:"أكثر غاز في الغلاف الجوي؟", options:["أكسجين","نيتروجين","ثاني أكسيد الكربون","هيليوم"], answer:1 },
-      { q:"عدد القارات؟", options:["5","6","7","8"], answer:2 },
-      { q:"أصغر كوكب؟", options:["عطارد","المريخ","الأرض","الزهرة"], answer:0 },
-      { q:"الشاي يُصنع من أوراق نبات؟", options:["النعناع","الكاميليا (Camellia)","الليمون","البن"], answer:1 },
-    ];
-    let gIndex = 0;
-    const gPicked = Array(gk.length).fill(null);
-
-    const gTitle = document.getElementById("gTitle");
-    const gNums  = document.getElementById("gNums");
-    const gQ     = document.getElementById("gQ");
-    const gOpts  = document.getElementById("gOpts");
-    const gMsg   = document.getElementById("gMsg");
-
-    function renderGK(idx){
-      gIndex = idx;
-      renderQuiz({
-        data: gk,
-        index: gIndex,
-        qEl: gQ, optsEl: gOpts, msgEl: gMsg,
-        titleEl: gTitle, numsEl: gNums,
-        onSetIndex: renderGK,
-        getPicked: (i)=> gPicked[i],
-        setPicked: (i,v)=> gPicked[i]=v
-      });
-    }
-    document.getElementById("gPrev").addEventListener("click", ()=> renderGK((gIndex-1+gk.length)%gk.length));
-    document.getElementById("gNext").addEventListener("click", ()=> renderGK((gIndex+1)%gk.length));
-    document.getElementById("gReset").addEventListener("click", ()=>{
-      for(let i=0;i<gPicked.length;i++) gPicked[i]=null;
-      renderGK(gIndex);
     });
-    document.getElementById("gMsgBtn").addEventListener("click", openModal);
+  }
 
-    /*************************
-     * COUNTRIES (24 questions)
-     *************************/
-    const countries = [
-      { q:"عاصمة مصر؟", options:["القاهرة","الأسكندرية","الأقصر","أسوان"], answer:0 },
-      { q:"عاصمة السعودية؟", options:["الرياض","جدة","مكة","الدمام"], answer:0 },
-      { q:"عاصمة الإمارات؟", options:["دبي","الشارقة","أبوظبي","العين"], answer:2 },
-      { q:"عاصمة قطر؟", options:["الدوحة","الريان","الخور","الوكرة"], answer:0 },
-      { q:"عاصمة الكويت؟", options:["الكويت","حولي","الفروانية","الجهراء"], answer:0 },
-      { q:"عاصمة المغرب؟", options:["الدار البيضاء","مراكش","الرباط","فاس"], answer:2 },
-      { q:"عاصمة الجزائر؟", options:["وهران","الجزائر","قسنطينة","عنابة"], answer:1 },
-      { q:"عاصمة تونس؟", options:["تونس","صفاقس","سوسة","قابس"], answer:0 },
-      { q:"عاصمة الأردن؟", options:["الزرقاء","إربد","العقبة","عمّان"], answer:3 },
-      { q:"عاصمة لبنان؟", options:["بيروت","طرابلس","صيدا","جبيل"], answer:0 },
-      { q:"عاصمة العراق؟", options:["البصرة","الموصل","بغداد","أربيل"], answer:2 },
-      { q:"عاصمة تركيا؟", options:["إسطنبول","أنقرة","إزمير","بورصة"], answer:1 },
-      { q:"عاصمة فرنسا؟", options:["ليون","مرسيليا","باريس","نيس"], answer:2 },
-      { q:"عاصمة إيطاليا؟", options:["روما","ميلانو","نابولي","فلورنسا"], answer:0 },
-      { q:"عاصمة إسبانيا؟", options:["برشلونة","مدريد","إشبيلية","فالنسيا"], answer:1 },
-      { q:"عاصمة ألمانيا؟", options:["ميونخ","هامبورغ","برلين","كولونيا"], answer:2 },
-      { q:"عاصمة روسيا؟", options:["سان بطرسبرغ","موسكو","قازان","سوتشي"], answer:1 },
-      { q:"عاصمة الصين؟", options:["شنغهاي","بكين","هونغ كونغ","شينزن"], answer:1 },
-      { q:"عاصمة اليابان؟", options:["طوكيو","كيوتو","أوساكا","ناغويا"], answer:0 },
-      { q:"عاصمة كندا؟", options:["تورونتو","أوتاوا","مونتريال","فانكوفر"], answer:1 },
-      { q:"عاصمة البرازيل؟", options:["ريو","ساو باولو","برازيليا","سلفادور"], answer:2 },
-      { q:"أستراليا تقع في قارة؟", options:["أوروبا","أفريقيا","أستراليا/أوقيانوسيا","آسيا"], answer:2 },
-      { q:"عاصمة اليونان؟", options:["أثينا","سالونيك","باتراس","لاريسا"], answer:0 },
-      { q:"عاصمة النرويج؟", options:["أوسلو","ستافنجر","بيرغن","ترومسو"], answer:0 },
-    ];
-    let cIndex = 0;
-    const cPicked = Array(countries.length).fill(null);
+  render();
+}
 
-    const cTitle = document.getElementById("cTitle");
-    const cNums  = document.getElementById("cNums");
-    const cQ     = document.getElementById("cQ");
-    const cOpts  = document.getElementById("cOpts");
-    const cMsg   = document.getElementById("cMsg");
+/* =========================
+   Content (Jokes + Quizzes + Prep3)
+========================= */
+const jokesPages = [
+  [
+    "مرّة واحد راح يشتري ساعة… لقاها بتتأخر… قالها: انتي بتتكسّفي ولا ايه؟",
+    "مرّة كهربائي اتجوز… خلف سلكين توأم.",
+    "مرّة واحد فتح التلاجة… لقى الجزر بيبصله… قاله: متقلقش أنا مش أرنب.",
+    "مرّة واحد اشترى مروحة… رجعها… قالهم: بتزقني نفسيًا.",
+    "مرّة باب كان بيكح عشان كان عنده door-bard 😭"
+  ],
+  [
+    "مرّة واحد راح للدكتور قاله: عندي نسيان… قاله: من امتى؟ قاله: من امتى ايه؟",
+    "مرّة واحد بيذاكر جغرافيا… نام… صحى لقى نفسه قارة.",
+    "مرّة واحد بيحب الهدوء… دخل فصل… اتوتر.",
+    "مرّة واحد شرب مياه كتير… بقى بيفكّر سائل.",
+    "مرّة واحد سأل صاحبه: معاك شاحن؟ قاله: لا معايا نَفَس."
+  ]
+];
 
-    function renderCountries(idx){
-      cIndex = idx;
-      renderQuiz({
-        data: countries,
-        index: cIndex,
-        qEl: cQ, optsEl: cOpts, msgEl: cMsg,
-        titleEl: cTitle, numsEl: cNums,
-        onSetIndex: renderCountries,
-        getPicked: (i)=> cPicked[i],
-        setPicked: (i,v)=> cPicked[i]=v
-      });
+function mountJokes(){
+  const el = $("#jokesCard");
+  let page = 0;
+
+  function render(){
+    const list = jokesPages[page] || [];
+    el.innerHTML = `
+      <div class="qHead">
+        <div class="badge">صفحة ${page+1} / ${jokesPages.length}</div>
+        <div class="badge">😂 نكت جديدة</div>
+      </div>
+      <div style="display:grid; gap:10px; margin-top:10px;">
+        ${list.map(j=>`<div class="choice" style="cursor:default">${j}</div>`).join("")}
+      </div>
+      <div class="btnRow">
+        <button class="btn btnGhost" id="jPrev" ${page===0?"disabled":""}>رجوع</button>
+        <button class="btn btnGhost" id="jNext" ${page===jokesPages.length-1?"disabled":""}>التالي</button>
+        <button class="btn" data-go="#home">الرئيسية</button>
+      </div>
+    `;
+    $("#jPrev", el).addEventListener("click", ()=>{ if(page>0){ page--; render(); } });
+    $("#jNext", el).addEventListener("click", ()=>{ if(page<jokesPages.length-1){ page++; render(); } });
+  }
+  render();
+}
+
+const generalQuestions = [
+  { q:"أكبر كوكب في المجموعة الشمسية هو…", choices:["الأرض","المشتري","المريخ","الزهرة"], answer:1 },
+  { q:"أسرع حيوان بري هو…", choices:["الفهد","الأسد","الحصان","الذئب"], answer:0 },
+  { q:"العنصر الكيميائي رمزه O هو…", choices:["ذهب","أكسجين","فضة","أوزون"], answer:1 },
+  { q:"أطول نهر في العالم غالبًا يُذكر كـ…", choices:["النيل","الأمازون","الدانوب","الكونغو"], answer:0 },
+  { q:"أكبر قارة مساحة هي…", choices:["أفريقيا","آسيا","أوروبا","أستراليا"], answer:1 },
+  { q:"عاصمة اليابان هي…", choices:["سيول","طوكيو","بكين","بانكوك"], answer:1 },
+  { q:"عدد ألوان الطيف الأساسية سبعة، من ضمنها…", choices:["البنفسجي","البيج","الذهبي","الرمادي"], answer:0 },
+  { q:"أقرب كوكب للشمس هو…", choices:["عطارد","الزهرة","الأرض","المريخ"], answer:0 },
+];
+
+const countryQuestions = [
+  { q:"عاصمة إسبانيا؟", choices:["روما","مدريد","لشبونة","برشلونة"], answer:1 },
+  { q:"عاصمة كندا؟", choices:["تورونتو","أوتاوا","فانكوفر","مونتريال"], answer:1 },
+  { q:"مصر تقع في قارة…", choices:["أوروبا","آسيا فقط","أفريقيا (وجزء آسيوي في سيناء)","أستراليا"], answer:2 },
+  { q:"عاصمة البرازيل؟", choices:["برازيليا","ريو","ساو باولو","سالڤادور"], answer:0 },
+  { q:"عاصمة تركيا؟", choices:["إسطنبول","أنقرة","إزمير","بورصة"], answer:1 },
+  { q:"عاصمة السعودية؟", choices:["جدة","مكة","الرياض","الدمام"], answer:2 },
+  { q:"عاصمة المغرب؟", choices:["مراكش","الدار البيضاء","الرباط","طنجة"], answer:2 },
+  { q:"عاصمة أستراليا؟", choices:["سيدني","ملبورن","كانبيرا","بيرث"], answer:2 },
+];
+
+/* Prep3 (term2) — أسئلة تدريبية قابلة للزيادة */
+const prep3 = {
+  ar: [
+    { q:"أي مما يلي يُعد من علامات رفع الفاعل؟", choices:["الكسرة","الفتحة","الضمة","السكون"], answer:2 },
+    { q:"(إنَّ) من أخوات…", choices:["كان","إن","كاد","ليس"], answer:1 },
+    { q:"التمييز يأتي لرفع…", choices:["الإبهام","الضمير","السكون","التشبيه"], answer:0 },
+    { q:"الجملة الفعلية تتكون من…", choices:["مبتدأ وخبر","فعل وفاعل","حرف واسم","فعل ومفعول فقط"], answer:1 },
+    { q:"علامة نصب المفعول به غالبًا…", choices:["الضمة","الفتحة","الكسرة","السكون"], answer:1 },
+  ],
+  en: [
+    { q:"Choose the correct answer: If I ___ time, I would help you.", choices:["have","had","has","having"], answer:1 },
+    { q:"Choose the correct: She is good ___ English.", choices:["at","in","on","to"], answer:1 },
+    { q:"Reading skill: ‘main idea’ means…", choices:["تفاصيل صغيرة","الفكرة الرئيسية","ترجمة حرفية","قواعد فقط"], answer:1 },
+    { q:"Choose: I have been here ___ two hours.", choices:["since","for","ago","yet"], answer:1 },
+    { q:"Vocabulary: ‘predict’ means…", choices:["يتوقع","ينسى","يكتب","يقفز"], answer:0 },
+  ],
+  math: [
+    { q:"ميل المستقيم المار بالنقطتين (2,1) و(4,5) يساوي…", choices:["1","2","3","4"], answer:1 },
+    { q:"منتصف القطعة بين (a,b) و(c,d) هو…", choices:["(a+c, b+d)","((a+c)/2, (b+d)/2)","(a-c, b-d)","(a/c, b/d)"], answer:1 },
+    { q:"إذا كان m1×m2 = -1 إذًا المستقيمان…", choices:["متوازيان","متعامدان","منطبقان","لا علاقة"], answer:1 },
+    { q:"معادلة المستقيم ص = 3س - 2: الجزء المقطوع من محور الصادات هو…", choices:["3","-2","2","0"], answer:1 },
+    { q:"وحدة قياس الميل في المستوى الإحداثي هي…", choices:["متر","بدون وحدة","ثانية","نيوتن"], answer:1 },
+  ],
+  sci: [
+    { q:"التفاعل الكيميائي ينتج عنه…", choices:["تغير فيزيائي فقط","مواد جديدة","زيادة كتلة دائمًا","اختفاء الذرات"], answer:1 },
+    { q:"الرمز الجيني موجود على…", choices:["الريبوسومات","الكروموسومات","الغشاء البلازمي","الميتوكوندريا فقط"], answer:1 },
+    { q:"النشاط الإشعاعي ينتج عنه…", choices:["انبعاث إشعاعات","انعدام طاقة","تبريد مفاجئ","توقف حركة الذرات"], answer:0 },
+    { q:"الهرمونات تُفرز من…", choices:["الغدد","العظام","الشعر","الأظافر"], answer:0 },
+    { q:"من أمثلة تفاعل احتراق…", choices:["صدأ الحديد","احتراق الخشب","ذوبان السكر","تمدد الهواء"], answer:1 },
+  ],
+  ss: [
+    { q:"تُعد قارة آسيا…", choices:["الأصغر مساحة","الأكبر مساحة","بلا جبال","بلا أنهار"], answer:1 },
+    { q:"العوامل التي تؤثر في توزيع السكان تشمل…", choices:["المناخ فقط","التضاريس فقط","مجموعة عوامل طبيعية وبشرية","لا شيء"], answer:2 },
+    { q:"من نتائج الحملة الفرنسية على مصر…", choices:["لا شيء","تأثيرات سياسية/علمية","اختفاء النيل","هجرة القمر"], answer:1 },
+    { q:"المناخ يؤثر على…", choices:["النبات الطبيعي","التربة","الإنسان","كل ما سبق"], answer:3 },
+    { q:"النفوذ الأجنبي يزيد غالبًا مع…", choices:["ضعف الدولة","قوة الاقتصاد","زيادة المطر","قلة السكان"], answer:0 },
+  ],
+  rel: [
+    { q:"من أهداف العبادة…", choices:["التفاخر","تهذيب النفس","الكسل","الخصام"], answer:1 },
+    { q:"الأمانة تعني…", choices:["الكذب","حفظ الحقوق","الغيبة","الظلم"], answer:1 },
+    { q:"من القيم المهمة في المجتمع…", choices:["العدل","العنف","التنمر","السرقة"], answer:0 },
+    { q:"الصدق يؤدي إلى…", choices:["ثقة الناس","خسارة كل شيء","عدم احترام","مشاكل فقط"], answer:0 },
+    { q:"صلة الرحم معناها…", choices:["قطع العلاقات","حسن التعامل مع الأقارب","نسيان الأقارب","السخرية"], answer:1 },
+  ],
+  it: [
+    { q:"رمز القرار (Decision) في خريطة التدفق يكون…", choices:["مستطيل","مُعيّن","دائرة","متوازي أضلاع"], answer:1 },
+    { q:"الخوارزمية هي…", choices:["خطوات لحل مشكلة","نوع شاشة","لعبة","ملف صوت"], answer:0 },
+    { q:"Loop يُستخدم لـ…", choices:["تكرار خطوات","حذف ملفات","زيادة الصوت","تغيير لون"], answer:0 },
+    { q:"المتغير في البرمجة هو…", choices:["قيمة ثابتة دائمًا","مكان لتخزين قيمة تتغير","زر في لوحة المفاتيح","نوع فيروس"], answer:1 },
+    { q:"Debugging يعني…", choices:["تشغيل الموسيقى","اكتشاف وتصحيح الأخطاء","تصميم خلفية","نسخ ملفات"], answer:1 },
+  ],
+};
+
+function mountAllQuizzes(){
+  mountQuiz($("#generalQuiz"), generalQuestions, { title:"معلومات عامة" });
+  mountQuiz($("#countriesQuiz"), countryQuestions, { title:"الدول" });
+
+  mountQuiz($("#prep3_ar"), prep3.ar, { title:"عربي – ترم تاني" });
+  mountQuiz($("#prep3_en"), prep3.en, { title:"إنجليزي – ترم تاني" });
+  mountQuiz($("#prep3_math"), prep3.math, { title:"رياضيات – ترم تاني" });
+  mountQuiz($("#prep3_sci"), prep3.sci, { title:"علوم – ترم تاني" });
+  mountQuiz($("#prep3_ss"), prep3.ss, { title:"دراسات – ترم تاني" });
+  mountQuiz($("#prep3_rel"), prep3.rel, { title:"دين – ترم تاني" });
+  mountQuiz($("#prep3_it"), prep3.it, { title:"كمبيوتر – ترم تاني" });
+}
+
+/* =========================
+   Games (init-on-open)
+========================= */
+let initFlags = {};
+function onEnterRoute(route){
+  // صفحات محتوى
+  if(route === "jokes" && !initFlags.jokes){ initFlags.jokes=true; mountJokes(); }
+  if((route === "general" || route === "countries" || route.startsWith("prep3")) && !initFlags.quizzes){
+    initFlags.quizzes=true; mountAllQuizzes();
+  }
+
+  // الألعاب
+  if(route === "game-xo" && !initFlags.xo){ initFlags.xo=true; initXO(); }
+  if(route === "game-mem" && !initFlags.mem){ initFlags.mem=true; initMemory(); }
+  if(route === "game-dino" && !initFlags.dino){ initFlags.dino=true; initDino(); }
+  if(route === "game-frog" && !initFlags.frog){ initFlags.frog=true; initFrog(); }
+
+  // الرسائل
+  if(route === "messages" && !initFlags.msg){ initFlags.msg=true; initMessages(); }
+}
+
+/* ===== XO (minimax depth-limited) ===== */
+function initXO(){
+  const grid = $("#xoGrid");
+  const status = $("#xoStatus");
+  const resetBtn = $("#xoReset");
+  let board = Array(9).fill(null);
+  let over = false;
+  const HUMAN = "❌", AI = "⭕";
+
+  function win(b){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const [a,c,d] of lines){
+      if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
     }
-    document.getElementById("cPrev").addEventListener("click", ()=> renderCountries((cIndex-1+countries.length)%countries.length));
-    document.getElementById("cNext").addEventListener("click", ()=> renderCountries((cIndex+1)%countries.length));
-    document.getElementById("cReset").addEventListener("click", ()=>{
-      for(let i=0;i<cPicked.length;i++) cPicked[i]=null;
-      renderCountries(cIndex);
-    });
-    document.getElementById("cMsgBtn").addEventListener("click", openModal);
+    if(b.every(Boolean)) return "draw";
+    return null;
+  }
 
-    /*************************
-     * RIDDLES (more fun)
-     *************************/
-    const riddles = [
-      { q:"لغز: أيهم مختلف؟ (🍋 🍎 🥦 🍉)", options:["🍋","🍎","🥦","🍉"], answer:2 },
-      { q:"لغز: شيء كل ما تاخد منه يكبر؟", options:["الحفرة","الماء","الهواء","الوقت"], answer:0 },
-      { q:"لغز: شيء له أسنان ولا يعض؟", options:["المشط","المنشار","السحّاب","المفتاح"], answer:0 },
-      { q:"لغز: يمشي بلا رجلين ويبكي بلا عينين؟", options:["السحاب","الريح","المطر","الظل"], answer:2 },
-      { q:"لغز: باب بلا مفاتيح وبيت بلا شبابيك؟", options:["الخيمة","القفص","السجن","الكنز"], answer:0 },
-      { q:"لغز: أنا في الليل أنور… وفي النهار أختفي. أنا؟", options:["القمر","النجمة","الشمس","البرق"], answer:0 },
-      { q:"لغز: ما هو الشيء الذي يكسر إذا نطقنا اسمه؟", options:["الصمت","الزجاج","السر","الحبل"], answer:0 },
-      { q:"لغز: شيء يطير بلا جناح؟", options:["الدخان","الحجر","الماء","الخشب"], answer:0 }
-    ];
-    let rIndex = 0;
-    const rPicked = Array(riddles.length).fill(null);
+  function scoreResult(res, depth){
+    if(res===AI) return 10 - depth;
+    if(res===HUMAN) return depth - 10;
+    if(res==="draw") return 0;
+    return null;
+  }
 
-    const rTitle = document.getElementById("rTitle");
-    const rNums  = document.getElementById("rNums");
-    const rQ     = document.getElementById("rQ");
-    const rOpts  = document.getElementById("rOpts");
-    const rMsg   = document.getElementById("rMsg");
+  function minimax(b, depth, isMax){
+    const res = win(b);
+    if(res) return { score: scoreResult(res, depth) };
+    if(depth >= 4) return { score: 0 }; // صعب بسيط
 
-    function renderRiddles(idx){
-      rIndex = idx;
-      renderQuiz({
-        data: riddles,
-        index: rIndex,
-        qEl: rQ, optsEl: rOpts, msgEl: rMsg,
-        titleEl: rTitle, numsEl: rNums,
-        onSetIndex: renderRiddles,
-        getPicked: (i)=> rPicked[i],
-        setPicked: (i,v)=> rPicked[i]=v
-      });
-    }
-    document.getElementById("rPrev").addEventListener("click", ()=> renderRiddles((rIndex-1+riddles.length)%riddles.length));
-    document.getElementById("rNext").addEventListener("click", ()=> renderRiddles((rIndex+1)%riddles.length));
-    document.getElementById("rReset").addEventListener("click", ()=>{
-      for(let i=0;i<rPicked.length;i++) rPicked[i]=null;
-      renderRiddles(rIndex);
-    });
-    document.getElementById("rMsgBtn").addEventListener("click", openModal);
-
-    /*************************
-     * THEMES
-     *************************/
-    const tMsg = document.getElementById("tMsg");
-    document.querySelectorAll("[data-theme]").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const theme = btn.dataset.theme;
-        setTheme(theme);
-        tMsg.textContent = `تم تطبيق الثيم: ${theme} ✅`;
-        tMsg.className = "msgline ok";
-      });
-    });
-    document.getElementById("tBackHome").addEventListener("click", ()=> go("home"));
-
-    function setTheme(theme){
-      document.body.dataset.theme = theme;
-      localStorage.setItem("neonhub_theme", theme);
-      buildSky();
-      // theme "chaos" changes home order a bit (creative touch)
-      const grid = document.getElementById("homeGrid");
-      if(theme === "chaos"){
-        // reorder tiles for fun: themes first
-        const tiles = [...grid.querySelectorAll(".tile")];
-        const byId = (id)=> tiles.find(t=>t.dataset.open===id);
-        grid.innerHTML = "";
-        [byId("themes"), byId("countries"), byId("gk"), byId("jokes")].forEach(x=> grid.appendChild(x));
-      }else{
-        // restore default order
-        const tiles = [...grid.querySelectorAll(".tile")];
-        const byId = (id)=> tiles.find(t=>t.dataset.open===id);
-        grid.innerHTML = "";
-        ["jokes","gk","countries","themes"].forEach(id=>{
-          const el = byId(id);
-          if(el) grid.appendChild(el);
-        });
-      }
-    }
-
-    /*************************
-     * GAMES MENU -> open pages
-     *************************/
-    document.querySelectorAll("[data-game]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const id = b.dataset.game;
-        go(id);
-        if(id==="xo") resetXO();
-        if(id==="memory") buildMemory();
-        if(id==="dino") dinoDrawSplash();
-        if(id==="frog") frogDrawSplash();
-      });
-    });
-    document.getElementById("gMsg2").addEventListener("click", openModal);
-
-    /*************************
-     * XO GAME
-     *************************/
-    const xoBoardEl = document.getElementById("xoBoard");
-    const xoStatus = document.getElementById("xoStatus");
-    const xoRestart = document.getElementById("xoRestart");
-
-    let xo = Array(9).fill(null);
-    let xoOver = false;
-
-    function winner(b){
-      const lines = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      for(const [a,c,d] of lines){
-        if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
-      }
-      if(b.every(Boolean)) return "draw";
-      return null;
-    }
-    function score(b){
-      const w = winner(b);
-      if(w==="⭕") return 10;
-      if(w==="❌") return -10;
-      return 0;
-    }
-    function minimax(b, depth, isMax, maxDepth){
-      const w = winner(b);
-      if(w || depth === maxDepth) return score(b);
-
-      const empties = b.map((v,i)=>v?null:i).filter(v=>v!==null);
-      if(isMax){
-        let best = -Infinity;
-        for(const i of empties){
-          b[i] = "⭕";
-          best = Math.max(best, minimax(b, depth+1, false, maxDepth));
-          b[i] = null;
+    if(isMax){
+      let best = { score: -Infinity, move: null };
+      for(let i=0;i<9;i++){
+        if(!b[i]){
+          b[i]=AI;
+          const r = minimax(b, depth+1, false);
+          b[i]=null;
+          if(r.score > best.score) best = { score: r.score, move: i };
         }
-        return best - depth*0.2;
-      }else{
-        let best = Infinity;
-        for(const i of empties){
-          b[i] = "❌";
-          best = Math.min(best, minimax(b, depth+1, true, maxDepth));
-          b[i] = null;
+      }
+      return best;
+    } else {
+      let best = { score: Infinity, move: null };
+      for(let i=0;i<9;i++){
+        if(!b[i]){
+          b[i]=HUMAN;
+          const r = minimax(b, depth+1, true);
+          b[i]=null;
+          if(r.score < best.score) best = { score: r.score, move: i };
         }
-        return best + depth*0.2;
       }
+      return best;
     }
-    function bestMove(b){
-      const empties = b.map((v,i)=>v?null:i).filter(v=>v!==null);
-      if(Math.random() < 0.18){
-        return empties[Math.floor(Math.random()*empties.length)];
-      }
-      let best = -Infinity, move = empties[0];
-      for(const i of empties){
-        b[i] = "⭕";
-        const val = minimax(b, 0, false, 4);
-        b[i] = null;
-        if(val > best){ best = val; move = i; }
-      }
-      return move;
-    }
+  }
 
-    function renderXO(){
-      xoBoardEl.innerHTML = "";
-      xo.forEach((v, idx)=>{
-        const cell = document.createElement("div");
-        cell.className = "xo-cell" + (xoOver ? " disabled" : "");
-        cell.textContent = v || "";
-        cell.addEventListener("click", ()=>{
-          if(xoOver) return;
-          if(xo[idx]) return;
-          xo[idx] = "❌";
-          afterMove();
-        });
-        xoBoardEl.appendChild(cell);
+  function render(){
+    grid.innerHTML = "";
+    board.forEach((v,i)=>{
+      const cell = document.createElement("div");
+      cell.className = "xoCell";
+      cell.textContent = v || "";
+      cell.addEventListener("click", ()=>{
+        if(over || board[i]) return;
+        board[i]=HUMAN;
+        tick();
       });
-    }
-    function afterMove(){
-      renderXO();
-      let w = winner(xo);
-      if(w){ endXO(w); return; }
+      grid.appendChild(cell);
+    });
+  }
 
-      xoStatus.textContent = "دور الكمبيوتر…";
+  function tick(){
+    render();
+    let res = win(board);
+    if(res){
+      over=true;
+      status.textContent = res==="draw" ? "تعادل 🤝" : (res===HUMAN ? "أنت كسبت 🔥" : "الكمبيوتر كسب 😈");
+      return;
+    }
+
+    status.textContent = "دور الكمبيوتر…";
+    setTimeout(()=>{
+      const {move} = minimax(board.slice(), 0, true);
+      const pick = (move ?? board.findIndex(x=>!x));
+      if(pick>=0) board[pick]=AI;
+
+      render();
+      res = win(board);
+      if(res){
+        over=true;
+        status.textContent = res==="draw" ? "تعادل 🤝" : (res===HUMAN ? "أنت كسبت 🔥" : "الكمبيوتر كسب 😈");
+      } else {
+        status.textContent = "دورك";
+      }
+    }, 250);
+  }
+
+  function reset(){
+    board = Array(9).fill(null);
+    over=false;
+    status.textContent = "دورك";
+    render();
+  }
+
+  resetBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* ===== Memory ===== */
+function initMemory(){
+  const grid = $("#memGrid");
+  const movesEl = $("#memMoves");
+  const matchesEl = $("#memMatches");
+  const resetBtn = $("#memReset");
+  const icons = ["😂","🔥","💎","🧠","🎮","✨","🍭","🟣"];
+  let deck=[], flipped=[], matched=new Set(), moves=0, matches=0, lock=false;
+
+  function build(){
+    const pair = icons.concat(icons);
+    deck = shuffle(pair).map((v, idx)=>({ id: idx, v }));
+  }
+
+  function render(){
+    grid.innerHTML="";
+    deck.forEach(card=>{
+      const div = document.createElement("div");
+      div.className="memCard";
+      const isFlip = flipped.includes(card.id) || matched.has(card.id);
+      if(isFlip) div.classList.add("flipped");
+      if(matched.has(card.id)) div.classList.add("matched");
+      div.textContent = isFlip ? card.v : "❔";
+      div.addEventListener("click", ()=> onPick(card.id));
+      grid.appendChild(div);
+    });
+    movesEl.textContent = "Moves: " + moves;
+    matchesEl.textContent = `Matches: ${matches}/8`;
+  }
+
+  function onPick(id){
+    if(lock) return;
+    if(matched.has(id)) return;
+    if(flipped.includes(id)) return;
+
+    flipped.push(id);
+    if(flipped.length === 2){
+      moves++;
+      lock = true;
+      const [a,b] = flipped;
+      const ca = deck.find(x=>x.id===a);
+      const cb = deck.find(x=>x.id===b);
+
+      render();
+
       setTimeout(()=>{
-        const m = bestMove(xo.slice());
-        if(m !== undefined && m !== null) xo[m] = "⭕";
-        renderXO();
-        w = winner(xo);
-        if(w) endXO(w);
-        else xoStatus.textContent = "دورك.";
-      }, 320);
-    }
-    function endXO(w){
-      xoOver = true;
-      if(w === "❌"){
-        xoStatus.textContent = "فزت ✅";
-        xoStatus.className = "msgline ok";
-      }else if(w === "⭕"){
-        xoStatus.textContent = "الكمبيوتر كسب 😈";
-        xoStatus.className = "msgline bad";
-      }else{
-        xoStatus.textContent = "تعادل";
-        xoStatus.className = "msgline";
-      }
-    }
-    function resetXO(){
-      xo = Array(9).fill(null);
-      xoOver = false;
-      xoStatus.textContent = "دورك.";
-      xoStatus.className = "msgline";
-      renderXO();
-    }
-    xoRestart.addEventListener("click", resetXO);
-    document.getElementById("xoMsg").addEventListener("click", openModal);
-
-    /*************************
-     * MEMORY GAME
-     *************************/
-    const memoryGrid = document.getElementById("memoryGrid");
-    const memStatus = document.getElementById("memStatus");
-    const memStart = document.getElementById("memStart");
-
-    const MEM_POOL = [
-      "😂","🤣","😭","🥲","😈","🙈","😎","🤝",
-      "💗","💘","✨","🌙","⭐","🧠","🎉","🔥",
-      "🍩","🪐","⚡","🎯","🧩","🧪","🫧","🔮"
-    ];
-
-    function pickUnique(pool, n){
-      const copy = pool.slice();
-      shuffle(copy);
-      return copy.slice(0, n);
-    }
-    let memFirst=null, memLock=false, memMatched=0;
-
-    function buildMemory(){
-      memoryGrid.innerHTML = "";
-      memFirst=null; memLock=false; memMatched=0;
-      memStatus.textContent = "تم: 0 / 8";
-
-      const chosen = pickUnique(MEM_POOL, 8);
-      const deck = shuffle([...chosen, ...chosen]);
-
-      deck.forEach(emo=>{
-        const c = document.createElement("div");
-        c.className = "mcard";
-        c.dataset.emo = emo;
-        c.innerHTML = `<div class="mfront">❔</div><div class="mback">${emo}</div>`;
-        c.addEventListener("click", ()=>{
-          if(memLock) return;
-          if(c.classList.contains("matched")) return;
-          if(c.classList.contains("revealed")) return;
-
-          c.classList.add("revealed");
-
-          if(!memFirst){ memFirst = c; return; }
-          const a = memFirst, b = c;
-          memFirst = null;
-
-          if(a.dataset.emo === b.dataset.emo){
-            a.classList.add("matched");
-            b.classList.add("matched");
-            memMatched++;
-            memStatus.textContent = `تم: ${memMatched} / 8`;
-          }else{
-            memLock = true;
-            setTimeout(()=>{
-              a.classList.remove("revealed");
-              b.classList.remove("revealed");
-              memLock = false;
-            }, 520);
-          }
-        });
-        memoryGrid.appendChild(c);
-      });
-    }
-    memStart.addEventListener("click", buildMemory);
-    document.getElementById("memMsg").addEventListener("click", openModal);
-
-    /*************************
-     * DINO RUNNER (Canvas)
-     *************************/
-    const dinoCanvas = document.getElementById("dinoCanvas");
-    const dctx = dinoCanvas.getContext("2d");
-    const dinoStatus = document.getElementById("dinoStatus");
-    let dinoRAF=null, dinoRunning=false;
-
-    const dino = {
-      x: 70, y: 0, w: 34, h: 46,
-      vy: 0, onGround: true
-    };
-    const dinoGame = {
-      t:0, score:0, speed: 5.5,
-      groundY: 260,
-      obstacles: [],
-      spawnTimer: 0,
-      over: false
-    };
-
-    function dinoReset(){
-      dino.y = dinoGame.groundY - dino.h;
-      dino.vy = 0;
-      dino.onGround = true;
-      dinoGame.t=0; dinoGame.score=0; dinoGame.speed=5.5;
-      dinoGame.obstacles=[];
-      dinoGame.spawnTimer=0;
-      dinoGame.over=false;
-      dinoStatus.textContent = "جاهز… اضغط ابدأ.";
-      dinoStatus.className = "msgline";
-      dinoDrawSplash();
-    }
-
-    function dinoJump(){
-      if(!dinoRunning || dinoGame.over) return;
-      if(dino.onGround){
-        dino.vy = -12.5;
-        dino.onGround = false;
-      }
-    }
-
-    function spawnObstacle(){
-      const h = pick([28, 36, 44]);
-      const w = pick([16, 18, 22]);
-      dinoGame.obstacles.push({ x: 900, y: dinoGame.groundY - h, w, h });
-    }
-
-    function rectHit(a,b){
-      return a.x < b.x + b.w && a.x + a.w > b.x &&
-             a.y < b.y + b.h && a.y + a.h > b.y;
-    }
-
-    function dinoLoop(){
-      dinoRAF = requestAnimationFrame(dinoLoop);
-      if(!dinoRunning) return;
-
-      // update
-      dinoGame.t++;
-      dinoGame.score += 0.15;
-      dinoGame.speed = Math.min(11, dinoGame.speed + 0.0018);
-
-      // gravity
-      dino.vy += 0.55;
-      dino.y += dino.vy;
-
-      if(dino.y >= dinoGame.groundY - dino.h){
-        dino.y = dinoGame.groundY - dino.h;
-        dino.vy = 0;
-        dino.onGround = true;
-      }
-
-      // obstacles
-      dinoGame.spawnTimer--;
-      if(dinoGame.spawnTimer <= 0){
-        spawnObstacle();
-        dinoGame.spawnTimer = Math.floor(rand(55, 90));
-      }
-      dinoGame.obstacles.forEach(o => o.x -= dinoGame.speed);
-      dinoGame.obstacles = dinoGame.obstacles.filter(o => o.x + o.w > -30);
-
-      // collision
-      const dRect = { x:dino.x, y:dino.y, w:dino.w, h:dino.h };
-      for(const o of dinoGame.obstacles){
-        if(rectHit(dRect, o)){
-          dinoGame.over = true;
-          dinoRunning = false;
-          dinoStatus.textContent = `خسرت 😈 — سكور: ${Math.floor(dinoGame.score)}`;
-          dinoStatus.className = "msgline bad";
-          break;
+        if(ca.v === cb.v){
+          matched.add(a); matched.add(b);
+          matches++;
         }
+        flipped = [];
+        lock = false;
+        render();
+      }, 450);
+    } else {
+      render();
+    }
+  }
+
+  function reset(){
+    flipped=[]; matched=new Set(); moves=0; matches=0; lock=false;
+    build(); render();
+  }
+
+  resetBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* ===== Dino Runner (canvas) ===== */
+function initDino(){
+  const cvs = $("#dinoCanvas");
+  const ctx = cvs.getContext("2d");
+  const scoreEl = $("#dinoScore");
+  const stateEl = $("#dinoState");
+  const restartBtn = $("#dinoRestart");
+
+  let running=false, dead=false;
+  let t=0, score=0;
+  const g = 0.7;
+  const ground = 160;
+  const dino = { x: 60, y: ground, vy: 0, w: 22, h: 28, jump: -11 };
+  let obstacles = [];
+  let lastSpawn = 0;
+
+  function reset(){
+    running=false; dead=false; t=0; score=0; obstacles=[]; lastSpawn=0;
+    dino.y=ground; dino.vy=0;
+    stateEl.textContent="اضغط/المس للقفز";
+    scoreEl.textContent="Score: 0";
+    draw();
+  }
+
+  function spawn(){
+    const h = 18 + (Math.random()*22|0);
+    const w = 12 + (Math.random()*18|0);
+    obstacles.push({ x: 520, y: ground + 28 - h, w, h });
+  }
+
+  function collide(a,b){
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
+
+  function jump(){
+    if(dead) return;
+    if(!running){ running=true; stateEl.textContent="شغال…"; loop(); }
+    if(dino.y >= ground - 0.5){
+      dino.vy = dino.jump;
+    }
+  }
+
+  function step(){
+    t++;
+    dino.vy += g;
+    dino.y += dino.vy;
+    if(dino.y > ground){ dino.y=ground; dino.vy=0; }
+
+    // spawn
+    if(t - lastSpawn > 70 + (Math.random()*40|0)){
+      spawn(); lastSpawn = t;
+    }
+
+    // move obstacles
+    const speed = 4.2 + Math.min(4, score/200);
+    obstacles.forEach(o=> o.x -= speed);
+    obstacles = obstacles.filter(o=> o.x + o.w > -10);
+
+    // score
+    score++;
+    scoreEl.textContent = "Score: " + Math.floor(score/4);
+
+    // collision
+    const boxD = { x:dino.x, y:dino.y, w:dino.w, h:dino.h };
+    for(const o of obstacles){
+      if(collide(boxD, o)){
+        dead=true; running=false;
+        stateEl.textContent="💥 خسرت! اضغط إعادة تشغيل";
+        break;
       }
+    }
+  }
 
-      // draw
-      dctx.clearRect(0,0,dinoCanvas.width,dinoCanvas.height);
+  function draw(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
 
-      // background glow
-      dctx.globalAlpha = 0.9;
-      dctx.fillStyle = "rgba(255,255,255,0.04)";
-      dctx.fillRect(0,0,dinoCanvas.width,dinoCanvas.height);
-      dctx.globalAlpha = 1;
+    // ground line
+    ctx.globalAlpha = .8;
+    ctx.fillStyle = "rgba(255,255,255,.18)";
+    ctx.fillRect(0, ground+28, cvs.width, 2);
+    ctx.globalAlpha = 1;
 
-      // ground
-      dctx.fillStyle = "rgba(255,255,255,0.18)";
-      dctx.fillRect(0, dinoGame.groundY, dinoCanvas.width, 3);
+    // dino
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
 
-      // dino (simple)
-      dctx.fillStyle = "rgba(103,240,255,0.85)";
-      dctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+    // obstacles
+    ctx.fillStyle = "rgba(255,214,102,.85)";
+    for(const o of obstacles) ctx.fillRect(o.x, o.y, o.w, o.h);
+  }
 
-      // obstacles
-      dctx.fillStyle = "rgba(255,95,209,0.80)";
-      for(const o of dinoGame.obstacles){
-        dctx.fillRect(o.x, o.y, o.w, o.h);
+  function loop(){
+    if(!running) return;
+    step();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // controls
+  cvs.addEventListener("pointerdown", jump);
+  window.addEventListener("keydown", (e)=>{ if(e.code==="Space") jump(); });
+
+  restartBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* ===== Frog (3 lanes, doors from right) ===== */
+function initFrog(){
+  const cvs = $("#frogCanvas");
+  const ctx = cvs.getContext("2d");
+  const scoreEl = $("#frogScore");
+  const stateEl = $("#frogState");
+  const upBtn = $("#frogUp");
+  const downBtn = $("#frogDown");
+  const restartBtn = $("#frogRestart");
+
+  let running=false, dead=false;
+  let score=0, frame=0;
+  const lanesY = [40, 100, 160];
+  const frog = { lane:1, x: 70, w: 26, h: 26 };
+  let doors = [];
+
+  function reset(){
+    running=false; dead=false; score=0; frame=0; doors=[];
+    frog.lane=1;
+    stateEl.textContent="اضغط فوق/تحت للبدء";
+    scoreEl.textContent="Score: 0";
+    draw();
+  }
+
+  function start(){
+    if(dead) return;
+    if(!running){
+      running=true;
+      stateEl.textContent="شغال…";
+      loop();
+    }
+  }
+
+  function spawnDoor(){
+    const lane = (Math.random()*3)|0;
+    const w = 22 + (Math.random()*18|0);
+    const h = 32;
+    doors.push({ x: 520, lane, w, h });
+  }
+
+  function step(){
+    frame++;
+    if(frame % 55 === 0) spawnDoor();
+
+    const speed = 4.3 + Math.min(4, score/200);
+    doors.forEach(d=> d.x -= speed);
+    doors = doors.filter(d=> d.x + d.w > -10);
+
+    score++;
+    scoreEl.textContent = "Score: " + Math.floor(score/5);
+
+    // collision
+    const fy = lanesY[frog.lane];
+    const fbox = { x:frog.x, y:fy, w:frog.w, h:frog.h };
+
+    for(const d of doors){
+      const dy = lanesY[d.lane] - 3;
+      const db = { x:d.x, y:dy, w:d.w, h:d.h };
+      if(fbox.x < db.x+db.w && fbox.x+fbox.w > db.x && fbox.y < db.y+db.h && fbox.y+fbox.h > db.y){
+        dead=true; running=false;
+        stateEl.textContent="🚪💥 اتخبطت! اضغط إعادة تشغيل";
+        break;
       }
+    }
+  }
 
-      // score
-      dctx.fillStyle = "rgba(238,244,255,0.9)";
-      dctx.font = "bold 18px system-ui";
-      dctx.fillText("Score: " + Math.floor(dinoGame.score), 18, 30);
+  function draw(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+
+    // lanes
+    for(let i=0;i<3;i++){
+      ctx.fillStyle = "rgba(255,255,255,.07)";
+      ctx.fillRect(0, lanesY[i]-10, cvs.width, 46);
+      ctx.fillStyle = "rgba(255,255,255,.14)";
+      ctx.fillRect(0, lanesY[i]+30, cvs.width, 2);
     }
 
-    function dinoDrawSplash(){
-      dctx.clearRect(0,0,dinoCanvas.width,dinoCanvas.height);
-      dctx.fillStyle = "rgba(255,255,255,0.04)";
-      dctx.fillRect(0,0,dinoCanvas.width,dinoCanvas.height);
-      dctx.fillStyle = "rgba(238,244,255,0.9)";
-      dctx.font = "bold 18px system-ui";
-      dctx.fillText("Tap / Space to Jump", 18, 30);
-      dctx.fillStyle = "rgba(255,255,255,0.18)";
-      dctx.fillRect(0, dinoGame.groundY, dinoCanvas.width, 3);
-      dctx.fillStyle = "rgba(103,240,255,0.85)";
-      dctx.fillRect(dino.x, dinoGame.groundY - dino.h, dino.w, dino.h);
-    }
+    // frog
+    const y = lanesY[frog.lane];
+    ctx.fillStyle = "rgba(44,255,159,.85)";
+    ctx.fillRect(frog.x, y, frog.w, frog.h);
+    ctx.fillStyle = "rgba(0,0,0,.25)";
+    ctx.fillRect(frog.x+6, y+7, 4, 4);
+    ctx.fillRect(frog.x+16, y+7, 4, 4);
 
-    function dinoStart(){
-      if(dinoRAF === null) dinoLoop();
-      if(dinoGame.over) dinoReset();
-      dinoRunning = true;
-      dinoStatus.textContent = "شغّال… اتجنب العوائق!";
-      dinoStatus.className = "msgline";
-    }
-
-    document.getElementById("dinoStart").addEventListener("click", dinoStart);
-    document.getElementById("dinoReset").addEventListener("click", dinoReset);
-    document.getElementById("dinoMsg").addEventListener("click", openModal);
-
-    dinoCanvas.addEventListener("pointerdown", ()=> dinoJump());
-    window.addEventListener("keydown", (e)=>{
-      if(e.code === "Space") { e.preventDefault(); dinoJump(); }
+    // doors
+    ctx.fillStyle = "rgba(255,214,102,.85)";
+    doors.forEach(d=>{
+      const y2 = lanesY[d.lane]-3;
+      ctx.fillRect(d.x, y2, d.w, d.h);
+      ctx.fillStyle = "rgba(0,0,0,.22)";
+      ctx.fillRect(d.x + d.w - 6, y2 + d.h/2, 3, 3);
+      ctx.fillStyle = "rgba(255,214,102,.85)";
     });
+  }
 
-    /*************************
-     * FROG DODGE (Canvas)
-     *************************/
-    const frogCanvas = document.getElementById("frogCanvas");
-    const fctx = frogCanvas.getContext("2d");
-    const frogStatus = document.getElementById("frogStatus");
-    let frogRAF=null, frogRunning=false;
+  function loop(){
+    if(!running) return;
+    step();
+    draw();
+    requestAnimationFrame(loop);
+  }
 
-    const frog = { x: 120, y: 180, r: 18 };
-    const frogGame = {
-      score: 0,
-      speed: 5.0,
-      doors: [],
-      spawn: 0,
-      over: false
-    };
+  function move(delta){
+    start();
+    if(dead) return;
+    frog.lane = Math.max(0, Math.min(2, frog.lane + delta));
+    draw();
+  }
 
-    function frogReset(){
-      frog.y = frogCanvas.height/2;
-      frogGame.score=0;
-      frogGame.speed=5.0;
-      frogGame.doors=[];
-      frogGame.spawn=0;
-      frogGame.over=false;
-      frogRunning=false;
-      frogStatus.textContent = "جاهز… اضغط ابدأ.";
-      frogStatus.className = "msgline";
-      frogDrawSplash();
-    }
+  upBtn.addEventListener("click", ()=>move(-1));
+  downBtn.addEventListener("click", ()=>move(1));
+  window.addEventListener("keydown", (e)=>{
+    if(e.code==="ArrowUp") move(-1);
+    if(e.code==="ArrowDown") move(1);
+  });
+  restartBtn.addEventListener("click", reset);
 
-    function frogStart(){
-      if(frogRAF === null) frogLoop();
-      if(frogGame.over) frogReset();
-      frogRunning = true;
-      frogStatus.textContent = "شغّال… تجنب الأبواب!";
-      frogStatus.className = "msgline";
-    }
+  reset();
+}
 
-    function spawnDoor(){
-      // door is a tall rectangle with a gap? User said doors hitting frog. We'll do single rectangle on one lane.
-      const h = pick([70, 90, 110]);
-      const y = Math.floor(rand(30, frogCanvas.height - h - 30));
-      const w = pick([26, 34]);
-      frogGame.doors.push({ x: frogCanvas.width + 20, y, w, h });
-    }
+/* =========================
+   Formspree Submit (fetch)
+========================= */
+function initMessages(){
+  const form = $("#msgForm");
+  const statusEl = $("#msgStatus");
+  const clearBtn = $("#msgClear");
 
-    function frogHit(door){
-      // circle-rect collision approx
-      const cx = frog.x, cy = frog.y, r = frog.r;
-      const rx = door.x, ry = door.y, rw = door.w, rh = door.h;
-      const nx = Math.max(rx, Math.min(cx, rx+rw));
-      const ny = Math.max(ry, Math.min(cy, ry+rh));
-      const dx = cx - nx, dy = cy - ny;
-      return (dx*dx + dy*dy) <= r*r;
-    }
+  function setStatus(msg){
+    statusEl.textContent = msg;
+    statusEl.classList.add("show");
+  }
 
-    function frogMove(dy){
-      if(!frogRunning || frogGame.over) return;
-      frog.y += dy;
-      frog.y = Math.max(frog.r+8, Math.min(frogCanvas.height - frog.r - 8, frog.y));
-    }
+  clearBtn.addEventListener("click", ()=>{
+    form.reset();
+    statusEl.classList.remove("show");
+  });
 
-    let lastPointerY = null;
-    frogCanvas.addEventListener("pointerdown", (e)=>{
-      lastPointerY = e.clientY;
-      frogCanvas.setPointerCapture(e.pointerId);
-    });
-    frogCanvas.addEventListener("pointermove", (e)=>{
-      if(lastPointerY === null) return;
-      const delta = e.clientY - lastPointerY;
-      // drag up => negative => move up
-      frogMove(delta * 0.35);
-      lastPointerY = e.clientY;
-    });
-    frogCanvas.addEventListener("pointerup", ()=> { lastPointerY = null; });
+  form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    setStatus("جاري الإرسال…");
 
-    document.getElementById("frogUp").addEventListener("click", ()=> frogMove(-26));
-    document.getElementById("frogDown").addEventListener("click", ()=> frogMove(26));
-    window.addEventListener("keydown", (e)=>{
-      if(!document.getElementById("frog").classList.contains("active")) return;
-      if(e.key === "ArrowUp"){ e.preventDefault(); frogMove(-26); }
-      if(e.key === "ArrowDown"){ e.preventDefault(); frogMove(26); }
-    });
-
-    function frogLoop(){
-      frogRAF = requestAnimationFrame(frogLoop);
-      if(!frogRunning) return;
-
-      frogGame.score += 0.20;
-      frogGame.speed = Math.min(12, frogGame.speed + 0.0022);
-
-      frogGame.spawn--;
-      if(frogGame.spawn <= 0){
-        spawnDoor();
-        frogGame.spawn = Math.floor(rand(40, 70));
-      }
-
-      frogGame.doors.forEach(d=> d.x -= frogGame.speed);
-      frogGame.doors = frogGame.doors.filter(d=> d.x + d.w > -40);
-
-      for(const d of frogGame.doors){
-        if(frogHit(d)){
-          frogGame.over = true;
-          frogRunning = false;
-          frogStatus.textContent = `خسرت 😈 — سكور: ${Math.floor(frogGame.score)}`;
-          frogStatus.className = "msgline bad";
-          break;
-        }
-      }
-
-      // draw
-      fctx.clearRect(0,0,frogCanvas.width,frogCanvas.height);
-      fctx.fillStyle = "rgba(255,255,255,0.04)";
-      fctx.fillRect(0,0,frogCanvas.width,frogCanvas.height);
-
-      // lanes (visual)
-      fctx.strokeStyle = "rgba(255,255,255,0.10)";
-      fctx.lineWidth = 2;
-      fctx.beginPath();
-      fctx.moveTo(0, frogCanvas.height/3);
-      fctx.lineTo(frogCanvas.width, frogCanvas.height/3);
-      fctx.moveTo(0, 2*frogCanvas.height/3);
-      fctx.lineTo(frogCanvas.width, 2*frogCanvas.height/3);
-      fctx.stroke();
-
-      // doors
-      fctx.fillStyle = "rgba(255,211,111,0.85)";
-      frogGame.doors.forEach(d=>{
-        fctx.fillRect(d.x, d.y, d.w, d.h);
-        // door knob
-        fctx.fillStyle = "rgba(255,95,209,0.85)";
-        fctx.beginPath();
-        fctx.arc(d.x + d.w*0.7, d.y + d.h*0.55, 5, 0, Math.PI*2);
-        fctx.fill();
-        fctx.fillStyle = "rgba(255,211,111,0.85)";
+    try{
+      const res = await fetch(form.action, {
+        method:"POST",
+        body: new FormData(form),
+        headers: { "Accept":"application/json" }
       });
 
-      // frog
-      fctx.fillStyle = "rgba(125,255,179,0.92)";
-      fctx.beginPath();
-      fctx.arc(frog.x, frog.y, frog.r, 0, Math.PI*2);
-      fctx.fill();
-
-      // eyes
-      fctx.fillStyle = "rgba(0,0,0,0.55)";
-      fctx.beginPath();
-      fctx.arc(frog.x-6, frog.y-5, 3, 0, Math.PI*2);
-      fctx.arc(frog.x+6, frog.y-5, 3, 0, Math.PI*2);
-      fctx.fill();
-
-      // score
-      fctx.fillStyle = "rgba(238,244,255,0.9)";
-      fctx.font = "bold 18px system-ui";
-      fctx.fillText("Score: " + Math.floor(frogGame.score), 18, 30);
-    }
-
-    function frogDrawSplash(){
-      fctx.clearRect(0,0,frogCanvas.width,frogCanvas.height);
-      fctx.fillStyle = "rgba(255,255,255,0.04)";
-      fctx.fillRect(0,0,frogCanvas.width,frogCanvas.height);
-      fctx.fillStyle = "rgba(238,244,255,0.9)";
-      fctx.font = "bold 18px system-ui";
-      fctx.fillText("Use ⬆️⬇️ or Drag", 18, 30);
-      fctx.fillStyle = "rgba(125,255,179,0.92)";
-      fctx.beginPath();
-      fctx.arc(frog.x, frogCanvas.height/2, frog.r, 0, Math.PI*2);
-      fctx.fill();
-    }
-
-    document.getElementById("frogStart").addEventListener("click", frogStart);
-    document.getElementById("frogReset").addEventListener("click", frogReset);
-    document.getElementById("frogMsg").addEventListener("click", openModal);
-
-    /*************************
-     * Messages modal + Formspree
-     *************************/
-    const modal = document.getElementById("modal");
-    const openMessages = document.getElementById("openMessages");
-    const closeModal = document.getElementById("closeModal");
-
-    function openModal(){
-      modal.classList.add("show");
-      document.getElementById("msgHint").textContent = "";
-      document.getElementById("msgHint").className = "msgline";
-    }
-    function hideModal(){
-      modal.classList.remove("show");
-    }
-    openMessages.addEventListener("click", openModal);
-    closeModal.addEventListener("click", hideModal);
-    modal.addEventListener("click", (e)=>{ if(e.target === modal) hideModal(); });
-
-    document.getElementById("jMsg").addEventListener("click", openModal);
-    document.getElementById("gMsgBtn").addEventListener("click", openModal);
-    document.getElementById("cMsgBtn").addEventListener("click", openModal);
-
-    const msgForm = document.getElementById("msgForm");
-    const msgText = document.getElementById("msgText");
-    const msgPage = document.getElementById("msgPage");
-    const msgSend = document.getElementById("msgSend");
-    const msgHint = document.getElementById("msgHint");
-
-    msgForm.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-
-      const gotcha = msgForm.querySelector('[name="_gotcha"]').value;
-      if(gotcha) return;
-
-      const msg = (msgText.value || "").trim();
-      if(!msg){
-        flashRed();
-        msgText.focus();
-        return;
+      if(res.ok){
+        setStatus("✅ تم الإرسال!");
+        form.reset();
+      } else {
+        let data = {};
+        try{ data = await res.json(); } catch {}
+        setStatus("❌ فشل الإرسال: " + (data?.error || "راجع إعدادات Formspree"));
       }
-
-      msgPage.value = location.href;
-      msgSend.disabled = true;
-      msgHint.textContent = "جاري الإرسال...";
-
-      try{
-        const fd = new FormData(msgForm);
-
-        let res = await fetch(FORMSPREE_ENDPOINT, {
-          method: "POST",
-          body: fd,
-          headers: { "Accept":"application/json" }
-        });
-
-        if(!res.ok){
-          const payload = new URLSearchParams();
-          for(const [k,v] of fd.entries()) payload.append(k, String(v));
-          res = await fetch(FORMSPREE_ENDPOINT, {
-            method:"POST",
-            headers:{
-              "Accept":"application/json",
-              "Content-Type":"application/x-www-form-urlencoded"
-            },
-            body: payload.toString()
-          });
-        }
-
-        const data = await res.json().catch(()=>({}));
-        if(!res.ok){
-          const m = data?.error || data?.message || "مرفوض";
-          msgHint.textContent = `فشل الإرسال (${res.status}): ${m}`;
-          msgHint.className = "msgline bad";
-          flashRed();
-          msgSend.disabled = false;
-          return;
-        }
-
-        msgHint.textContent = "تم الإرسال ✅";
-        msgHint.className = "msgline ok";
-        msgSend.disabled = false;
-
-      }catch(err){
-        msgHint.textContent = "فشل اتصال/حظر من إضافة. جرّب Incognito أو بدّل فورم.";
-        msgHint.className = "msgline bad";
-        flashRed();
-        msgSend.disabled = false;
-      }
-    });
-
-    /*************************
-     * Misc bindings
-     *************************/
-    document.getElementById("jMsg").addEventListener("click", openModal);
-    document.getElementById("jMsg").addEventListener("click", openModal);
-
-    /*************************
-     * INIT
-     *************************/
-    // restore theme
-    const savedTheme = localStorage.getItem("neonhub_theme") || "aura";
-    document.body.dataset.theme = savedTheme;
-    buildSky();
-
-    // initial renders
-    renderJokes(0);
-    renderGK(0);
-    renderCountries(0);
-    renderRiddles(0);
-
-    // init games
-    resetXO();
-    buildMemory();
-    dinoReset();
-    frogReset();
-
-    // Home -> games
-    document.getElementById("openGames").addEventListener("click", ()=> go("games"));
-
-    // Messages shortcuts
-    document.getElementById("gMsg2").addEventListener("click", openModal);
-  </script>
+    } catch(err){
+      setStatus("❌ مشكلة اتصال. جرّب تاني.");
+    }
+  });
+}
+</script>
 </body>
 </html>
-
