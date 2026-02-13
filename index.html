@@ -4,35 +4,62 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b0f1e" />
-  <title>V2.1 fayomy hup</title>
+  <title>Neon Hub v3</title>
 
   <style>
+    /* =========================
+       THEME TOKENS (default)
+       ========================= */
     :root{
-      --bgA:#070a14;
-      --bgB:#081a2e;
-      --bgC:#2a0b2a;
-
-      --txt:#eef4ff;
-      --mut:rgba(238,244,255,.72);
-
+      --bgA:#070a14; --bgB:#081a2e; --bgC:#2a0b2a;
+      --txt:#eef4ff; --mut:rgba(238,244,255,.72);
       --glass1: rgba(255,255,255,.12);
       --glass2: rgba(255,255,255,.06);
       --stroke: rgba(255,255,255,.14);
-
-      --c1:#67f0ff;  /* cyan */
-      --c2:#b06cff;  /* violet */
-      --c3:#ff5fd1;  /* pink */
-      --c4:#ffd36f;  /* gold */
-
-      --ok:#7dffb3;
-      --bad:#ff6b6b;
-
+      --c1:#67f0ff; --c2:#b06cff; --c3:#ff5fd1; --c4:#ffd36f;
+      --ok:#7dffb3; --bad:#ff6b6b;
       --shadow: 0 18px 70px rgba(0,0,0,.55);
       --shadow2: 0 10px 40px rgba(0,0,0,.45);
-
       --r: 26px;
+      --tileRadius: 24px;
+      --tilePad: 16px;
+      --fontScale: 1;
     }
 
+    /* =========================
+       THEMES (4)
+       ========================= */
+    body[data-theme="aura"]{
+      --bgA:#050710; --bgB:#09244a; --bgC:#0b0f1e;
+      --c1:#7af7ff; --c2:#6cfab4; --c3:#ff6ad5; --c4:#ffe27a;
+      --glass1: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.05);
+    }
+    body[data-theme="sunset"]{
+      --bgA:#12040a; --bgB:#2b0722; --bgC:#1d0e30;
+      --c1:#ff9a5a; --c2:#ff5fd1; --c3:#a67bff; --c4:#ffd36f;
+      --glass1: rgba(255,255,255,.11);
+      --glass2: rgba(255,255,255,.06);
+    }
+    body[data-theme="ice"]{
+      --bgA:#02060b; --bgB:#052035; --bgC:#041117;
+      --c1:#7bd3ff; --c2:#85ffd6; --c3:#7b9bff; --c4:#b8f7ff;
+      --glass1: rgba(255,255,255,.09);
+      --glass2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.12);
+    }
+    /* Theme 4 changes layout + style */
+    body[data-theme="chaos"]{
+      --bgA:#07020a; --bgB:#18061f; --bgC:#040814;
+      --c1:#ff4df3; --c2:#5bffec; --c3:#ffe56f; --c4:#9d7bff;
+      --tileRadius: 28px;
+      --tilePad: 18px;
+      --fontScale: 1.03;
+    }
+
+    /* =========================
+       Base
+       ========================= */
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -40,30 +67,32 @@
       font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
       color:var(--txt);
       overflow:hidden;
+      font-size: calc(16px * var(--fontScale));
 
       background:
-        radial-gradient(900px 650px at 15% 85%, rgba(103,240,255,.12), transparent 60%),
-        radial-gradient(900px 650px at 85% 15%, rgba(176,108,255,.12), transparent 60%),
-        radial-gradient(900px 650px at 55% 60%, rgba(255,95,209,.10), transparent 60%),
+        radial-gradient(900px 650px at 15% 85%, color-mix(in oklab, var(--c1) 18%, transparent), transparent 60%),
+        radial-gradient(900px 650px at 85% 15%, color-mix(in oklab, var(--c2) 18%, transparent), transparent 60%),
+        radial-gradient(900px 650px at 55% 60%, color-mix(in oklab, var(--c3) 14%, transparent), transparent 60%),
         linear-gradient(140deg, var(--bgA), var(--bgB), var(--bgC));
     }
 
-    /* Fix black bars (mobile dynamic viewport) */
+    /* Fullscreen fix (no inner black gaps) */
     .app{
       position:fixed;
       inset:0;
       height: 100svh;
       height: 100dvh;
-      display:grid;
-      place-items:center;
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
       padding:
-        calc(16px + env(safe-area-inset-top))
-        14px
-        calc(74px + env(safe-area-inset-bottom));
+        calc(10px + env(safe-area-inset-top))
+        12px
+        calc(10px + env(safe-area-inset-bottom));
       overscroll-behavior: none;
     }
 
-    /* Floating emojis (NEW set) */
+    /* Floating emojis */
     .sky{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
     .e{
       position:absolute;
@@ -78,18 +107,18 @@
       15%{ opacity:.95; }
       to{ transform: translate3d(var(--dx), -25svh, 0) rotate(calc(var(--r) + 140deg)); opacity:0; }
     }
-
     .vignette{
       position:fixed; inset:0; pointer-events:none;
       background: radial-gradient(circle at 50% 38%, transparent 34%, rgba(0,0,0,.62) 88%);
       mix-blend-mode: multiply;
     }
 
-    /* Panels */
+    /* Panels / Cards fill height */
     .panel{
       width: min(980px, 96vw);
+      height: 100%;
       display:none;
-      animation: pop .34s ease both;
+      animation: pop .32s ease both;
     }
     .panel.active{ display:block; }
     @keyframes pop{
@@ -98,6 +127,9 @@
     }
 
     .card{
+      height: 100%;
+      display:flex;
+      flex-direction:column;
       border-radius: var(--r);
       border:1px solid var(--stroke);
       background: linear-gradient(180deg, var(--glass1), var(--glass2));
@@ -114,6 +146,7 @@
       justify-content:space-between;
       gap:10px;
       padding: 14px 14px 10px;
+      flex: 0 0 auto;
     }
 
     .brand{
@@ -150,19 +183,15 @@
       font-size: 12px;
       letter-spacing:.2px;
       flex: 0 0 auto;
+      white-space:nowrap;
     }
 
+    /* content scroll INSIDE card */
     .content{
       padding: 10px 14px 14px;
-    }
-
-    /* Scrollable content (when long) */
-    .scroll{
-      max-height: calc(100svh - 200px);
-      max-height: calc(100dvh - 200px);
-      overflow:auto;
-      padding-right: 6px;
-      scrollbar-width: thin;
+      flex: 1;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* Buttons */
@@ -173,7 +202,7 @@
       padding: 12px 14px;
       font-weight: 1000;
       color:#0b0710;
-      background: linear-gradient(135deg, var(--c4), rgba(255,211,111,.60));
+      background: linear-gradient(135deg, var(--c4), color-mix(in oklab, var(--c4) 55%, transparent));
       box-shadow: var(--shadow2);
       transition: transform .12s ease, filter .12s ease;
       -webkit-tap-highlight-color: transparent;
@@ -187,16 +216,21 @@
     }
     .btn.pink{
       color: white;
-      background: linear-gradient(135deg, var(--c3), rgba(255,95,209,.55));
-      filter: drop-shadow(0 0 18px rgba(255,95,209,.30));
+      background: linear-gradient(135deg, var(--c3), color-mix(in oklab, var(--c3) 55%, transparent));
+      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c3) 28%, transparent));
     }
     .btn.cyan{
       color:#061017;
-      background: linear-gradient(135deg, var(--c1), rgba(103,240,255,.55));
-      filter: drop-shadow(0 0 18px rgba(103,240,255,.25));
+      background: linear-gradient(135deg, var(--c1), color-mix(in oklab, var(--c1) 55%, transparent));
+      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c1) 22%, transparent));
+    }
+    .btn.violet{
+      color:#0c0714;
+      background: linear-gradient(135deg, var(--c2), color-mix(in oklab, var(--c2) 55%, transparent));
+      filter: drop-shadow(0 0 18px color-mix(in oklab, var(--c2) 22%, transparent));
     }
 
-    /* Home grid */
+    /* Home grid (theme 4 changes layout) */
     .grid{
       display:grid;
       gap:14px;
@@ -206,13 +240,17 @@
     @media (min-width: 760px){
       .grid{ grid-template-columns: 1fr 1fr; }
     }
+    body[data-theme="chaos"] .grid{
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
 
     .tile{
-      border-radius: 24px;
+      border-radius: var(--tileRadius);
       border:1px solid rgba(255,255,255,.14);
       background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
       box-shadow: var(--shadow2);
-      padding: 16px 14px;
+      padding: var(--tilePad) 14px;
       cursor:pointer;
       position:relative;
       overflow:hidden;
@@ -224,9 +262,9 @@
       content:"";
       position:absolute; inset:-2px;
       background:
-        radial-gradient(280px 140px at 25% 25%, rgba(103,240,255,.18), transparent 60%),
-        radial-gradient(280px 140px at 85% 70%, rgba(255,95,209,.16), transparent 60%),
-        radial-gradient(280px 140px at 60% 40%, rgba(176,108,255,.14), transparent 62%);
+        radial-gradient(280px 140px at 25% 25%, color-mix(in oklab, var(--c1) 22%, transparent), transparent 60%),
+        radial-gradient(280px 140px at 85% 70%, color-mix(in oklab, var(--c3) 18%, transparent), transparent 60%),
+        radial-gradient(280px 140px at 60% 40%, color-mix(in oklab, var(--c2) 16%, transparent), transparent 62%);
       opacity:.9;
       pointer-events:none;
     }
@@ -261,6 +299,7 @@
       justify-content:space-between;
       gap:10px;
       margin: 10px 0 12px;
+      flex: 0 0 auto;
     }
     .page-title{
       font-weight: 1000;
@@ -300,23 +339,25 @@
     }
     .num:active{ transform: scale(.99); }
     .num.active{
-      outline: 2px solid rgba(103,240,255,.35);
-      background: linear-gradient(180deg, rgba(103,240,255,.18), rgba(0,0,0,.22));
+      outline: 2px solid color-mix(in oklab, var(--c1) 35%, transparent);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--c1) 18%, transparent), rgba(0,0,0,.22));
     }
 
-    /* Typewriter */
-    .big{
+    /* Typewriter box */
+    .box{
       border-radius: 22px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.18);
       padding: 16px 14px;
       box-shadow: 0 12px 44px rgba(0,0,0,.30);
+      margin-bottom: 12px;
     }
     .type{
       margin:0;
       font-size: clamp(16px, 4.2vw, 20px);
       line-height: 1.85;
       font-weight: 900;
+      white-space: pre-wrap;
     }
     .cursor{
       display:inline-block;
@@ -351,8 +392,8 @@
       transition: transform .12s ease, background .12s ease;
     }
     .opt:active{ transform: scale(.99); }
-    .opt.correct{ outline: 2px solid rgba(125,255,179,.35); background: rgba(125,255,179,.10); }
-    .opt.wrong{ outline: 2px solid rgba(255,107,107,.35); background: rgba(255,107,107,.10); }
+    .opt.correct{ outline: 2px solid color-mix(in oklab, var(--ok) 35%, transparent); background: color-mix(in oklab, var(--ok) 10%, rgba(0,0,0,.18)); }
+    .opt.wrong{ outline: 2px solid color-mix(in oklab, var(--bad) 35%, transparent); background: color-mix(in oklab, var(--bad) 10%, rgba(0,0,0,.18)); }
 
     .msgline{ min-height: 18px; font-size: 13px; color: rgba(238,244,255,.78); margin-top:10px; }
     .msgline.ok{ color: rgba(125,255,179,.92); }
@@ -366,7 +407,108 @@
       }
     }
 
-    /* Messages modal */
+    /* Games menu buttons */
+    .game-grid{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 760px){
+      .game-grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Canvas games */
+    .game-wrap{
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      padding: 12px;
+      box-shadow: 0 12px 44px rgba(0,0,0,.28);
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
+      display:block;
+      touch-action: none;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .kbd{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      padding: 10px 12px;
+      color: rgba(238,244,255,.85);
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1.5;
+      flex: 1 1 auto;
+      min-width: 180px;
+    }
+
+    /* XO board */
+    .xo-board{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .xo-cell{
+      height: 86px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 14px 38px rgba(0,0,0,.26);
+      display:grid;
+      place-items:center;
+      font-size: 34px;
+      font-weight: 1000;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .xo-cell:active{ transform: scale(.99); }
+    .xo-cell.disabled{ cursor:default; opacity:.85; }
+
+    /* Memory */
+    .grid16{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .mcard{
+      height: 74px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 14px 38px rgba(0,0,0,.26);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    .mcard:active{ transform: scale(.99); }
+    .mfront, .mback{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      border-radius: 18px;
+      transition: opacity .18s ease;
+    }
+    .mfront{ font-weight: 1000; font-size: 22px; opacity:1; color: rgba(238,245,255,.85); }
+    .mback{ font-size: 34px; opacity:0; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+    .mcard.revealed .mfront{ opacity:0; }
+    .mcard.revealed .mback{ opacity:1; }
+    .mcard.matched{ outline: 2px solid color-mix(in oklab, var(--ok) 35%, transparent); cursor:default; }
+
+    /* Modal messages */
     .modal{
       position:fixed;
       inset:0;
@@ -385,15 +527,13 @@
       border-radius: 28px;
       border:1px solid rgba(255,255,255,.14);
       background:
-        radial-gradient(700px 320px at 15% 0%, rgba(103,240,255,.14), transparent 60%),
-        radial-gradient(700px 320px at 85% 25%, rgba(255,95,209,.14), transparent 60%),
+        radial-gradient(700px 320px at 15% 0%, color-mix(in oklab, var(--c1) 18%, transparent), transparent 60%),
+        radial-gradient(700px 320px at 85% 25%, color-mix(in oklab, var(--c3) 18%, transparent), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .sheet .header{
-      padding: 14px 14px 10px;
-    }
+
     .field{
       width:100%;
       border-radius: 18px;
@@ -406,46 +546,39 @@
     }
     textarea.field{ min-height: 140px; resize: vertical; }
 
-    /* Footer */
     .footer{
-      position:fixed;
-      left:0; right:0;
-      bottom: 10px;
       text-align:center;
       font-size: 13px;
       color: rgba(238,244,255,.65);
-      text-shadow: 0 10px 25px rgba(0,0,0,.55);
-      pointer-events:none;
-      padding: 0 10px;
+      padding: 12px 10px 0;
     }
   </style>
 </head>
 
-<body>
+<body data-theme="aura">
   <div class="sky" id="sky" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
 
   <div class="app">
-
     <!-- HOME -->
     <section class="panel active" id="home">
       <div class="card">
         <div class="header">
           <div class="brand">
             <h1>Neon Hub</h1>
-            <p>v2.1 — اختار خانة… وكل خانة جواها صفحات بأرقام + رجوع/التالي</p>
+            <p>تحديث الألعاب + ثيمات + أسئلة كتير + ألغاز…</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
 
         <div class="content">
-          <div class="grid">
+          <div class="grid" id="homeGrid">
             <div class="tile" data-open="jokes">
               <div class="row">
                 <h2>نكت بيض</h2>
                 <div class="icon">🥚</div>
               </div>
-              <p>صفحات نكت… كل صفحة نكتة.</p>
+              <p>نكت جديدة — صفحات بأرقام + رجوع/التالي.</p>
             </div>
 
             <div class="tile" data-open="gk">
@@ -453,7 +586,7 @@
                 <h2>اسئلة معلومات عامه</h2>
                 <div class="icon">🧠</div>
               </div>
-              <p>5 أسئلة + اختيارات (تفاعلي).</p>
+              <p>أكتر من 20 سؤال — تفاعلي.</p>
             </div>
 
             <div class="tile" data-open="countries">
@@ -461,34 +594,37 @@
                 <h2>اسئله عن الدول</h2>
                 <div class="icon">🌍</div>
               </div>
-              <p>5 أسئلة عن عواصم/دول/قارات.</p>
+              <p>أكتر من 20 سؤال جديد عن دول/عواصم/قارات.</p>
             </div>
 
-            <div class="tile" data-open="soon">
+            <div class="tile" data-open="themes">
               <div class="row">
-                <h2>قريبا</h2>
-                <div class="icon">✨</div>
+                <h2>الثيمات</h2>
+                <div class="icon">🎨</div>
               </div>
-              <p>صفحات للتنقل… تجهيزات جاية.</p>
+              <p>4 ثيمات تغيّر شكل الموقع (واحد يغيّر الديزاين/الترتيب كمان).</p>
             </div>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:14px;">
-            <button class="btn cyan" id="openMessages" type="button">✉️ الرسائل (للضروره)</button>
-            <button class="btn ghost" id="openExtras" type="button">🎮 إضافات ممتعة</button>
+          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+            <button class="btn cyan" id="openGames" type="button">🎮 الألعاب</button>
+            <button class="btn violet" id="openRiddles" type="button">🧩 ألغاز زيادة</button>
+            <button class="btn pink" id="openMessages" type="button">✉️ الرسائل (جلو)</button>
           </div>
+
+          <div class="footer">صُنع بواسطة : بني ادم براس فرخه v2.2 .</div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION TEMPLATE: JOKES -->
+    <!-- JOKES -->
     <section class="panel" id="jokes">
       <div class="card">
         <div class="header">
           <button class="btn ghost" data-home>⟵</button>
           <div class="brand">
-            <h1>نكت بيض</h1>
-            <p>تنقلي بالأرقام أو بالأسهم…</p>
+            <h1>نكت بيض (جديدة)</h1>
+            <p>رقم + رجوع/التالي…</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
@@ -501,14 +637,11 @@
           </div>
           <div class="nums" id="jNums"></div>
 
-          <div class="scroll">
-            <div class="big">
-              <p class="type" id="jText"></p>
-            </div>
-            <div class="msgline" id="jHint"></div>
+          <div class="box">
+            <p class="type" id="jText"></p>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:12px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn pink" type="button" id="jReplay">↻ إعادة كتابة</button>
             <button class="btn cyan" type="button" id="jMsg">✉️ رسالة</button>
           </div>
@@ -516,14 +649,14 @@
       </div>
     </section>
 
-    <!-- SECTION: GENERAL KNOWLEDGE -->
+    <!-- GK -->
     <section class="panel" id="gk">
       <div class="card">
         <div class="header">
           <button class="btn ghost" data-home>⟵</button>
           <div class="brand">
-            <h1>اسئلة معلومات عامه</h1>
-            <p>اختار إجابة… هتظهر صح/غلط.</p>
+            <h1>معلومات عامة</h1>
+            <p>أكتر من 20 سؤال — اختيارات.</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
@@ -536,30 +669,28 @@
           </div>
           <div class="nums" id="gNums"></div>
 
-          <div class="scroll">
-            <div class="big">
-              <p class="q" id="gQ"></p>
-              <div class="opts" id="gOpts"></div>
-              <div class="msgline" id="gMsg"></div>
-            </div>
+          <div class="box">
+            <p class="q" id="gQ"></p>
+            <div class="opts" id="gOpts"></div>
+            <div class="msgline" id="gMsg"></div>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:12px;">
-            <button class="btn cyan" type="button" id="gReset">🧼 تصفير الإجابات</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn cyan" type="button" id="gReset">🧼 تصفير</button>
             <button class="btn pink" type="button" id="gMsgBtn">✉️ رسالة</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: COUNTRIES -->
+    <!-- COUNTRIES -->
     <section class="panel" id="countries">
       <div class="card">
         <div class="header">
           <button class="btn ghost" data-home>⟵</button>
           <div class="brand">
-            <h1>اسئله عن الدول</h1>
-            <p>5 أسئلة… أظهرلك الصح.</p>
+            <h1>أسئلة الدول</h1>
+            <p>أكتر من 20 سؤال جديد.</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
@@ -572,95 +703,217 @@
           </div>
           <div class="nums" id="cNums"></div>
 
-          <div class="scroll">
-            <div class="big">
-              <p class="q" id="cQ"></p>
-              <div class="opts" id="cOpts"></div>
-              <div class="msgline" id="cMsg"></div>
-            </div>
+          <div class="box">
+            <p class="q" id="cQ"></p>
+            <div class="opts" id="cOpts"></div>
+            <div class="msgline" id="cMsg"></div>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:12px;">
-            <button class="btn cyan" type="button" id="cReset">🧼 تصفير الإجابات</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn cyan" type="button" id="cReset">🧼 تصفير</button>
             <button class="btn pink" type="button" id="cMsgBtn">✉️ رسالة</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: SOON (WITH PAGES + NAV) -->
-    <section class="panel" id="soon">
+    <!-- THEMES -->
+    <section class="panel" id="themes">
       <div class="card">
         <div class="header">
           <button class="btn ghost" data-home>⟵</button>
           <div class="brand">
-            <h1>قريبا</h1>
-            <p>صفحات بأرقام + رجوع/التالي زي ما طلبت.</p>
+            <h1>الثيمات</h1>
+            <p>4 ثيمات — واحد منهم يغير الديزاين والترتيب.</p>
+          </div>
+          <span class="chip">الشاشة الرئيسية</span>
+        </div>
+
+        <div class="content">
+          <div class="box">
+            <p class="q">اختار ثيم:</p>
+            <div class="opts" style="gap:12px;">
+              <button class="opt" type="button" data-theme="aura">AURA — نيون رايق ✨</button>
+              <button class="opt" type="button" data-theme="sunset">SUNSET — وردي/ذهبي 🌅</button>
+              <button class="opt" type="button" data-theme="ice">ICE — بارد/هادئ ❄️</button>
+              <button class="opt" type="button" data-theme="chaos">CHAOS — يغيّر شكل وترتيب الصفحة 🔥</button>
+            </div>
+            <div class="msgline" id="tMsg"></div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn cyan" id="tBackHome" type="button">🏠 الرئيسية</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIDDLES -->
+    <section class="panel" id="riddles">
+      <div class="card">
+        <div class="header">
+          <button class="btn ghost" data-home>⟵</button>
+          <div class="brand">
+            <h1>ألغاز زيادة</h1>
+            <p>صفحات + أرقام + رجوع/التالي.</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
 
         <div class="content">
           <div class="pager">
-            <button class="btn ghost" id="sPrev">◀</button>
-            <div class="page-title" id="sTitle">صفحة</div>
-            <button class="btn ghost" id="sNext">▶</button>
+            <button class="btn ghost" id="rPrev">◀</button>
+            <div class="page-title" id="rTitle">لغز</div>
+            <button class="btn ghost" id="rNext">▶</button>
           </div>
-          <div class="nums" id="sNums"></div>
+          <div class="nums" id="rNums"></div>
 
-          <div class="scroll">
-            <div class="big">
-              <p class="type" id="sText"></p>
-            </div>
-            <div class="msgline" id="sMsg"></div>
+          <div class="box">
+            <p class="q" id="rQ"></p>
+            <div class="opts" id="rOpts"></div>
+            <div class="msgline" id="rMsg"></div>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:12px;">
-            <button class="btn cyan" type="button" id="sMsgBtn">✉️ رسالة</button>
-            <button class="btn ghost" type="button" id="sBackHome">🏠 الرئيسية</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn cyan" type="button" id="rReset">🧼 تصفير</button>
+            <button class="btn pink" type="button" id="rMsgBtn">✉️ رسالة</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- EXTRAS (added games + puzzles to make it more fun) -->
-    <section class="panel" id="extras">
+    <!-- GAMES MENU -->
+    <section class="panel" id="games">
       <div class="card">
         <div class="header">
           <button class="btn ghost" data-home>⟵</button>
           <div class="brand">
-            <h1>🎮 إضافات ممتعة</h1>
-            <p>ألعاب + ألغاز صغيرة زيادة (علشان الموقع يبقى ممتع أكتر).</p>
+            <h1>🎮 الألعاب</h1>
+            <p>كل لعبة في صفحة لوحدها.</p>
           </div>
           <span class="chip">الشاشة الرئيسية</span>
         </div>
 
         <div class="content">
-          <div class="scroll">
-            <div class="big" style="margin-bottom:12px;">
-              <p class="q">اختار واحدة:</p>
-              <div style="display:grid; gap:10px;">
-                <button class="btn cyan" type="button" id="goXO">🎯 لعبة XO (سريعة)</button>
-                <button class="btn pink" type="button" id="goMemory">🃏 لعبة المطابقة</button>
-                <button class="btn ghost" type="button" id="miniRiddle">🧩 لغز سريع (نقرة واحدة)</button>
-              </div>
-              <div class="msgline" id="exMsg"></div>
-            </div>
-
-            <div class="big" id="miniBox" style="display:none;">
-              <p class="q">لغز: أيهم “مش مناسب” وسطهم؟</p>
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn ghost" type="button" data-mini="A">🍋</button>
-                <button class="btn ghost" type="button" data-mini="B">🍎</button>
-                <button class="btn ghost" type="button" data-mini="C">🥦</button>
-                <button class="btn ghost" type="button" data-mini="D">🍉</button>
-              </div>
-              <div class="msgline" id="miniMsg"></div>
-            </div>
+          <div class="game-grid">
+            <button class="btn cyan" type="button" data-game="xo">❌⭕ لعبة XO</button>
+            <button class="btn pink" type="button" data-game="memory">🃏 لعبة المطابقة</button>
+            <button class="btn violet" type="button" data-game="dino">🦖 لعبة الديناصور</button>
+            <button class="btn" type="button" data-game="frog">🐸 لعبة الضفدع</button>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:12px;">
-            <button class="btn pink" type="button" id="exMsgBtn">✉️ رسالة</button>
+          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+            <button class="btn pink" type="button" id="gMsg2">✉️ رسالة</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- XO GAME -->
+    <section class="panel" id="xo">
+      <div class="card">
+        <div class="header">
+          <button class="btn ghost" data-back="games">⟵</button>
+          <div class="brand">
+            <h1>❌⭕ XO ضد كمبيوتر</h1>
+            <p>إنت ❌ — الكمبيوتر ⭕</p>
+          </div>
+          <span class="chip">الألعاب</span>
+        </div>
+
+        <div class="content">
+          <div class="box">
+            <div class="xo-board" id="xoBoard"></div>
+            <div class="msgline" id="xoStatus">دورك.</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+              <button class="btn cyan" id="xoRestart" type="button">↻ إعادة</button>
+              <button class="btn pink" type="button" id="xoMsg">✉️ رسالة</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMORY GAME -->
+    <section class="panel" id="memory">
+      <div class="card">
+        <div class="header">
+          <button class="btn ghost" data-back="games">⟵</button>
+          <div class="brand">
+            <h1>🃏 المطابقة 4×4</h1>
+            <p>كل مرة توزيع عشوائي.</p>
+          </div>
+          <span class="chip">الألعاب</span>
+        </div>
+
+        <div class="content">
+          <div class="box">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <button class="btn cyan" id="memStart" type="button">ابدأ / إعادة</button>
+              <button class="btn pink" id="memMsg" type="button">✉️ رسالة</button>
+            </div>
+            <div class="grid16" id="memoryGrid"></div>
+            <div class="msgline" id="memStatus">تم: 0 / 8</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DINO GAME -->
+    <section class="panel" id="dino">
+      <div class="card">
+        <div class="header">
+          <button class="btn ghost" data-back="games">⟵</button>
+          <div class="brand">
+            <h1>🦖 الديناصور</h1>
+            <p>اضغط/المس للقفز.</p>
+          </div>
+          <span class="chip">الألعاب</span>
+        </div>
+
+        <div class="content">
+          <div class="game-wrap">
+            <canvas id="dinoCanvas" width="900" height="320"></canvas>
+            <div class="controls">
+              <button class="btn cyan" id="dinoStart" type="button">ابدأ</button>
+              <button class="btn pink" id="dinoReset" type="button">إعادة</button>
+              <button class="btn ghost" id="dinoMsg" type="button">✉️ رسالة</button>
+            </div>
+            <div class="kbd">التحكم: لمس/Space = قفز. الهدف: اتجنب العوائق.</div>
+            <div class="msgline" id="dinoStatus"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FROG GAME -->
+    <section class="panel" id="frog">
+      <div class="card">
+        <div class="header">
+          <button class="btn ghost" data-back="games">⟵</button>
+          <div class="brand">
+            <h1>🐸 الضفدع ضد الأبواب</h1>
+            <p>حرّك الضفدع فوق/تحت لتفادي الأبواب.</p>
+          </div>
+          <span class="chip">الألعاب</span>
+        </div>
+
+        <div class="content">
+          <div class="game-wrap">
+            <canvas id="frogCanvas" width="900" height="360"></canvas>
+            <div class="controls">
+              <button class="btn cyan" id="frogStart" type="button">ابدأ</button>
+              <button class="btn pink" id="frogReset" type="button">إعادة</button>
+              <button class="btn ghost" id="frogMsg" type="button">✉️ رسالة</button>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+              <button class="btn ghost" id="frogUp" type="button">⬆️</button>
+              <button class="btn ghost" id="frogDown" type="button">⬇️</button>
+            </div>
+
+            <div class="kbd">التحكم: ⬆️⬇️ أو سحب لأعلى/لأسفل. الهدف: ابعد عن الأبواب اللي جاية من اليمين.</div>
+            <div class="msgline" id="frogStatus"></div>
           </div>
         </div>
       </div>
@@ -675,16 +928,16 @@
         <button class="btn ghost" id="closeModal">✖</button>
         <div class="brand">
           <h1>✉️ الرسائل</h1>
-          <p>الرساله بتوصلني بلاش ازعاج☺️</p>
+          <p>شكل جلو + إرسال سريع</p>
         </div>
         <span class="chip">الشاشة الرئيسية</span>
       </div>
 
       <div class="content">
-        <form id="msgForm" class="row" style="display:grid; gap:10px;">
+        <form id="msgForm" style="display:grid; gap:10px;">
           <textarea class="field" id="msgText" name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
           <input type="hidden" name="page" id="msgPage">
-          <input type="hidden" name="_subject" value="Message from v2.1 Neon Hub">
+          <input type="hidden" name="_subject" value="Message from Neon Hub v3">
           <input type="text" name="_gotcha" style="display:none">
           <button class="btn pink" id="msgSend" type="submit">إرسال</button>
           <div class="msgline" id="msgHint"></div>
@@ -693,17 +946,14 @@
     </div>
   </div>
 
-  <footer class="footer">صُنع بواسطة : بني ادم براس فرخه v2.1 .</footer>
-
   <script>
     /*************************
      * CONFIG
      *************************/
-    // لو عندك فورم مختلف: غيّر ده
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/mykdkqza";
 
     /*************************
-     * helpers
+     * Helpers
      *************************/
     function rand(min,max){ return Math.random()*(max-min)+min; }
     function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
@@ -718,68 +968,70 @@
       document.body.classList.add("flash-red");
       setTimeout(()=>document.body.classList.remove("flash-red"), 700);
     }
-    function normalizeArabic(s){
-      return (s||"").toLowerCase().trim()
-        .replace(/\s+/g,"")
-        .replace(/[إأآا]/g,"ا")
-        .replace(/ى/g,"ي")
-        .replace(/ؤ/g,"و")
-        .replace(/ئ/g,"ي")
-        .replace(/ة/g,"ه")
-        .replace(/[ـًٌٍَُِّْ]/g,"");
-    }
 
     /*************************
-     * floating emojis (NEW)
+     * Floating emojis (theme-aware)
      *************************/
     const sky = document.getElementById("sky");
-    const FLOAT_EMOJIS = ["🪐","💫","🧊","🎭","🎲","🧠","⚡","🌈","🍩","🎧","🫧","🔮","🧪","🎯"];
-    const count = Math.min(30, Math.max(18, Math.floor(window.innerWidth/42)));
-    for(let i=0;i<count;i++){
-      const el = document.createElement("span");
-      el.className = "e";
-      el.textContent = pick(FLOAT_EMOJIS);
-      el.style.left = rand(2,98) + "vw";
-      el.style.setProperty("--r", rand(-35,35) + "deg");
-      el.style.setProperty("--dx", rand(-18,18).toFixed(1) + "px");
-      el.style.animationDuration = rand(9.5, 16.5).toFixed(2) + "s";
-      el.style.animationDelay = rand(-12, 0).toFixed(2) + "s";
-      sky.appendChild(el);
+    function buildSky(){
+      sky.innerHTML = "";
+      const theme = document.body.dataset.theme || "aura";
+      const sets = {
+        aura:   ["✨","🫧","💫","🔮","🎧","🎯","🧠","⚡","🌈","🪐","🧪","🧩"],
+        sunset: ["🌅","🔥","🎆","🍓","🍒","✨","💗","🎭","🎈","🎯","🧁","🫶"],
+        ice:    ["❄️","🧊","🌨️","🪽","🫧","💎","🌙","⭐","🧠","🧪","🔷","🫧"],
+        chaos:  ["🌀","💥","🎲","⚡","👾","🧨","🎭","🧠","🍩","🪐","🧩","🦖"]
+      };
+      const EMOJI = sets[theme] || sets.aura;
+      const count = Math.min(30, Math.max(18, Math.floor(window.innerWidth/42)));
+      for(let i=0;i<count;i++){
+        const el = document.createElement("span");
+        el.className = "e";
+        el.textContent = pick(EMOJI);
+        el.style.left = rand(2,98) + "vw";
+        el.style.setProperty("--r", rand(-35,35) + "deg");
+        el.style.setProperty("--dx", rand(-18,18).toFixed(1) + "px");
+        el.style.animationDuration = rand(9.5, 16.5).toFixed(2) + "s";
+        el.style.animationDelay = rand(-12, 0).toFixed(2) + "s";
+        sky.appendChild(el);
+      }
     }
 
     /*************************
-     * router
+     * Router
      *************************/
     const panels = [...document.querySelectorAll(".panel")];
     function go(id){
       panels.forEach(p=>p.classList.toggle("active", p.id === id));
       window.scrollTo(0,0);
     }
-
-    // home tiles
+    document.querySelectorAll("[data-home]").forEach(b=> b.addEventListener("click", ()=> go("home")));
     document.querySelectorAll("[data-open]").forEach(t=>{
       t.addEventListener("click", ()=> {
         const id = t.dataset.open;
         if(id==="jokes"){ renderJokes(jIndex); }
         if(id==="gk"){ renderGK(gIndex); }
         if(id==="countries"){ renderCountries(cIndex); }
-        if(id==="soon"){ renderSoon(sIndex); }
         go(id);
       });
     });
-    document.querySelectorAll("[data-home]").forEach(b=> b.addEventListener("click", ()=> go("home")));
+    document.getElementById("openGames").addEventListener("click", ()=> go("games"));
+    document.getElementById("openRiddles").addEventListener("click", ()=> { renderRiddles(rIndex); go("riddles"); });
+
+    document.querySelectorAll("[data-back]").forEach(b=>{
+      b.addEventListener("click", ()=> go(b.dataset.back));
+    });
 
     /*************************
      * Typewriter
      *************************/
     let twTimer = null;
-    function typewrite(el, text, speed=18){
+    function typewrite(el, text, speed=14){
       if(twTimer) clearInterval(twTimer);
       el.innerHTML = "";
       const cur = document.createElement("span");
       cur.className = "cursor";
       el.appendChild(cur);
-
       let i=0;
       twTimer = setInterval(()=>{
         if(i >= text.length){
@@ -789,39 +1041,14 @@
           el.textContent = text;
           return;
         }
-        // insert before cursor
         cur.insertAdjacentText("beforebegin", text[i]);
         i++;
       }, speed);
     }
 
     /*************************
-     * JOKES (pages)
+     * Pager helpers
      *************************/
-    const jokes = [
-      "مره نمله طارت يوم فرحها عشان مانت بتتسشور ..",
-      "مره حنفية بتنزل ماية فا الفلتر قالها انتِ waterتيني ...",
-      "مره باب كان بيكح عشان كان عندو door برد ..",
-      "مرك نملة كان لونها ازرق عشان كانت للبسه بنطلون چيني ..",
-
-      // +10 نكت غبية من عندي
-      "مرة واحد اشترى كرسي… قعد عليه فرحان قال: أخيرًا لقيت حد “يسندني”.",
-      "مرة واحد فتح التلاجة لقى الجبنة بتقول: اقفل بسرعة… أنا لسه مش مستعدة نفسياً.",
-      "مرة قلم رصاص زعل… قال: أنا طول عمري “مرسوملي” كده.",
-      "مرة الساعة قالت للتانية: متستعجليش… إحنا بنعدّيها بالراحة.",
-      "مرة شاحن موبايل اتجوز… خلف “باور” صغير بيعيط لما الكهرباء تقطع.",
-      "مرة زرار قميص اتخانق… قال: أنا دايمًا مضغوط!",
-      "مرة مراية بتتفرج على نفسها… قالت: واو… أنا شكلي عاكس الواقع بزيادة.",
-      "مرة واحد راح يشتري سكر… قالوله: عندنا عادي وعندنا “سويت”.. قال: هاتلي اللي بيضحك.",
-      "مرة واحد سمع كلمة (صمت)… قال: دي أكيد بتعمل ASMR.",
-      "مرة واحد لقى النور مطفي… قال: واضح إن المصباح واخد يوم راحة نفسية."
-    ];
-    let jIndex = 0;
-
-    const jTitle = document.getElementById("jTitle");
-    const jText  = document.getElementById("jText");
-    const jNums  = document.getElementById("jNums");
-
     function buildNums(container, total, active, onPick){
       container.innerHTML = "";
       for(let i=0;i<total;i++){
@@ -834,11 +1061,37 @@
       }
     }
 
+    /*************************
+     * JOKES (new set)
+     *************************/
+    const jokes = [
+      "مرة واحد اشترى شمسية… رجعها قال: دي بتعمل ظل بس!",
+      "مرة واحد سأل القلم: بتكتب إزاي؟ قاله: على حسب المزاج… أنا رصاص!",
+      "مرة بطارية قالت للتانية: أنا تعبانة… قالتلها: اشحني نفسك.",
+      "مرة واحد فتح الكتاب… لقى الصفحة بتقول: اقفلني أنا لسه مش جاهزة.",
+      "مرة كوباية شاي اتأخرت… قالوا: أكيد محطوط في “زحمة النعناع”.",
+      "مرة زرار اتوتر… قال: أنا كده مضغوط زيادة.",
+      "مرة واي فاي قال للموبايل: قرب… أنا بحب العلاقات القريبة.",
+      "مرة مسطرة اتخانقت… قالت: أنا اللي بحدد الحدود!",
+      "مرة واحد جاب مراية… بص فيها قال: دي بتقلدني!",
+      "مرة ساعة قالت: أنا مش متأخرة… أنا بس واقفة أفكر.",
+      "مرة سلك شاحن اتجوز… خلف “باور بنك” صغير.",
+      "مرة واحد راح يشتري سكر… قالوله: عادي ولا دايت؟ قال: هات اللي بيضحك.",
+      "مرة تلاجة قالت: أنا بردانة… قالولها: إنتي أساسًا شغلك تبريدي!",
+      "مرة فازة وقعت… قالت: مش أنا… الجاذبية!",
+      "مرة واحد قال للنور: ليه مطفي؟ قاله: يوم راحة نفسية.",
+      "مرة كرسي قال: أخيرًا حد “يسندني”."
+    ];
+    let jIndex = 0;
+    const jTitle = document.getElementById("jTitle");
+    const jText  = document.getElementById("jText");
+    const jNums  = document.getElementById("jNums");
+
     function renderJokes(idx){
       jIndex = idx;
       jTitle.textContent = `صفحة ${idx+1} / ${jokes.length}`;
-      buildNums(jNums, jokes.length, idx, (i)=>{ renderJokes(i); });
-      typewrite(jText, jokes[idx], 14);
+      buildNums(jNums, jokes.length, idx, (i)=> renderJokes(i));
+      typewrite(jText, jokes[idx], 12);
     }
     document.getElementById("jPrev").addEventListener("click", ()=> renderJokes((jIndex-1 + jokes.length)%jokes.length));
     document.getElementById("jNext").addEventListener("click", ()=> renderJokes((jIndex+1)%jokes.length));
@@ -846,17 +1099,15 @@
     document.getElementById("jMsg").addEventListener("click", openModal);
 
     /*************************
-     * QUIZ ENGINE
+     * Quiz Engine
      *************************/
     function renderQuiz({data, index, qEl, optsEl, msgEl, titleEl, numsEl, onSetIndex, getPicked, setPicked}){
       const item = data[index];
       titleEl.textContent = `صفحة ${index+1} / ${data.length}`;
-      buildNums(numsEl, data.length, index, (i)=>{ onSetIndex(i); });
-
+      buildNums(numsEl, data.length, index, (i)=> onSetIndex(i));
       qEl.textContent = item.q;
       optsEl.innerHTML = "";
       msgEl.textContent = "";
-
       const picked = getPicked(index);
 
       item.options.forEach((opt, i)=>{
@@ -874,7 +1125,6 @@
 
         b.addEventListener("click", ()=>{
           setPicked(index, i);
-          // re-render same page to lock
           onSetIndex(index);
         });
 
@@ -891,14 +1141,33 @@
     }
 
     /*************************
-     * GENERAL KNOWLEDGE (5 Q)
+     * GK (24 questions)
      *************************/
     const gk = [
       { q:"كم عدد كواكب المجموعة الشمسية؟", options:["7","8","9","10"], answer:1 },
-      { q:"أكبر محيط على الأرض هو؟", options:["الأطلسي","الهادئ","الهندي","المتجمد الشمالي"], answer:1 },
-      { q:"أقرب كوكب للشمس هو؟", options:["الزهرة","المريخ","عطارد","الأرض"], answer:2 },
-      { q:"أطول سورة في القرآن هي؟", options:["آل عمران","البقرة","النساء","الأنعام"], answer:1 },
-      { q:"درجة غليان الماء عند مستوى سطح البحر تقريباً؟", options:["90°","100°","110°","120°"], answer:1 }
+      { q:"أكبر محيط على الأرض هو؟", options:["الأطلسي","الهادئ","الهندي","المتجمد"], answer:1 },
+      { q:"أقرب كوكب للشمس؟", options:["الزهرة","المريخ","عطارد","الأرض"], answer:2 },
+      { q:"أطول سورة في القرآن؟", options:["آل عمران","البقرة","النساء","الأنعام"], answer:1 },
+      { q:"درجة غليان الماء تقريباً؟", options:["90°","100°","110°","120°"], answer:1 },
+      { q:"العنصر الكيميائي O هو؟", options:["ذهب","أكسجين","أوزون","حديد"], answer:1 },
+      { q:"أكبر كوكب في المجموعة الشمسية؟", options:["زحل","المشتري","أورانوس","نبتون"], answer:1 },
+      { q:"أسرع حيوان بري؟", options:["النمر","الفهد","الغزال","الذئب"], answer:1 },
+      { q:"عدد أضلاع المثلث؟", options:["2","3","4","5"], answer:1 },
+      { q:"عاصمة اليابان؟", options:["كيوتو","طوكيو","أوساكا","ناغويا"], answer:1 },
+      { q:"أكبر قارة مساحة؟", options:["أفريقيا","آسيا","أوروبا","أمريكا الشمالية"], answer:1 },
+      { q:"لغة البرازيل الرسمية؟", options:["الإسبانية","البرتغالية","الفرنسية","الإنجليزية"], answer:1 },
+      { q:"أصغر دولة مساحة (شائعًا)؟", options:["مالطا","الفاتيكان","سنغافورة","قطر"], answer:1 },
+      { q:"مخترع المصباح الكهربائي (شائعًا)؟", options:["نيوتن","أديسون","داروين","جراهام بيل"], answer:1 },
+      { q:"عدد أيام السنة الكبيسة؟", options:["365","366","364","360"], answer:1 },
+      { q:"أكبر عضو في جسم الإنسان؟", options:["القلب","الجلد","الكبد","الرئة"], answer:1 },
+      { q:"أقرب نجم للأرض بعد الشمس؟", options:["الشعرى","ألفا سنتوري","سهيل","سماك"], answer:1 },
+      { q:"عملة الاتحاد الأوروبي؟", options:["جنيه","يورو","دولار","ين"], answer:1 },
+      { q:"السداسي له كم ضلع؟", options:["5","6","7","8"], answer:1 },
+      { q:"أبرد كوكب (شائعًا)؟", options:["نبتون","أورانوس","زحل","المريخ"], answer:1 },
+      { q:"أكثر غاز في الغلاف الجوي؟", options:["أكسجين","نيتروجين","ثاني أكسيد الكربون","هيليوم"], answer:1 },
+      { q:"عدد القارات؟", options:["5","6","7","8"], answer:2 },
+      { q:"أصغر كوكب؟", options:["عطارد","المريخ","الأرض","الزهرة"], answer:0 },
+      { q:"الشاي يُصنع من أوراق نبات؟", options:["النعناع","الكاميليا (Camellia)","الليمون","البن"], answer:1 },
     ];
     let gIndex = 0;
     const gPicked = Array(gk.length).fill(null);
@@ -914,11 +1183,8 @@
       renderQuiz({
         data: gk,
         index: gIndex,
-        qEl: gQ,
-        optsEl: gOpts,
-        msgEl: gMsg,
-        titleEl: gTitle,
-        numsEl: gNums,
+        qEl: gQ, optsEl: gOpts, msgEl: gMsg,
+        titleEl: gTitle, numsEl: gNums,
         onSetIndex: renderGK,
         getPicked: (i)=> gPicked[i],
         setPicked: (i,v)=> gPicked[i]=v
@@ -933,14 +1199,33 @@
     document.getElementById("gMsgBtn").addEventListener("click", openModal);
 
     /*************************
-     * COUNTRIES (5 Q)
+     * COUNTRIES (24 questions)
      *************************/
     const countries = [
-      { q:"عاصمة مصر هي؟", options:["الأسكندرية","القاهرة","الأقصر","أسوان"], answer:1 },
-      { q:"عاصمة السعودية هي؟", options:["جدة","مكة","الرياض","الدمام"], answer:2 },
-      { q:"فرنسا تقع في قارة؟", options:["آسيا","أفريقيا","أوروبا","أمريكا الجنوبية"], answer:2 },
-      { q:"عاصمة كندا هي؟", options:["تورونتو","أوتاوا","مونتريال","فانكوفر"], answer:1 },
-      { q:"البرازيل عاصمتها؟", options:["ريو دي جانيرو","ساو باولو","برازيليا","سلفادور"], answer:2 }
+      { q:"عاصمة مصر؟", options:["القاهرة","الأسكندرية","الأقصر","أسوان"], answer:0 },
+      { q:"عاصمة السعودية؟", options:["الرياض","جدة","مكة","الدمام"], answer:0 },
+      { q:"عاصمة الإمارات؟", options:["دبي","الشارقة","أبوظبي","العين"], answer:2 },
+      { q:"عاصمة قطر؟", options:["الدوحة","الريان","الخور","الوكرة"], answer:0 },
+      { q:"عاصمة الكويت؟", options:["الكويت","حولي","الفروانية","الجهراء"], answer:0 },
+      { q:"عاصمة المغرب؟", options:["الدار البيضاء","مراكش","الرباط","فاس"], answer:2 },
+      { q:"عاصمة الجزائر؟", options:["وهران","الجزائر","قسنطينة","عنابة"], answer:1 },
+      { q:"عاصمة تونس؟", options:["تونس","صفاقس","سوسة","قابس"], answer:0 },
+      { q:"عاصمة الأردن؟", options:["الزرقاء","إربد","العقبة","عمّان"], answer:3 },
+      { q:"عاصمة لبنان؟", options:["بيروت","طرابلس","صيدا","جبيل"], answer:0 },
+      { q:"عاصمة العراق؟", options:["البصرة","الموصل","بغداد","أربيل"], answer:2 },
+      { q:"عاصمة تركيا؟", options:["إسطنبول","أنقرة","إزمير","بورصة"], answer:1 },
+      { q:"عاصمة فرنسا؟", options:["ليون","مرسيليا","باريس","نيس"], answer:2 },
+      { q:"عاصمة إيطاليا؟", options:["روما","ميلانو","نابولي","فلورنسا"], answer:0 },
+      { q:"عاصمة إسبانيا؟", options:["برشلونة","مدريد","إشبيلية","فالنسيا"], answer:1 },
+      { q:"عاصمة ألمانيا؟", options:["ميونخ","هامبورغ","برلين","كولونيا"], answer:2 },
+      { q:"عاصمة روسيا؟", options:["سان بطرسبرغ","موسكو","قازان","سوتشي"], answer:1 },
+      { q:"عاصمة الصين؟", options:["شنغهاي","بكين","هونغ كونغ","شينزن"], answer:1 },
+      { q:"عاصمة اليابان؟", options:["طوكيو","كيوتو","أوساكا","ناغويا"], answer:0 },
+      { q:"عاصمة كندا؟", options:["تورونتو","أوتاوا","مونتريال","فانكوفر"], answer:1 },
+      { q:"عاصمة البرازيل؟", options:["ريو","ساو باولو","برازيليا","سلفادور"], answer:2 },
+      { q:"أستراليا تقع في قارة؟", options:["أوروبا","أفريقيا","أستراليا/أوقيانوسيا","آسيا"], answer:2 },
+      { q:"عاصمة اليونان؟", options:["أثينا","سالونيك","باتراس","لاريسا"], answer:0 },
+      { q:"عاصمة النرويج؟", options:["أوسلو","ستافنجر","بيرغن","ترومسو"], answer:0 },
     ];
     let cIndex = 0;
     const cPicked = Array(countries.length).fill(null);
@@ -956,11 +1241,8 @@
       renderQuiz({
         data: countries,
         index: cIndex,
-        qEl: cQ,
-        optsEl: cOpts,
-        msgEl: cMsg,
-        titleEl: cTitle,
-        numsEl: cNums,
+        qEl: cQ, optsEl: cOpts, msgEl: cMsg,
+        titleEl: cTitle, numsEl: cNums,
         onSetIndex: renderCountries,
         getPicked: (i)=> cPicked[i],
         setPicked: (i,v)=> cPicked[i]=v
@@ -975,75 +1257,609 @@
     document.getElementById("cMsgBtn").addEventListener("click", openModal);
 
     /*************************
-     * SOON pages (with pager)
+     * RIDDLES (more fun)
      *************************/
-    const soonPages = [
-      "قريباً…\nهنضيف أقسام جديدة وواجهة أسرع + تأثيرات أحلى.",
-      "قريباً…\nتجميع نقاط + ترتيب أعلى الزوار + مفاجآت.",
-      "قريباً…\nصفحة “محتوى خاص” + ألعاب إضافية.",
-      "قريباً…\nثيمات كتير تختار منها (Dark/Neon/Pastel).",
-      "قريباً…\nلو حبيت تحط أسئلتك أنت… هنعمل محرر صغير."
+    const riddles = [
+      { q:"لغز: أيهم مختلف؟ (🍋 🍎 🥦 🍉)", options:["🍋","🍎","🥦","🍉"], answer:2 },
+      { q:"لغز: شيء كل ما تاخد منه يكبر؟", options:["الحفرة","الماء","الهواء","الوقت"], answer:0 },
+      { q:"لغز: شيء له أسنان ولا يعض؟", options:["المشط","المنشار","السحّاب","المفتاح"], answer:0 },
+      { q:"لغز: يمشي بلا رجلين ويبكي بلا عينين؟", options:["السحاب","الريح","المطر","الظل"], answer:2 },
+      { q:"لغز: باب بلا مفاتيح وبيت بلا شبابيك؟", options:["الخيمة","القفص","السجن","الكنز"], answer:0 },
+      { q:"لغز: أنا في الليل أنور… وفي النهار أختفي. أنا؟", options:["القمر","النجمة","الشمس","البرق"], answer:0 },
+      { q:"لغز: ما هو الشيء الذي يكسر إذا نطقنا اسمه؟", options:["الصمت","الزجاج","السر","الحبل"], answer:0 },
+      { q:"لغز: شيء يطير بلا جناح؟", options:["الدخان","الحجر","الماء","الخشب"], answer:0 }
     ];
-    let sIndex = 0;
-    const sTitle = document.getElementById("sTitle");
-    const sNums  = document.getElementById("sNums");
-    const sText  = document.getElementById("sText");
+    let rIndex = 0;
+    const rPicked = Array(riddles.length).fill(null);
 
-    function renderSoon(idx){
-      sIndex = idx;
-      sTitle.textContent = `صفحة ${idx+1} / ${soonPages.length}`;
-      buildNums(sNums, soonPages.length, idx, (i)=> renderSoon(i));
-      typewrite(sText, soonPages[idx], 14);
+    const rTitle = document.getElementById("rTitle");
+    const rNums  = document.getElementById("rNums");
+    const rQ     = document.getElementById("rQ");
+    const rOpts  = document.getElementById("rOpts");
+    const rMsg   = document.getElementById("rMsg");
+
+    function renderRiddles(idx){
+      rIndex = idx;
+      renderQuiz({
+        data: riddles,
+        index: rIndex,
+        qEl: rQ, optsEl: rOpts, msgEl: rMsg,
+        titleEl: rTitle, numsEl: rNums,
+        onSetIndex: renderRiddles,
+        getPicked: (i)=> rPicked[i],
+        setPicked: (i,v)=> rPicked[i]=v
+      });
     }
-    document.getElementById("sPrev").addEventListener("click", ()=> renderSoon((sIndex-1+soonPages.length)%soonPages.length));
-    document.getElementById("sNext").addEventListener("click", ()=> renderSoon((sIndex+1)%soonPages.length));
-    document.getElementById("sMsgBtn").addEventListener("click", openModal);
-    document.getElementById("sBackHome").addEventListener("click", ()=> go("home"));
+    document.getElementById("rPrev").addEventListener("click", ()=> renderRiddles((rIndex-1+riddles.length)%riddles.length));
+    document.getElementById("rNext").addEventListener("click", ()=> renderRiddles((rIndex+1)%riddles.length));
+    document.getElementById("rReset").addEventListener("click", ()=>{
+      for(let i=0;i<rPicked.length;i++) rPicked[i]=null;
+      renderRiddles(rIndex);
+    });
+    document.getElementById("rMsgBtn").addEventListener("click", openModal);
 
     /*************************
-     * EXTRAS section
+     * THEMES
      *************************/
-    document.getElementById("openExtras").addEventListener("click", ()=>{
-      go("extras");
-      document.getElementById("exMsg").textContent = "اختار لعبة…";
-      document.getElementById("miniBox").style.display = "none";
-      document.getElementById("miniMsg").textContent = "";
-    });
-    document.getElementById("exMsgBtn").addEventListener("click", openModal);
-
-    document.getElementById("goXO").addEventListener("click", ()=>{
-      // quick jump: open countries section? No — we keep just a message
-      document.getElementById("exMsg").textContent = "XO موجودة في النسخ القديمة… هنا هنبقى نضيفها كصفحة كاملة قريباً 😉";
-      document.getElementById("exMsg").className = "msgline";
-    });
-    document.getElementById("goMemory").addEventListener("click", ()=>{
-      document.getElementById("exMsg").textContent = "المطابقة موجودة في النسخ القديمة… هنا قريباً نسخة أسرع 🔥";
-      document.getElementById("exMsg").className = "msgline";
-    });
-
-    document.getElementById("miniRiddle").addEventListener("click", ()=>{
-      document.getElementById("miniBox").style.display = "block";
-      document.getElementById("miniMsg").textContent = "اختار الإجابة…";
-      document.getElementById("miniMsg").className = "msgline";
-    });
-
-    document.querySelectorAll("[data-mini]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const v = b.dataset.mini;
-        const msg = document.getElementById("miniMsg");
-        if(v === "C"){
-          msg.textContent = "صح ✅ (🥦 مش فاكهة)";
-          msg.className = "msgline ok";
-        }else{
-          flashRed();
-          msg.textContent = "غلط ❌ جرّب تاني";
-          msg.className = "msgline bad";
-        }
+    const tMsg = document.getElementById("tMsg");
+    document.querySelectorAll("[data-theme]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const theme = btn.dataset.theme;
+        setTheme(theme);
+        tMsg.textContent = `تم تطبيق الثيم: ${theme} ✅`;
+        tMsg.className = "msgline ok";
       });
     });
+    document.getElementById("tBackHome").addEventListener("click", ()=> go("home"));
+
+    function setTheme(theme){
+      document.body.dataset.theme = theme;
+      localStorage.setItem("neonhub_theme", theme);
+      buildSky();
+      // theme "chaos" changes home order a bit (creative touch)
+      const grid = document.getElementById("homeGrid");
+      if(theme === "chaos"){
+        // reorder tiles for fun: themes first
+        const tiles = [...grid.querySelectorAll(".tile")];
+        const byId = (id)=> tiles.find(t=>t.dataset.open===id);
+        grid.innerHTML = "";
+        [byId("themes"), byId("countries"), byId("gk"), byId("jokes")].forEach(x=> grid.appendChild(x));
+      }else{
+        // restore default order
+        const tiles = [...grid.querySelectorAll(".tile")];
+        const byId = (id)=> tiles.find(t=>t.dataset.open===id);
+        grid.innerHTML = "";
+        ["jokes","gk","countries","themes"].forEach(id=>{
+          const el = byId(id);
+          if(el) grid.appendChild(el);
+        });
+      }
+    }
 
     /*************************
-     * MESSAGES modal + Formspree
+     * GAMES MENU -> open pages
+     *************************/
+    document.querySelectorAll("[data-game]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const id = b.dataset.game;
+        go(id);
+        if(id==="xo") resetXO();
+        if(id==="memory") buildMemory();
+        if(id==="dino") dinoDrawSplash();
+        if(id==="frog") frogDrawSplash();
+      });
+    });
+    document.getElementById("gMsg2").addEventListener("click", openModal);
+
+    /*************************
+     * XO GAME
+     *************************/
+    const xoBoardEl = document.getElementById("xoBoard");
+    const xoStatus = document.getElementById("xoStatus");
+    const xoRestart = document.getElementById("xoRestart");
+
+    let xo = Array(9).fill(null);
+    let xoOver = false;
+
+    function winner(b){
+      const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for(const [a,c,d] of lines){
+        if(b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
+      }
+      if(b.every(Boolean)) return "draw";
+      return null;
+    }
+    function score(b){
+      const w = winner(b);
+      if(w==="⭕") return 10;
+      if(w==="❌") return -10;
+      return 0;
+    }
+    function minimax(b, depth, isMax, maxDepth){
+      const w = winner(b);
+      if(w || depth === maxDepth) return score(b);
+
+      const empties = b.map((v,i)=>v?null:i).filter(v=>v!==null);
+      if(isMax){
+        let best = -Infinity;
+        for(const i of empties){
+          b[i] = "⭕";
+          best = Math.max(best, minimax(b, depth+1, false, maxDepth));
+          b[i] = null;
+        }
+        return best - depth*0.2;
+      }else{
+        let best = Infinity;
+        for(const i of empties){
+          b[i] = "❌";
+          best = Math.min(best, minimax(b, depth+1, true, maxDepth));
+          b[i] = null;
+        }
+        return best + depth*0.2;
+      }
+    }
+    function bestMove(b){
+      const empties = b.map((v,i)=>v?null:i).filter(v=>v!==null);
+      if(Math.random() < 0.18){
+        return empties[Math.floor(Math.random()*empties.length)];
+      }
+      let best = -Infinity, move = empties[0];
+      for(const i of empties){
+        b[i] = "⭕";
+        const val = minimax(b, 0, false, 4);
+        b[i] = null;
+        if(val > best){ best = val; move = i; }
+      }
+      return move;
+    }
+
+    function renderXO(){
+      xoBoardEl.innerHTML = "";
+      xo.forEach((v, idx)=>{
+        const cell = document.createElement("div");
+        cell.className = "xo-cell" + (xoOver ? " disabled" : "");
+        cell.textContent = v || "";
+        cell.addEventListener("click", ()=>{
+          if(xoOver) return;
+          if(xo[idx]) return;
+          xo[idx] = "❌";
+          afterMove();
+        });
+        xoBoardEl.appendChild(cell);
+      });
+    }
+    function afterMove(){
+      renderXO();
+      let w = winner(xo);
+      if(w){ endXO(w); return; }
+
+      xoStatus.textContent = "دور الكمبيوتر…";
+      setTimeout(()=>{
+        const m = bestMove(xo.slice());
+        if(m !== undefined && m !== null) xo[m] = "⭕";
+        renderXO();
+        w = winner(xo);
+        if(w) endXO(w);
+        else xoStatus.textContent = "دورك.";
+      }, 320);
+    }
+    function endXO(w){
+      xoOver = true;
+      if(w === "❌"){
+        xoStatus.textContent = "فزت ✅";
+        xoStatus.className = "msgline ok";
+      }else if(w === "⭕"){
+        xoStatus.textContent = "الكمبيوتر كسب 😈";
+        xoStatus.className = "msgline bad";
+      }else{
+        xoStatus.textContent = "تعادل";
+        xoStatus.className = "msgline";
+      }
+    }
+    function resetXO(){
+      xo = Array(9).fill(null);
+      xoOver = false;
+      xoStatus.textContent = "دورك.";
+      xoStatus.className = "msgline";
+      renderXO();
+    }
+    xoRestart.addEventListener("click", resetXO);
+    document.getElementById("xoMsg").addEventListener("click", openModal);
+
+    /*************************
+     * MEMORY GAME
+     *************************/
+    const memoryGrid = document.getElementById("memoryGrid");
+    const memStatus = document.getElementById("memStatus");
+    const memStart = document.getElementById("memStart");
+
+    const MEM_POOL = [
+      "😂","🤣","😭","🥲","😈","🙈","😎","🤝",
+      "💗","💘","✨","🌙","⭐","🧠","🎉","🔥",
+      "🍩","🪐","⚡","🎯","🧩","🧪","🫧","🔮"
+    ];
+
+    function pickUnique(pool, n){
+      const copy = pool.slice();
+      shuffle(copy);
+      return copy.slice(0, n);
+    }
+    let memFirst=null, memLock=false, memMatched=0;
+
+    function buildMemory(){
+      memoryGrid.innerHTML = "";
+      memFirst=null; memLock=false; memMatched=0;
+      memStatus.textContent = "تم: 0 / 8";
+
+      const chosen = pickUnique(MEM_POOL, 8);
+      const deck = shuffle([...chosen, ...chosen]);
+
+      deck.forEach(emo=>{
+        const c = document.createElement("div");
+        c.className = "mcard";
+        c.dataset.emo = emo;
+        c.innerHTML = `<div class="mfront">❔</div><div class="mback">${emo}</div>`;
+        c.addEventListener("click", ()=>{
+          if(memLock) return;
+          if(c.classList.contains("matched")) return;
+          if(c.classList.contains("revealed")) return;
+
+          c.classList.add("revealed");
+
+          if(!memFirst){ memFirst = c; return; }
+          const a = memFirst, b = c;
+          memFirst = null;
+
+          if(a.dataset.emo === b.dataset.emo){
+            a.classList.add("matched");
+            b.classList.add("matched");
+            memMatched++;
+            memStatus.textContent = `تم: ${memMatched} / 8`;
+          }else{
+            memLock = true;
+            setTimeout(()=>{
+              a.classList.remove("revealed");
+              b.classList.remove("revealed");
+              memLock = false;
+            }, 520);
+          }
+        });
+        memoryGrid.appendChild(c);
+      });
+    }
+    memStart.addEventListener("click", buildMemory);
+    document.getElementById("memMsg").addEventListener("click", openModal);
+
+    /*************************
+     * DINO RUNNER (Canvas)
+     *************************/
+    const dinoCanvas = document.getElementById("dinoCanvas");
+    const dctx = dinoCanvas.getContext("2d");
+    const dinoStatus = document.getElementById("dinoStatus");
+    let dinoRAF=null, dinoRunning=false;
+
+    const dino = {
+      x: 70, y: 0, w: 34, h: 46,
+      vy: 0, onGround: true
+    };
+    const dinoGame = {
+      t:0, score:0, speed: 5.5,
+      groundY: 260,
+      obstacles: [],
+      spawnTimer: 0,
+      over: false
+    };
+
+    function dinoReset(){
+      dino.y = dinoGame.groundY - dino.h;
+      dino.vy = 0;
+      dino.onGround = true;
+      dinoGame.t=0; dinoGame.score=0; dinoGame.speed=5.5;
+      dinoGame.obstacles=[];
+      dinoGame.spawnTimer=0;
+      dinoGame.over=false;
+      dinoStatus.textContent = "جاهز… اضغط ابدأ.";
+      dinoStatus.className = "msgline";
+      dinoDrawSplash();
+    }
+
+    function dinoJump(){
+      if(!dinoRunning || dinoGame.over) return;
+      if(dino.onGround){
+        dino.vy = -12.5;
+        dino.onGround = false;
+      }
+    }
+
+    function spawnObstacle(){
+      const h = pick([28, 36, 44]);
+      const w = pick([16, 18, 22]);
+      dinoGame.obstacles.push({ x: 900, y: dinoGame.groundY - h, w, h });
+    }
+
+    function rectHit(a,b){
+      return a.x < b.x + b.w && a.x + a.w > b.x &&
+             a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function dinoLoop(){
+      dinoRAF = requestAnimationFrame(dinoLoop);
+      if(!dinoRunning) return;
+
+      // update
+      dinoGame.t++;
+      dinoGame.score += 0.15;
+      dinoGame.speed = Math.min(11, dinoGame.speed + 0.0018);
+
+      // gravity
+      dino.vy += 0.55;
+      dino.y += dino.vy;
+
+      if(dino.y >= dinoGame.groundY - dino.h){
+        dino.y = dinoGame.groundY - dino.h;
+        dino.vy = 0;
+        dino.onGround = true;
+      }
+
+      // obstacles
+      dinoGame.spawnTimer--;
+      if(dinoGame.spawnTimer <= 0){
+        spawnObstacle();
+        dinoGame.spawnTimer = Math.floor(rand(55, 90));
+      }
+      dinoGame.obstacles.forEach(o => o.x -= dinoGame.speed);
+      dinoGame.obstacles = dinoGame.obstacles.filter(o => o.x + o.w > -30);
+
+      // collision
+      const dRect = { x:dino.x, y:dino.y, w:dino.w, h:dino.h };
+      for(const o of dinoGame.obstacles){
+        if(rectHit(dRect, o)){
+          dinoGame.over = true;
+          dinoRunning = false;
+          dinoStatus.textContent = `خسرت 😈 — سكور: ${Math.floor(dinoGame.score)}`;
+          dinoStatus.className = "msgline bad";
+          break;
+        }
+      }
+
+      // draw
+      dctx.clearRect(0,0,dinoCanvas.width,dinoCanvas.height);
+
+      // background glow
+      dctx.globalAlpha = 0.9;
+      dctx.fillStyle = "rgba(255,255,255,0.04)";
+      dctx.fillRect(0,0,dinoCanvas.width,dinoCanvas.height);
+      dctx.globalAlpha = 1;
+
+      // ground
+      dctx.fillStyle = "rgba(255,255,255,0.18)";
+      dctx.fillRect(0, dinoGame.groundY, dinoCanvas.width, 3);
+
+      // dino (simple)
+      dctx.fillStyle = "rgba(103,240,255,0.85)";
+      dctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+
+      // obstacles
+      dctx.fillStyle = "rgba(255,95,209,0.80)";
+      for(const o of dinoGame.obstacles){
+        dctx.fillRect(o.x, o.y, o.w, o.h);
+      }
+
+      // score
+      dctx.fillStyle = "rgba(238,244,255,0.9)";
+      dctx.font = "bold 18px system-ui";
+      dctx.fillText("Score: " + Math.floor(dinoGame.score), 18, 30);
+    }
+
+    function dinoDrawSplash(){
+      dctx.clearRect(0,0,dinoCanvas.width,dinoCanvas.height);
+      dctx.fillStyle = "rgba(255,255,255,0.04)";
+      dctx.fillRect(0,0,dinoCanvas.width,dinoCanvas.height);
+      dctx.fillStyle = "rgba(238,244,255,0.9)";
+      dctx.font = "bold 18px system-ui";
+      dctx.fillText("Tap / Space to Jump", 18, 30);
+      dctx.fillStyle = "rgba(255,255,255,0.18)";
+      dctx.fillRect(0, dinoGame.groundY, dinoCanvas.width, 3);
+      dctx.fillStyle = "rgba(103,240,255,0.85)";
+      dctx.fillRect(dino.x, dinoGame.groundY - dino.h, dino.w, dino.h);
+    }
+
+    function dinoStart(){
+      if(dinoRAF === null) dinoLoop();
+      if(dinoGame.over) dinoReset();
+      dinoRunning = true;
+      dinoStatus.textContent = "شغّال… اتجنب العوائق!";
+      dinoStatus.className = "msgline";
+    }
+
+    document.getElementById("dinoStart").addEventListener("click", dinoStart);
+    document.getElementById("dinoReset").addEventListener("click", dinoReset);
+    document.getElementById("dinoMsg").addEventListener("click", openModal);
+
+    dinoCanvas.addEventListener("pointerdown", ()=> dinoJump());
+    window.addEventListener("keydown", (e)=>{
+      if(e.code === "Space") { e.preventDefault(); dinoJump(); }
+    });
+
+    /*************************
+     * FROG DODGE (Canvas)
+     *************************/
+    const frogCanvas = document.getElementById("frogCanvas");
+    const fctx = frogCanvas.getContext("2d");
+    const frogStatus = document.getElementById("frogStatus");
+    let frogRAF=null, frogRunning=false;
+
+    const frog = { x: 120, y: 180, r: 18 };
+    const frogGame = {
+      score: 0,
+      speed: 5.0,
+      doors: [],
+      spawn: 0,
+      over: false
+    };
+
+    function frogReset(){
+      frog.y = frogCanvas.height/2;
+      frogGame.score=0;
+      frogGame.speed=5.0;
+      frogGame.doors=[];
+      frogGame.spawn=0;
+      frogGame.over=false;
+      frogRunning=false;
+      frogStatus.textContent = "جاهز… اضغط ابدأ.";
+      frogStatus.className = "msgline";
+      frogDrawSplash();
+    }
+
+    function frogStart(){
+      if(frogRAF === null) frogLoop();
+      if(frogGame.over) frogReset();
+      frogRunning = true;
+      frogStatus.textContent = "شغّال… تجنب الأبواب!";
+      frogStatus.className = "msgline";
+    }
+
+    function spawnDoor(){
+      // door is a tall rectangle with a gap? User said doors hitting frog. We'll do single rectangle on one lane.
+      const h = pick([70, 90, 110]);
+      const y = Math.floor(rand(30, frogCanvas.height - h - 30));
+      const w = pick([26, 34]);
+      frogGame.doors.push({ x: frogCanvas.width + 20, y, w, h });
+    }
+
+    function frogHit(door){
+      // circle-rect collision approx
+      const cx = frog.x, cy = frog.y, r = frog.r;
+      const rx = door.x, ry = door.y, rw = door.w, rh = door.h;
+      const nx = Math.max(rx, Math.min(cx, rx+rw));
+      const ny = Math.max(ry, Math.min(cy, ry+rh));
+      const dx = cx - nx, dy = cy - ny;
+      return (dx*dx + dy*dy) <= r*r;
+    }
+
+    function frogMove(dy){
+      if(!frogRunning || frogGame.over) return;
+      frog.y += dy;
+      frog.y = Math.max(frog.r+8, Math.min(frogCanvas.height - frog.r - 8, frog.y));
+    }
+
+    let lastPointerY = null;
+    frogCanvas.addEventListener("pointerdown", (e)=>{
+      lastPointerY = e.clientY;
+      frogCanvas.setPointerCapture(e.pointerId);
+    });
+    frogCanvas.addEventListener("pointermove", (e)=>{
+      if(lastPointerY === null) return;
+      const delta = e.clientY - lastPointerY;
+      // drag up => negative => move up
+      frogMove(delta * 0.35);
+      lastPointerY = e.clientY;
+    });
+    frogCanvas.addEventListener("pointerup", ()=> { lastPointerY = null; });
+
+    document.getElementById("frogUp").addEventListener("click", ()=> frogMove(-26));
+    document.getElementById("frogDown").addEventListener("click", ()=> frogMove(26));
+    window.addEventListener("keydown", (e)=>{
+      if(!document.getElementById("frog").classList.contains("active")) return;
+      if(e.key === "ArrowUp"){ e.preventDefault(); frogMove(-26); }
+      if(e.key === "ArrowDown"){ e.preventDefault(); frogMove(26); }
+    });
+
+    function frogLoop(){
+      frogRAF = requestAnimationFrame(frogLoop);
+      if(!frogRunning) return;
+
+      frogGame.score += 0.20;
+      frogGame.speed = Math.min(12, frogGame.speed + 0.0022);
+
+      frogGame.spawn--;
+      if(frogGame.spawn <= 0){
+        spawnDoor();
+        frogGame.spawn = Math.floor(rand(40, 70));
+      }
+
+      frogGame.doors.forEach(d=> d.x -= frogGame.speed);
+      frogGame.doors = frogGame.doors.filter(d=> d.x + d.w > -40);
+
+      for(const d of frogGame.doors){
+        if(frogHit(d)){
+          frogGame.over = true;
+          frogRunning = false;
+          frogStatus.textContent = `خسرت 😈 — سكور: ${Math.floor(frogGame.score)}`;
+          frogStatus.className = "msgline bad";
+          break;
+        }
+      }
+
+      // draw
+      fctx.clearRect(0,0,frogCanvas.width,frogCanvas.height);
+      fctx.fillStyle = "rgba(255,255,255,0.04)";
+      fctx.fillRect(0,0,frogCanvas.width,frogCanvas.height);
+
+      // lanes (visual)
+      fctx.strokeStyle = "rgba(255,255,255,0.10)";
+      fctx.lineWidth = 2;
+      fctx.beginPath();
+      fctx.moveTo(0, frogCanvas.height/3);
+      fctx.lineTo(frogCanvas.width, frogCanvas.height/3);
+      fctx.moveTo(0, 2*frogCanvas.height/3);
+      fctx.lineTo(frogCanvas.width, 2*frogCanvas.height/3);
+      fctx.stroke();
+
+      // doors
+      fctx.fillStyle = "rgba(255,211,111,0.85)";
+      frogGame.doors.forEach(d=>{
+        fctx.fillRect(d.x, d.y, d.w, d.h);
+        // door knob
+        fctx.fillStyle = "rgba(255,95,209,0.85)";
+        fctx.beginPath();
+        fctx.arc(d.x + d.w*0.7, d.y + d.h*0.55, 5, 0, Math.PI*2);
+        fctx.fill();
+        fctx.fillStyle = "rgba(255,211,111,0.85)";
+      });
+
+      // frog
+      fctx.fillStyle = "rgba(125,255,179,0.92)";
+      fctx.beginPath();
+      fctx.arc(frog.x, frog.y, frog.r, 0, Math.PI*2);
+      fctx.fill();
+
+      // eyes
+      fctx.fillStyle = "rgba(0,0,0,0.55)";
+      fctx.beginPath();
+      fctx.arc(frog.x-6, frog.y-5, 3, 0, Math.PI*2);
+      fctx.arc(frog.x+6, frog.y-5, 3, 0, Math.PI*2);
+      fctx.fill();
+
+      // score
+      fctx.fillStyle = "rgba(238,244,255,0.9)";
+      fctx.font = "bold 18px system-ui";
+      fctx.fillText("Score: " + Math.floor(frogGame.score), 18, 30);
+    }
+
+    function frogDrawSplash(){
+      fctx.clearRect(0,0,frogCanvas.width,frogCanvas.height);
+      fctx.fillStyle = "rgba(255,255,255,0.04)";
+      fctx.fillRect(0,0,frogCanvas.width,frogCanvas.height);
+      fctx.fillStyle = "rgba(238,244,255,0.9)";
+      fctx.font = "bold 18px system-ui";
+      fctx.fillText("Use ⬆️⬇️ or Drag", 18, 30);
+      fctx.fillStyle = "rgba(125,255,179,0.92)";
+      fctx.beginPath();
+      fctx.arc(frog.x, frogCanvas.height/2, frog.r, 0, Math.PI*2);
+      fctx.fill();
+    }
+
+    document.getElementById("frogStart").addEventListener("click", frogStart);
+    document.getElementById("frogReset").addEventListener("click", frogReset);
+    document.getElementById("frogMsg").addEventListener("click", openModal);
+
+    /*************************
+     * Messages modal + Formspree
      *************************/
     const modal = document.getElementById("modal");
     const openMessages = document.getElementById("openMessages");
@@ -1052,16 +1868,18 @@
     function openModal(){
       modal.classList.add("show");
       document.getElementById("msgHint").textContent = "";
+      document.getElementById("msgHint").className = "msgline";
     }
     function hideModal(){
       modal.classList.remove("show");
     }
-
     openMessages.addEventListener("click", openModal);
     closeModal.addEventListener("click", hideModal);
-    modal.addEventListener("click", (e)=>{
-      if(e.target === modal) hideModal();
-    });
+    modal.addEventListener("click", (e)=>{ if(e.target === modal) hideModal(); });
+
+    document.getElementById("jMsg").addEventListener("click", openModal);
+    document.getElementById("gMsgBtn").addEventListener("click", openModal);
+    document.getElementById("cMsgBtn").addEventListener("click", openModal);
 
     const msgForm = document.getElementById("msgForm");
     const msgText = document.getElementById("msgText");
@@ -1096,7 +1914,6 @@
         });
 
         if(!res.ok){
-          // fallback urlencoded
           const payload = new URLSearchParams();
           for(const [k,v] of fd.entries()) payload.append(k, String(v));
           res = await fetch(FORMSPREE_ENDPOINT, {
@@ -1132,22 +1949,36 @@
     });
 
     /*************************
-     * HOME quick extras
+     * Misc bindings
      *************************/
-    document.getElementById("openExtras").addEventListener("click", ()=>{});
+    document.getElementById("jMsg").addEventListener("click", openModal);
+    document.getElementById("jMsg").addEventListener("click", openModal);
 
     /*************************
-     * init renders (lazy)
+     * INIT
      *************************/
-    // build first view data when opening sections
-    // but we can pre-render jokes page 1 to avoid blank if user opens quickly
+    // restore theme
+    const savedTheme = localStorage.getItem("neonhub_theme") || "aura";
+    document.body.dataset.theme = savedTheme;
+    buildSky();
+
+    // initial renders
     renderJokes(0);
     renderGK(0);
     renderCountries(0);
-    renderSoon(0);
+    renderRiddles(0);
 
+    // init games
+    resetXO();
+    buildMemory();
+    dinoReset();
+    frogReset();
+
+    // Home -> games
+    document.getElementById("openGames").addEventListener("click", ()=> go("games"));
+
+    // Messages shortcuts
+    document.getElementById("gMsg2").addEventListener("click", openModal);
   </script>
 </body>
 </html>
-
-
