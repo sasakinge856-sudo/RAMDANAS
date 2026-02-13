@@ -1,1 +1,1807 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fun Hub v2.5</title>
+
+  <style>
+    /* ======================
+       Reset + mobile full screen
+    ====================== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%; margin:0; overflow-x:hidden}
+    img,svg,canvas{max-width:100%; display:block}
+    button,input,textarea{font:inherit}
+    :root{
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --stroke: rgba(255,255,255,.14);
+
+      /* theme vars (get overridden) */
+      --bg0:#050814;
+      --bg1:#0a1233;
+      --cardA: rgba(255,255,255,.08);
+      --cardB: rgba(255,255,255,.06);
+
+      --accentA:#ffd666;
+      --accentB:#22d3ee;
+      --accentC:#a855f7;
+
+      --radius: 22px;
+      --shadow: 0 30px 80px rgba(0,0,0,.35);
+      --glow: 0 0 30px rgba(255,214,102,.16), 0 0 90px rgba(34,211,238,.10);
+      --font: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+
+      --layout-pad: 12px;
+      --header-style: 1; /* used by theme classes */
+    }
+
+    body{
+      font-family: var(--font);
+      color: var(--txt);
+      background:
+        radial-gradient(1100px 650px at 12% 18%, color-mix(in srgb, var(--accentA) 22%, transparent), transparent 60%),
+        radial-gradient(850px 550px at 90% 30%, color-mix(in srgb, var(--accentC) 18%, transparent), transparent 60%),
+        radial-gradient(850px 550px at 45% 100%, color-mix(in srgb, var(--accentB) 16%, transparent), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+
+      min-height: 100svh;
+      min-height: 100vh;
+
+      padding:
+        calc(var(--layout-pad) + env(safe-area-inset-top))
+        calc(var(--layout-pad) + env(safe-area-inset-right))
+        calc(var(--layout-pad) + env(safe-area-inset-bottom))
+        calc(var(--layout-pad) + env(safe-area-inset-left));
+
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+    }
+
+    /* Floating emojis */
+    .float-layer{position:fixed; inset:0; pointer-events:none; overflow:hidden; opacity:.85}
+    .emoji{
+      position:absolute;
+      font-size:clamp(18px, 4vw, 30px);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      animation: drift linear infinite;
+      transform: translate3d(0,0,0);
+      opacity:.85;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(var(--x), 110svh, 0) rotate(0deg); }
+      to  { transform: translate3d(var(--x), -20svh, 0) rotate(360deg); }
+    }
+
+    /* App shell */
+    .app{
+      width: min(1100px, 100%);
+      margin-inline:auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      flex:1;
+      position:relative;
+      z-index:2;
+      min-height:0;
+    }
+
+    /* ===== Header variants controlled by theme classes ===== */
+    header{
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .theme-card header{
+      border-radius: 28px;
+      background:
+        radial-gradient(500px 240px at 10% 0%, color-mix(in srgb, var(--accentA) 35%, transparent), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+    }
+    .theme-min header{
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      box-shadow: 0 20px 50px rgba(0,0,0,.30);
+    }
+    .theme-arc header{
+      border-radius: 999px;
+      padding: 10px 14px;
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--accentA) 16%, rgba(0,0,0,.22)),
+                              color-mix(in srgb, var(--accentB) 16%, rgba(0,0,0,.22)));
+    }
+
+    .brand{display:flex; flex-direction:column; gap:3px}
+    .brand h1{margin:0; font-size:clamp(16px, 4vw, 20px); letter-spacing:.2px}
+    .brand p{margin:0; color:var(--muted); font-size:12.5px}
+
+    .pill{
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.25);
+      padding:8px 10px;
+      border-radius:999px;
+      display:flex; gap:8px; align-items:center;
+      color:rgba(255,255,255,.86);
+      font-size:12.5px;
+      white-space:nowrap;
+    }
+
+    main{
+      flex:1;
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow), var(--glow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+
+    .page{
+      display:none;
+      padding: 14px;
+      overflow:auto;
+      min-height:0;
+    }
+    .page.active{display:block}
+
+    /* Layout variants */
+    .theme-min main{ border-radius: 16px; background: rgba(0,0,0,.28); }
+    .theme-arc main{ border-radius: 28px; }
+    .theme-card main{ border-radius: 28px; }
+
+    .sectionTitle{margin:0 0 10px; font-size:clamp(18px, 4.6vw, 24px)}
+    .muted{margin:0; color:var(--muted); font-size:13.5px; line-height:1.65}
+
+    /* Tiles */
+    .grid4{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-top:12px}
+    @media (min-width:760px){ .grid4{grid-template-columns:repeat(4, minmax(0,1fr))} }
+
+    .tile{
+      border:1px solid rgba(255,255,255,.15);
+      background: rgba(0,0,0,.20);
+      border-radius: 18px;
+      padding:14px 12px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.25);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition: transform .15s ease, filter .15s ease;
+      min-height: 92px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .theme-min .tile{border-radius:14px; background: rgba(255,255,255,.06)}
+    .theme-arc .tile{border-radius:22px}
+    .tile:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+    .tile .t{font-weight:900; font-size:15px}
+    .tile .d{color:var(--muted); font-size:12.5px; line-height:1.4}
+    .tile::after{
+      content:"";
+      position:absolute; inset:-60px -60px auto auto;
+      width:140px; height:140px;
+      background: radial-gradient(circle at 30% 30%,
+        color-mix(in srgb, var(--accentA) 45%, transparent),
+        color-mix(in srgb, var(--accentB) 18%, transparent),
+        transparent 65%);
+      transform: rotate(25deg);
+      opacity:.9;
+    }
+
+    /* Cards and buttons */
+    .card{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.20);
+      border-radius: 18px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .theme-min .card{border-radius:14px; background: rgba(255,255,255,.06)}
+    .theme-card .card{
+      border-radius: 22px;
+      background:
+        radial-gradient(500px 240px at 10% 0%, color-mix(in srgb, var(--accentC) 22%, transparent), transparent 60%),
+        rgba(0,0,0,.20);
+    }
+
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:12px}
+    .btn{
+      border:0; cursor:pointer;
+      border-radius: 16px;
+      padding:12px 14px;
+      font-weight:900;
+      color:#0b1020;
+      background: linear-gradient(90deg, var(--accentA), var(--accentB));
+      box-shadow: 0 14px 40px rgba(255, 214, 102,.18);
+      transition: transform .15s ease, filter .15s ease;
+      min-width: 150px;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+    .btn:active{ transform: translateY(0px) scale(.98); }
+
+    .btnGhost{
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.16);
+      color: rgba(255,255,255,.88);
+      box-shadow:none;
+      min-width:auto;
+    }
+
+    /* Nav */
+    nav{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+    .theme-arc nav{ border-radius: 999px; }
+    .theme-min nav{ border-radius: 16px; background: rgba(0,0,0,.28); }
+
+    .navBtn{
+      flex:1;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.88);
+      border-radius: 16px;
+      padding:10px 8px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:12.5px;
+      transition: transform .15s ease, filter .15s ease;
+      text-align:center;
+      user-select:none;
+    }
+    .navBtn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .navBtn.active{
+      border-color: color-mix(in srgb, var(--accentA) 55%, rgba(255,255,255,.14));
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accentA) 18%, transparent);
+    }
+
+    /* Forms */
+    .field{
+      width:100%;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--txt);
+      border-radius: 14px;
+      padding: 12px;
+      outline:none;
+    }
+    .field:focus{
+      border-color: color-mix(in srgb, var(--accentA) 55%, rgba(255,255,255,.14));
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accentA) 18%, transparent);
+    }
+    textarea.field{ min-height: 140px; resize: vertical; }
+    .status{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      display:none;
+      word-break: break-word;
+    }
+    .status.show{ display:block; }
+
+    /* Quiz */
+    .qHead{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      font-size:12px;
+      color: rgba(255,255,255,.85);
+    }
+    .question{font-weight:950; font-size:15px; line-height:1.6; margin-top:10px}
+    .choices{display:grid; gap:8px; margin-top:10px}
+    .choice{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .choice:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .choice.correct{ border-color: rgba(44,255,159,.55); box-shadow: 0 0 0 4px rgba(44,255,159,.10); }
+    .choice.wrong{ border-color: rgba(255,59,92,.55); box-shadow: 0 0 0 4px rgba(255,59,92,.10); }
+    .qFooter{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:12px}
+
+    /* Canvas wrapper */
+    .canvasWrap{
+      width:min(720px, 100%);
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(0,0,0,.22);
+    }
+    canvas{ width:100%; height:auto; }
+
+    /* 2048 grid */
+    .g2048{
+      width:min(420px, 100%);
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
+    }
+    .cell{
+      aspect-ratio: 1/1;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      font-weight: 1000;
+      user-select:none;
+    }
+
+    /* Whack area */
+    .whackArena{
+      width:min(520px, 100%);
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    .whackHole{
+      aspect-ratio: 1/1;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 32px;
+      user-select:none;
+      cursor:pointer;
+    }
+
+    /* Maze */
+    .mazeWrap{
+      width:min(520px, 100%);
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(0,0,0,.22);
+      padding: 10px;
+    }
+    .mazeGrid{
+      display:grid;
+      grid-template-columns: repeat(10, minmax(0,1fr));
+      gap:6px;
+    }
+    .mazeCell{
+      aspect-ratio: 1/1;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+    }
+    .mazeCell.wall{ background: rgba(255,255,255,.16); }
+    .mazeCell.player{ background: color-mix(in srgb, var(--accentB) 35%, rgba(255,255,255,.06)); }
+    .mazeCell.goal{ background: color-mix(in srgb, var(--accentA) 35%, rgba(255,255,255,.06)); }
+
+    /* Typing Rush */
+    .typeBox{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:10px;
+    }
+    .word{
+      font-size: 18px;
+      font-weight: 1000;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+    }
+
+    /* Theme picker */
+    .themePicker{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .themeBtn{
+      border-radius: 18px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      cursor:pointer;
+      user-select:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .themeBtn:hover{ transform: translateY(-2px); filter: brightness(1.05); }
+    .swatches{ display:flex; gap:8px; }
+    .sw{ width:18px; height:18px; border-radius:999px; border:1px solid rgba(255,255,255,.18); }
+
+    /* Footer small */
+    .footer{
+      margin-top:12px;
+      text-align:center;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.58);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="float-layer" id="floatLayer" aria-hidden="true"></div>
+
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <h1>Fun Hub v2.5</h1>
+        <p>صُنع بواسطة: بني ادم براس فرخه v2</p>
+      </div>
+      <div class="pill" id="pill">✨ جاهز</div>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section class="page" data-route="home">
+        <h2 class="sectionTitle">اختار قسم 👇</h2>
+        <p class="muted">موقع ألعاب + أسئلة + تحديات. كل حاجة بتشتغل داخل صفحة واحدة.</p>
+
+        <div class="grid4">
+          <div class="tile" data-go="#games"><div class="t">الألعاب</div><div class="d">كل لعبة في صفحة لوحدها</div></div>
+          <div class="tile" data-go="#general"><div class="t">معلومات عامة</div><div class="d">MCQ + نتيجة</div></div>
+          <div class="tile" data-go="#countries"><div class="t">الدول</div><div class="d">عواصم/قارات</div></div>
+          <div class="tile" data-go="#prep3"><div class="t">تالتة إعدادي</div><div class="d">ترم تاني + مواد</div></div>
+        </div>
+
+        <div class="card">
+          <p class="muted">✉️ لو محتاج تبعت رسالة: افتح قسم الرسائل من الشريط تحت.</p>
+        </div>
+      </section>
+
+      <!-- GAMES MENU -->
+      <section class="page" data-route="games">
+        <h2 class="sectionTitle">الألعاب 🎮</h2>
+        <p class="muted">اختار لعبة:</p>
+
+        <div class="grid4">
+          <div class="tile" data-go="#g-2048"><div class="t">2048 Emoji</div><div class="d">ادمج الإيموجيز</div></div>
+          <div class="tile" data-go="#g-whack"><div class="t">Whack-a-Emoji</div><div class="d">خبط بسرعة</div></div>
+          <div class="tile" data-go="#g-react"><div class="t">Reaction Test</div><div class="d">سرعة رد الفعل</div></div>
+          <div class="tile" data-go="#g-maze"><div class="t">Maze</div><div class="d">تحريك نقطة</div></div>
+
+          <div class="tile" data-go="#g-typing"><div class="t">Typing Rush</div><div class="d">اكتب بسرعة</div></div>
+          <div class="tile" data-go="#g-dino"><div class="t">Dino</div><div class="d">اقفز وتفادى</div></div>
+          <div class="tile" data-go="#g-frog"><div class="t">Frog</div><div class="d">3 خانات + أبواب</div></div>
+          <div class="tile" data-go="#home"><div class="t">رجوع</div><div class="d">للرئيسية</div></div>
+        </div>
+      </section>
+
+      <!-- 2048 EMOJI -->
+      <section class="page" data-route="g-2048">
+        <h2 class="sectionTitle">2048 Emoji Edition 🧩</h2>
+        <p class="muted">اسحب (يمين/شمال/فوق/تحت) لدمج نفس الإيموجي. الهدف: توصل لأعلى مستوى.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="e2048Score">Score: 0</div>
+            <div class="badge" id="e2048Best">Best: 0</div>
+          </div>
+          <div class="g2048" id="e2048Grid"></div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="e2048Reset">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHACK -->
+      <section class="page" data-route="g-whack">
+        <h2 class="sectionTitle">Whack-a-Emoji 🔨</h2>
+        <p class="muted">الإيموجي هيطلع بسرعة… اضغط عليه قبل ما يختفي.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="whackScore">Score: 0</div>
+            <div class="badge" id="whackTimer">Time: 30</div>
+          </div>
+
+          <div class="whackArena" id="whackArena"></div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="whackStart">ابدأ</button>
+            <button class="btn btnGhost" id="whackReset">إعادة</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- REACTION -->
+      <section class="page" data-route="g-react">
+        <h2 class="sectionTitle">Reaction Test ⚡</h2>
+        <p class="muted">اضغط "ابدأ"… استنى لحد ما تظهر كلمة "اضغط!" واضغط فورًا. هيحسب زمن رد فعلك.</p>
+
+        <div class="card" style="text-align:center;">
+          <div class="badge" id="reactBest">أفضل زمن: —</div>
+          <div style="height:12px"></div>
+
+          <div id="reactBox" style="
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:18px;
+            padding:26px 12px;
+            background:rgba(0,0,0,.22);
+            font-weight:1000;
+            font-size:18px;
+            user-select:none;
+            cursor:pointer;
+          ">جاهز</div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="reactStart">ابدأ</button>
+            <button class="btn btnGhost" id="reactReset">إعادة</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAZE -->
+      <section class="page" data-route="g-maze">
+        <h2 class="sectionTitle">Maze بسيطة 🧭</h2>
+        <p class="muted">حرّك النقطة بالأسهم (⬅️➡️⬆️⬇️) أو أزرار التحكم لحد الهدف ⭐.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="mazeMoves">Moves: 0</div>
+            <div class="badge" id="mazeState">جاهز</div>
+          </div>
+
+          <div class="mazeWrap">
+            <div class="mazeGrid" id="mazeGrid"></div>
+          </div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="mazeUp">⬆️</button>
+            <button class="btn btnGhost" id="mazeDown">⬇️</button>
+            <button class="btn btnGhost" id="mazeLeft">⬅️</button>
+            <button class="btn btnGhost" id="mazeRight">➡️</button>
+            <button class="btn btnGhost" id="mazeReset">إعادة</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TYPING RUSH -->
+      <section class="page" data-route="g-typing">
+        <h2 class="sectionTitle">Typing Rush ⌨️</h2>
+        <p class="muted">اكتب الكلمة اللي تظهر بسرعة. عندك 30 ثانية.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="typeScore">Score: 0</div>
+            <div class="badge" id="typeTime">Time: 30</div>
+          </div>
+
+          <div class="typeBox">
+            <div class="word" id="typeWord">—</div>
+            <input class="field" id="typeInput" placeholder="اكتب هنا…" autocomplete="off" />
+          </div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="typeStart">ابدأ</button>
+            <button class="btn btnGhost" id="typeReset">إعادة</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DINO -->
+      <section class="page" data-route="g-dino">
+        <h2 class="sectionTitle">Dino 🦖</h2>
+        <p class="muted">اضغط/المس عشان تقفز. هدفك أعلى سكور.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="dinoScore">Score: 0</div>
+            <div class="badge" id="dinoState">جاهز</div>
+          </div>
+
+          <div class="canvasWrap"><canvas id="dinoCanvas" width="720" height="220"></canvas></div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="dinoRestart">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FROG -->
+      <section class="page" data-route="g-frog">
+        <h2 class="sectionTitle">Frog 🐸🚪</h2>
+        <p class="muted">3 خانات. حرّك الضفدع فوق/تحت لتفادي الأبواب اللي جاية من اليمين.</p>
+
+        <div class="card">
+          <div class="qHead">
+            <div class="badge" id="frogScore">Score: 0</div>
+            <div class="badge" id="frogState">جاهز</div>
+          </div>
+
+          <div class="canvasWrap"><canvas id="frogCanvas" width="720" height="240"></canvas></div>
+
+          <div class="btnRow">
+            <button class="btn btnGhost" id="frogUp">⬆️ فوق</button>
+            <button class="btn btnGhost" id="frogDown">⬇️ تحت</button>
+            <button class="btn btnGhost" id="frogRestart">إعادة تشغيل</button>
+            <button class="btn" data-go="#games">رجوع للألعاب</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- GENERAL QUIZ -->
+      <section class="page" data-route="general">
+        <h2 class="sectionTitle">أسئلة معلومات عامة 🧩</h2>
+        <div class="card" id="generalQuiz"></div>
+      </section>
+
+      <!-- COUNTRIES QUIZ -->
+      <section class="page" data-route="countries">
+        <h2 class="sectionTitle">أسئلة عن الدول 🌍</h2>
+        <div class="card" id="countriesQuiz"></div>
+      </section>
+
+      <!-- PREP3 -->
+      <section class="page" data-route="prep3">
+        <h2 class="sectionTitle">تالتة إعدادي – الترم التاني 📚</h2>
+        <p class="muted">اختار المادة. الأسئلة تدريبية ومتنوعة (قواعد/قراءة/مفردات/مسائل…).</p>
+
+        <div class="grid4">
+          <div class="tile" data-go="#p3-ar"><div class="t">عربي</div><div class="d">نحو + مهارات</div></div>
+          <div class="tile" data-go="#p3-en"><div class="t">إنجليزي</div><div class="d">Functions/Reading/Vocab</div></div>
+          <div class="tile" data-go="#p3-math"><div class="t">رياضيات</div><div class="d">جبر + هندسة</div></div>
+          <div class="tile" data-go="#p3-sci"><div class="t">علوم</div><div class="d">تفاعلات/وراثة/هرمونات</div></div>
+
+          <div class="tile" data-go="#p3-ss"><div class="t">دراسات</div><div class="d">جغرافيا/تاريخ</div></div>
+          <div class="tile" data-go="#p3-rel"><div class="t">دين</div><div class="d">قيم + فهم</div></div>
+          <div class="tile" data-go="#p3-it"><div class="t">كمبيوتر</div><div class="d">خوارزميات/Flowchart</div></div>
+          <div class="tile" data-go="#home"><div class="t">رجوع</div><div class="d">للرئيسية</div></div>
+        </div>
+
+        <div class="card">
+          <p class="muted">ملاحظة: لو عايز بنك أسئلة ضخم (100+ لكل مادة)، هنزوده تدريجيًا بنفس الشكل ده.</p>
+        </div>
+      </section>
+
+      <section class="page" data-route="p3-ar"><h2 class="sectionTitle">عربي – ترم تاني</h2><div class="card" id="p3_ar"></div></section>
+      <section class="page" data-route="p3-en"><h2 class="sectionTitle">إنجليزي – ترم تاني</h2><div class="card" id="p3_en"></div></section>
+      <section class="page" data-route="p3-math"><h2 class="sectionTitle">رياضيات – ترم تاني</h2><div class="card" id="p3_math"></div></section>
+      <section class="page" data-route="p3-sci"><h2 class="sectionTitle">علوم – ترم تاني</h2><div class="card" id="p3_sci"></div></section>
+      <section class="page" data-route="p3-ss"><h2 class="sectionTitle">دراسات – ترم تاني</h2><div class="card" id="p3_ss"></div></section>
+      <section class="page" data-route="p3-rel"><h2 class="sectionTitle">دين – ترم تاني</h2><div class="card" id="p3_rel"></div></section>
+      <section class="page" data-route="p3-it"><h2 class="sectionTitle">كمبيوتر – ترم تاني</h2><div class="card" id="p3_it"></div></section>
+
+      <!-- MESSAGES -->
+      <section class="page" data-route="messages">
+        <h2 class="sectionTitle">الرسائل ✉️</h2>
+        <p class="muted">اكتب رسالتك هنا وسيتم إرسالها لصاحب الموقع.</p>
+
+        <div class="card">
+          <form id="msgForm" action="https://formspree.io/f/mykdkqza" method="POST">
+            <label class="muted">إيميلك (اختياري)</label>
+            <input class="field" type="email" name="email" placeholder="example@mail.com" autocomplete="email" />
+            <div style="height:10px"></div>
+            <label class="muted">رسالتك</label>
+            <textarea class="field" name="message" placeholder="اكتب هنا…" required></textarea>
+
+            <div class="btnRow">
+              <button class="btn" type="submit">إرسال</button>
+              <button class="btn btnGhost" type="button" id="msgClear">مسح</button>
+            </div>
+
+            <div class="status" id="msgStatus"></div>
+          </form>
+
+          <div class="footer">يرجى عدم كتابة بيانات حساسة.</div>
+        </div>
+      </section>
+
+      <!-- THEMES -->
+      <section class="page" data-route="themes">
+        <h2 class="sectionTitle">الثيمات 🎨</h2>
+        <p class="muted">كل ثيم بيغير لون + شكل + تصميم الواجهة.</p>
+        <div class="themePicker" id="themePicker"></div>
+      </section>
+    </main>
+
+    <nav>
+      <div class="navBtn" data-go="#home">الرئيسية</div>
+      <div class="navBtn" data-go="#games">الألعاب</div>
+      <div class="navBtn" data-go="#messages">الرسائل</div>
+      <div class="navBtn" data-go="#themes">الثيمات</div>
+    </nav>
+  </div>
+
+<script>
+/* =========================
+   Helpers + Router
+========================= */
+const $ = (s, p=document)=>p.querySelector(s);
+const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
+const app = $("#app");
+const pill = $("#pill");
+function setPill(t){ pill.textContent = t; }
+
+const ROUTES = new Set($$(".page").map(p => p.dataset.route));
+function routeFromHash(){
+  const raw = (location.hash || "#home").slice(1);
+  return ROUTES.has(raw) ? raw : "home";
+}
+function showRoute(route){
+  $$(".page").forEach(p => p.classList.toggle("active", p.dataset.route === route));
+  $$(".navBtn").forEach(b => b.classList.toggle("active", (b.getAttribute("data-go")||"")==="#"+route));
+  setPill("📍 " + route);
+  onEnterRoute(route);
+}
+addEventListener("hashchange", ()=>showRoute(routeFromHash()));
+document.addEventListener("click",(e)=>{
+  const go = e.target.closest("[data-go]")?.getAttribute("data-go");
+  if(go) location.hash = go;
+});
+showRoute(routeFromHash());
+
+/* =========================
+   Floating emojis
+========================= */
+const floatLayer = $("#floatLayer");
+const floatEmojis = ["🪐","🎮","✨","💎","🧠","🌈","🎭","🧩","🔥","🍭","💫","🛸","🟣","🟦","🟨","⭐","🎯"];
+function spawnEmojis(count){
+  floatLayer.innerHTML="";
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");
+    el.className="emoji";
+    el.textContent=floatEmojis[(Math.random()*floatEmojis.length)|0];
+    const left=Math.random()*100;
+    const dur=9+Math.random()*11;
+    const delay=-Math.random()*dur;
+    el.style.left = left+"vw";
+    el.style.setProperty("--x",(left-50)+"vw");
+    el.style.animationDuration=dur+"s";
+    el.style.animationDelay=delay+"s";
+    el.style.top=(90+Math.random()*20)+"vh";
+    floatLayer.appendChild(el);
+  }
+}
+spawnEmojis(innerWidth<420?14:22);
+addEventListener("resize",()=>spawnEmojis(innerWidth<420?14:22));
+
+/* =========================
+   Themes (design + layout changes)
+========================= */
+const THEMES = [
+  {
+    id:"neo",
+    name:"Neo Glow",
+    desc:"نيون + زجاجي",
+    className:"theme-card",
+    vars:{ "--bg0":"#050814","--bg1":"#0a1233","--accentA":"#ffd666","--accentB":"#22d3ee","--accentC":"#a855f7","--layout-pad":"12px" }
+  },
+  {
+    id:"minimal",
+    name:"Minimal Dark",
+    desc:"شكل بسيط واحترافي",
+    className:"theme-min",
+    vars:{ "--bg0":"#07080c","--bg1":"#11131a","--accentA":"#7dd3fc","--accentB":"#2cff9f","--accentC":"#c084fc","--layout-pad":"10px" }
+  },
+  {
+    id:"arc",
+    name:"Arc UI",
+    desc:"حواف دائرية قوية + Nav كبسولة",
+    className:"theme-arc",
+    vars:{ "--bg0":"#120616","--bg1":"#250b30","--accentA":"#ff6bd6","--accentB":"#ffd666","--accentC":"#22d3ee","--layout-pad":"12px" }
+  },
+  {
+    id:"gold",
+    name:"Golden Dust",
+    desc:"ذهبي دافي + لمعة",
+    className:"theme-card",
+    vars:{ "--bg0":"#120b02","--bg1":"#2a1706","--accentA":"#ffd666","--accentB":"#f59e0b","--accentC":"#22d3ee","--layout-pad":"12px" }
+  }
+];
+
+function applyTheme(id){
+  const t = THEMES.find(x=>x.id===id) || THEMES[0];
+  // remove all theme classes then add the chosen one
+  app.classList.remove(...THEMES.map(x=>x.className));
+  app.classList.add(t.className);
+
+  for(const k in t.vars) document.documentElement.style.setProperty(k, t.vars[k]);
+  localStorage.setItem("themeId", t.id);
+  setPill("🎨 " + t.name);
+}
+
+applyTheme(localStorage.getItem("themeId") || "neo");
+
+const themePicker = $("#themePicker");
+themePicker.innerHTML = THEMES.map(t=>{
+  const sws = [t.vars["--accentA"], t.vars["--accentB"], t.vars["--accentC"]].map(v=>`<span class="sw" style="background:${v}"></span>`).join("");
+  return `
+    <div class="themeBtn" data-theme="${t.id}">
+      <b>${t.name}</b>
+      <div class="swatches">${sws}</div>
+      <div class="muted" style="font-size:12.5px">${t.desc}</div>
+    </div>
+  `;
+}).join("");
+
+themePicker.addEventListener("click",(e)=>{
+  const id = e.target.closest(".themeBtn")?.dataset.theme;
+  if(id) applyTheme(id);
+});
+
+/* =========================
+   Shared helpers
+========================= */
+function shuffle(a){
+  const arr=a.slice();
+  for(let i=arr.length-1;i>0;i--){
+    const j=(Math.random()*(i+1))|0;
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+/* =========================
+   Quiz Engine
+========================= */
+function mountQuiz(el, questions, opts={}){
+  let idx=0, score=0;
+  let q = shuffle(questions);
+
+  function render(){
+    const item = q[idx];
+    const choices = shuffle(item.choices.map((c,i)=>({text:c, i})));
+
+    el.innerHTML = `
+      <div class="qHead">
+        <div class="badge">سؤال ${idx+1} / ${q.length}</div>
+        <div class="badge">النتيجة: ${score}</div>
+        ${opts.tag ? `<div class="badge">${opts.tag}</div>` : ""}
+      </div>
+
+      <div class="question">${item.q}</div>
+
+      <div class="choices">
+        ${choices.map(ch=>`<div class="choice" data-ans="${ch.i}">${ch.text}</div>`).join("")}
+      </div>
+
+      <div class="qFooter">
+        <button class="btn btnGhost" id="qPrev" ${idx===0?"disabled":""}>رجوع</button>
+        <button class="btn btnGhost" id="qReset">إعادة</button>
+        <button class="btn" id="qNext">${idx===q.length-1 ? "إنهاء" : "التالي"}</button>
+      </div>
+
+      <p class="muted" id="qHint" style="margin-top:8px"></p>
+    `;
+
+    const hint = $("#qHint", el);
+
+    $$(".choice", el).forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        $$(".choice", el).forEach(x=>x.style.pointerEvents="none");
+        const picked = +ch.dataset.ans;
+
+        if(picked === item.answer){
+          ch.classList.add("correct");
+          score++;
+          hint.textContent = "✅ إجابة صحيحة";
+        } else {
+          ch.classList.add("wrong");
+          const correctEl = $$(".choice", el).find(x => +x.dataset.ans === item.answer);
+          if(correctEl) correctEl.classList.add("correct");
+          hint.textContent = "❌ إجابة غير صحيحة";
+        }
+      });
+    });
+
+    $("#qPrev", el).addEventListener("click", ()=>{ if(idx>0){ idx--; render(); } });
+    $("#qReset", el).addEventListener("click", ()=>{ idx=0; score=0; q=shuffle(questions); render(); });
+    $("#qNext", el).addEventListener("click", ()=>{
+      if(idx === q.length-1){
+        el.innerHTML = `
+          <div class="qHead">
+            <div class="badge">النتيجة النهائية: ${score} / ${q.length}</div>
+          </div>
+          <div class="card">
+            <p class="muted">اضغط إعادة للمحاولة مرة أخرى.</p>
+            <div class="btnRow">
+              <button class="btn" id="again">إعادة</button>
+              <button class="btn btnGhost" data-go="#prep3">رجوع للمواد</button>
+            </div>
+          </div>
+        `;
+        $("#again", el).addEventListener("click", ()=>{ idx=0; score=0; q=shuffle(questions); render(); });
+      } else {
+        idx++;
+        render();
+      }
+    });
+  }
+
+  render();
+}
+
+/* =========================
+   Content
+========================= */
+const generalQuestions = [
+  { q:"أكبر كوكب في المجموعة الشمسية هو…", choices:["الأرض","المشتري","المريخ","الزهرة"], answer:1 },
+  { q:"العنصر رمزه O هو…", choices:["ذهب","أكسجين","فضة","حديد"], answer:1 },
+  { q:"أقرب كوكب للشمس هو…", choices:["عطارد","الزهرة","الأرض","المريخ"], answer:0 },
+  { q:"عدد ألوان الطيف…", choices:["5","6","7","8"], answer:2 },
+  { q:"اللغة الرسمية في البرازيل…", choices:["الإسبانية","البرتغالية","الإنجليزية","الفرنسية"], answer:1 },
+];
+
+const countryQuestions = [
+  { q:"عاصمة كندا؟", choices:["تورونتو","أوتاوا","فانكوفر","مونتريال"], answer:1 },
+  { q:"عاصمة أستراليا؟", choices:["سيدني","ملبورن","كانبيرا","بيرث"], answer:2 },
+  { q:"عاصمة تركيا؟", choices:["إسطنبول","أنقرة","إزمير","بورصة"], answer:1 },
+  { q:"عاصمة المغرب؟", choices:["مراكش","الدار البيضاء","الرباط","طنجة"], answer:2 },
+  { q:"مصر تقع في…", choices:["أوروبا","آسيا فقط","أفريقيا (وسيناء آسيوي)","أستراليا"], answer:2 },
+];
+
+/* Prep3 expanded (term2) — تدريبية، متدرجة، قريبة من شكل المواصفات */
+const prep3 = {
+  ar: [
+    { q:"اختر الإعراب الصحيح للكلمة المظللة: نجحَ الطالبُ **المجتهدُ**.", choices:["خبر مرفوع","نعت مرفوع","مفعول به","حال"], answer:1 },
+    { q:"علامة نصب المفعول به الأصلية هي…", choices:["الضمة","الفتحة","الكسرة","السكون"], answer:1 },
+    { q:"(إنَّ) وأخواتها تنصب…", choices:["المبتدأ","الخبر","المبتدأ والخبر","الفاعل"], answer:0 },
+    { q:"الجملة الفعلية تتكون من…", choices:["مبتدأ وخبر","فعل وفاعل","حرف واسم","فعل ومفعول فقط"], answer:1 },
+    { q:"التمييز يأتي لرفع…", choices:["الإبهام","الضمير","السكون","التشبيه"], answer:0 },
+    { q:"أي مما يلي أسلوب شرط؟", choices:["إن تجتهد تنجح","ما أجمل السماء","ليت الشباب يعود","هل حضرت؟"], answer:0 },
+    { q:"علامة رفع جمع المذكر السالم…", choices:["الواو","الألف","الياء","الفتحة"], answer:0 },
+    { q:"المضاف إليه يكون دائمًا…", choices:["منصوبًا","مرفوعًا","مجرورًا","مجزومًا"], answer:2 },
+    { q:"من علامات جزم الفعل المضارع…", choices:["الفتحة","السكون","الضمة","الألف"], answer:1 },
+    { q:"(لن) من أدوات…", choices:["الجزم","النصب","الرفع","الاستفهام"], answer:1 },
+  ],
+
+  en: [
+    { q:"Choose: If I ___ time, I would help you.", choices:["have","had","has","having"], answer:1 },
+    { q:"Choose: She is good ___ English.", choices:["at","in","on","to"], answer:1 },
+    { q:"Choose: I have been here ___ two hours.", choices:["since","for","ago","yet"], answer:1 },
+    { q:"Choose: He ___ to school yesterday.", choices:["go","went","goes","going"], answer:1 },
+    { q:"Vocabulary: ‘predict’ means…", choices:["يتوقع","ينسى","يكتب","يقفز"], answer:0 },
+    { q:"Language function: ‘Could you help me?’ is used for…", choices:["رفض","طلب مساعدة بأدب","تهديد","سخرية"], answer:1 },
+    { q:"Choose: This is the boy ___ won the prize.", choices:["who","where","when","what"], answer:0 },
+    { q:"Reading skill: ‘inference’ means…", choices:["معلومة صريحة","استنتاج من النص","ترجمة حرفية","عنوان فقط"], answer:1 },
+    { q:"Choose: She was tired, ___ she kept working.", choices:["but","because","so","or"], answer:0 },
+    { q:"Choose: I prefer tea ___ coffee.", choices:["than","to","from","at"], answer:1 },
+  ],
+
+  math: [
+    { q:"ميل المستقيم المار بالنقطتين (2,1) و(4,5) يساوي…", choices:["1","2","3","4"], answer:1 },
+    { q:"منتصف القطعة بين (a,b) و(c,d) هو…", choices:["(a+c, b+d)","((a+c)/2, (b+d)/2)","(a-c, b-d)","(a/c, b/d)"], answer:1 },
+    { q:"إذا كان m1×m2 = -1 فإن المستقيمين…", choices:["متوازيان","متعامدان","منطبقان","لا علاقة"], answer:1 },
+    { q:"معادلة المستقيم ص = 3س - 2: الجزء المقطوع من محور الصادات…", choices:["3","-2","2","0"], answer:1 },
+    { q:"ميل المستقيم الأفقي يساوي…", choices:["0","1","غير معرف","-1"], answer:0 },
+    { q:"إذا كانت الدالة f(x)=x² فإن f(3)=…", choices:["6","9","3","12"], answer:1 },
+    { q:"نسبة 20 إلى 5 تساوي…", choices:["2","3","4","5"], answer:2 },
+    { q:"إذا زادت كمية بالـتغير الطردي مع الزمن…", choices:["تقل مع الزمن","تزيد مع الزمن","ثابتة","عشوائية"], answer:1 },
+    { q:"الانحراف المعياري يقيس…", choices:["الطول","التشتت","الزمن","السرعة"], answer:1 },
+    { q:"ميل المستقيم الرأسي…", choices:["0","1","غير معرف","-1"], answer:2 },
+  ],
+
+  sci: [
+    { q:"التفاعل الكيميائي ينتج عنه…", choices:["تغير فيزيائي فقط","مواد جديدة","اختفاء الذرات","زيادة كتلة دائمًا"], answer:1 },
+    { q:"من أمثلة تفاعل الاحتراق…", choices:["ذوبان السكر","احتراق الخشب","تمدد الهواء","انصهار الثلج"], answer:1 },
+    { q:"الجينات توجد على…", choices:["الريبوسومات","الكروموسومات","الغشاء البلازمي","الفجوة"], answer:1 },
+    { q:"الهرمونات تُفرز من…", choices:["الغدد","العظام","الأظافر","الجلد"], answer:0 },
+    { q:"النشاط الإشعاعي يعني…", choices:["انبعاث إشعاعات","انعدام طاقة","تجمد","انصهار"], answer:0 },
+    { q:"قانون حفظ الكتلة يعني…", choices:["الكتلة تختفي","الكتلة تزيد دائمًا","كتلة المتفاعلات = كتلة النواتج","لا علاقة"], answer:2 },
+    { q:"المحلول الحمضي يتميز بأنه…", choices:["pH أكبر من 7","pH أقل من 7","pH يساوي 7 دائمًا","لا يقاس"], answer:1 },
+    { q:"الأملاح تتكون غالبًا من تفاعل…", choices:["حمض + قاعدة","ماء + هواء","فلز + ضوء","سكر + ماء"], answer:0 },
+    { q:"الوراثة تنتقل عبر…", choices:["الجينات","الدهون","الماء","الهواء"], answer:0 },
+    { q:"الهرمونات تنظم…", choices:["النمو","العمليات الحيوية","الاستجابة","كل ما سبق"], answer:3 },
+  ],
+
+  ss: [
+    { q:"أكبر قارة مساحة هي…", choices:["أفريقيا","آسيا","أوروبا","أستراليا"], answer:1 },
+    { q:"العوامل البشرية لتوزيع السكان تشمل…", choices:["الصناعة والتجارة","الجبال فقط","الأمطار فقط","الرياح فقط"], answer:0 },
+    { q:"المناخ يؤثر على…", choices:["النبات الطبيعي","التربة","الإنسان","كل ما سبق"], answer:3 },
+    { q:"من نتائج الضعف الداخلي للدولة…", choices:["زيادة النفوذ الخارجي","اختفاء التجارة","توقف المناخ","لا شيء"], answer:0 },
+    { q:"السهل من التضاريس يتميز بـ…", choices:["سطح منبسط","ارتفاع شديد","جليد دائم","فوهات بركانية دائمًا"], answer:0 },
+    { q:"الاستعمار يستهدف غالبًا…", choices:["الموارد","الكتب","الطقس","اللغة فقط"], answer:0 },
+    { q:"القارة التي تضم أكبر عدد من السكان…", choices:["أفريقيا","آسيا","أوروبا","أمريكا الجنوبية"], answer:1 },
+    { q:"الزراعة تزدهر أكثر في…", choices:["المناطق شديدة الجفاف","المناطق ذات تربة خصبة ومياه","قمم الجبال","المحيط"], answer:1 },
+    { q:"توزيع السكان غير متساوٍ بسبب…", choices:["عوامل طبيعية وبشرية","سبب واحد فقط","لا سبب","الصوت"], answer:0 },
+    { q:"الموانئ تساعد على…", choices:["التجارة","الزلازل","الجفاف","النوم"], answer:0 },
+  ],
+
+  rel: [
+    { q:"من أهداف العبادة…", choices:["التفاخر","تهذيب النفس","الخصام","الغيبة"], answer:1 },
+    { q:"الأمانة تعني…", choices:["حفظ الحقوق","الكذب","الإساءة","الظلم"], answer:0 },
+    { q:"الصدق يؤدي إلى…", choices:["ثقة الناس","كره الناس","ضعف المجتمع","مشاكل فقط"], answer:0 },
+    { q:"صلة الرحم معناها…", choices:["قطع العلاقات","حسن التعامل مع الأقارب","السخرية","التجاهل"], answer:1 },
+    { q:"من القيم المهمة…", choices:["العدل","السرقة","التنمر","الغش"], answer:0 },
+    { q:"الإحسان يعني…", choices:["إتقان العمل وفعل الخير","الكذب","الكسل","التهور"], answer:0 },
+    { q:"التعاون يساعد على…", choices:["إنجاز الأعمال","زيادة الفوضى","قطع العلاقات","الخسارة"], answer:0 },
+    { q:"الغش في الامتحان…", choices:["سلوك صحيح","سلوك خاطئ","مطلوب","عادي دائمًا"], answer:1 },
+    { q:"الرحمة تظهر في…", choices:["مساعدة الضعيف","الأذى","الظلم","التنمر"], answer:0 },
+    { q:"احترام الكبير يعني…", choices:["سوء الكلام","تقديره واللين معه","السخرية","المقاطعة"], answer:1 },
+  ],
+
+  it: [
+    { q:"رمز القرار (Decision) في خريطة التدفق يكون…", choices:["مستطيل","مُعيّن","دائرة","متوازي أضلاع"], answer:1 },
+    { q:"الخوارزمية هي…", choices:["خطوات لحل مشكلة","نوع شاشة","لعبة","ملف صوت"], answer:0 },
+    { q:"Loop يُستخدم لـ…", choices:["تكرار خطوات","حذف ملفات","زيادة الصوت","تغيير لون"], answer:0 },
+    { q:"Debugging يعني…", choices:["تصحيح أخطاء","تشغيل فيديو","حذف تطبيق","نسخ ملف"], answer:0 },
+    { q:"المتغير (Variable) هو…", choices:["قيمة ثابتة دائمًا","مكان لتخزين قيمة تتغير","زر","صورة"], answer:1 },
+    { q:"رمز الإدخال/الإخراج في Flowchart غالبًا…", choices:["متوازي الأضلاع","دائرة","مستطيل","معين"], answer:0 },
+    { q:"الـ IDE يعني…", choices:["بيئة تطوير متكاملة","ملف صوت","متصفح","فيروس"], answer:0 },
+    { q:"Event Handler هو…", choices:["كود يتنفذ عند حدث","صورة","موسيقى","زرار"], answer:0 },
+    { q:"الـ Algorithm لازم تكون…", choices:["واضحة ومحددة","عشوائية","طويلة جدًا","سرية"], answer:0 },
+    { q:"الـ Flowchart يساعد على…", choices:["تصوير خطوات الحل","إخفاء الأخطاء","زيادة العشوائية","إلغاء المنطق"], answer:0 },
+  ],
+};
+
+/* =========================
+   Init flags (init on open)
+========================= */
+const initFlags = {};
+function onEnterRoute(route){
+  if(route === "general" && !initFlags.general){
+    initFlags.general=true;
+    mountQuiz($("#generalQuiz"), generalQuestions, { tag:"General" });
+  }
+  if(route === "countries" && !initFlags.countries){
+    initFlags.countries=true;
+    mountQuiz($("#countriesQuiz"), countryQuestions, { tag:"Countries" });
+  }
+
+  if(route === "p3-ar" && !initFlags.p3ar){ initFlags.p3ar=true; mountQuiz($("#p3_ar"), prep3.ar, { tag:"عربي" }); }
+  if(route === "p3-en" && !initFlags.p3en){ initFlags.p3en=true; mountQuiz($("#p3_en"), prep3.en, { tag:"English" }); }
+  if(route === "p3-math" && !initFlags.p3m){ initFlags.p3m=true; mountQuiz($("#p3_math"), prep3.math, { tag:"Math" }); }
+  if(route === "p3-sci" && !initFlags.p3s){ initFlags.p3s=true; mountQuiz($("#p3_sci"), prep3.sci, { tag:"Science" }); }
+  if(route === "p3-ss" && !initFlags.p3ss){ initFlags.p3ss=true; mountQuiz($("#p3_ss"), prep3.ss, { tag:"Social" }); }
+  if(route === "p3-rel" && !initFlags.p3rel){ initFlags.p3rel=true; mountQuiz($("#p3_rel"), prep3.rel, { tag:"Religion" }); }
+  if(route === "p3-it" && !initFlags.p3it){ initFlags.p3it=true; mountQuiz($("#p3_it"), prep3.it, { tag:"IT" }); }
+
+  if(route === "messages" && !initFlags.msg){ initFlags.msg=true; initMessages(); }
+
+  if(route === "g-2048" && !initFlags.e2048){ initFlags.e2048=true; initEmoji2048(); }
+  if(route === "g-whack" && !initFlags.whack){ initFlags.whack=true; initWhack(); }
+  if(route === "g-react" && !initFlags.react){ initFlags.react=true; initReaction(); }
+  if(route === "g-maze" && !initFlags.maze){ initFlags.maze=true; initMaze(); }
+  if(route === "g-typing" && !initFlags.typing){ initFlags.typing=true; initTypingRush(); }
+  if(route === "g-dino" && !initFlags.dino){ initFlags.dino=true; initDino(); }
+  if(route === "g-frog" && !initFlags.frog){ initFlags.frog=true; initFrog(); }
+}
+
+/* =========================
+   Messages (Formspree)
+========================= */
+function initMessages(){
+  const form = $("#msgForm");
+  const statusEl = $("#msgStatus");
+  const clearBtn = $("#msgClear");
+  const setStatus = (m)=>{ statusEl.textContent=m; statusEl.classList.add("show"); };
+
+  clearBtn.addEventListener("click", ()=>{
+    form.reset();
+    statusEl.classList.remove("show");
+  });
+
+  form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    setStatus("جاري الإرسال…");
+
+    try{
+      const res = await fetch(form.action, {
+        method:"POST",
+        body: new FormData(form),
+        headers: { "Accept":"application/json" }
+      });
+
+      if(res.ok){
+        setStatus("✅ تم إرسال الرسالة بنجاح.");
+        form.reset();
+      } else {
+        let data = {};
+        try{ data = await res.json(); } catch {}
+        setStatus("❌ فشل الإرسال. حاول مرة أخرى لاحقًا.");
+      }
+    } catch{
+      setStatus("❌ مشكلة اتصال. تأكد من الإنترنت ثم حاول مرة أخرى.");
+    }
+  });
+}
+
+/* =========================
+   Emoji 2048
+========================= */
+function initEmoji2048(){
+  const gridEl = $("#e2048Grid");
+  const scoreEl = $("#e2048Score");
+  const bestEl = $("#e2048Best");
+  const resetBtn = $("#e2048Reset");
+
+  const levels = ["😀","😄","😎","🥳","🤩","👑","🪐","🌟","💎","🔥"];
+  let board = Array(16).fill(0); // store level index+1, 0 empty
+  let score=0;
+  let best = +localStorage.getItem("e2048Best") || 0;
+  bestEl.textContent = "Best: " + best;
+
+  function addRandom(){
+    const empty = board.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+    if(!empty.length) return;
+    const i = empty[(Math.random()*empty.length)|0];
+    board[i] = Math.random()<0.9 ? 1 : 2;
+  }
+
+  function render(){
+    gridEl.innerHTML="";
+    for(let i=0;i<16;i++){
+      const v = board[i];
+      const div = document.createElement("div");
+      div.className="cell";
+      div.textContent = v===0 ? "" : levels[v-1];
+      gridEl.appendChild(div);
+    }
+    scoreEl.textContent = "Score: " + score;
+    if(score>best){
+      best=score;
+      localStorage.setItem("e2048Best", best);
+      bestEl.textContent = "Best: " + best;
+    }
+  }
+
+  function compress(line){
+    const a = line.filter(x=>x!==0);
+    while(a.length<4) a.push(0);
+    return a;
+  }
+
+  function merge(line){
+    for(let i=0;i<3;i++){
+      if(line[i] && line[i]===line[i+1]){
+        line[i] = Math.min(line[i]+1, levels.length);
+        line[i+1]=0;
+        score += line[i]*5;
+      }
+    }
+    return line;
+  }
+
+  function move(dir){
+    const old = board.slice();
+
+    const getRow = (r)=> board.slice(r*4, r*4+4);
+    const setRow = (r, arr)=> { for(let i=0;i<4;i++) board[r*4+i]=arr[i]; };
+
+    const getCol = (c)=> [board[c],board[c+4],board[c+8],board[c+12]];
+    const setCol = (c, arr)=> { board[c]=arr[0]; board[c+4]=arr[1]; board[c+8]=arr[2]; board[c+12]=arr[3]; };
+
+    if(dir==="left" || dir==="right"){
+      for(let r=0;r<4;r++){
+        let line = getRow(r);
+        if(dir==="right") line.reverse();
+        line = compress(line);
+        line = merge(line);
+        line = compress(line);
+        if(dir==="right") line.reverse();
+        setRow(r, line);
+      }
+    } else {
+      for(let c=0;c<4;c++){
+        let line = getCol(c);
+        if(dir==="down") line.reverse();
+        line = compress(line);
+        line = merge(line);
+        line = compress(line);
+        if(dir==="down") line.reverse();
+        setCol(c, line);
+      }
+    }
+
+    const changed = old.some((v,i)=>v!==board[i]);
+    if(changed){
+      addRandom();
+      render();
+    }
+  }
+
+  function reset(){
+    board = Array(16).fill(0);
+    score = 0;
+    addRandom(); addRandom();
+    render();
+  }
+
+  // Swipe + keyboard
+  let sx=0, sy=0;
+  gridEl.addEventListener("pointerdown",(e)=>{ sx=e.clientX; sy=e.clientY; });
+  gridEl.addEventListener("pointerup",(e)=>{
+    const dx = e.clientX - sx;
+    const dy = e.clientY - sy;
+    if(Math.abs(dx)<25 && Math.abs(dy)<25) return;
+    if(Math.abs(dx)>Math.abs(dy)){
+      move(dx>0?"right":"left");
+    } else {
+      move(dy>0?"down":"up");
+    }
+  });
+
+  window.addEventListener("keydown",(e)=>{
+    if(!$("#e2048Grid")) return;
+    const r = routeFromHash();
+    if(r!=="g-2048") return;
+    if(e.key==="ArrowLeft") move("left");
+    if(e.key==="ArrowRight") move("right");
+    if(e.key==="ArrowUp") move("up");
+    if(e.key==="ArrowDown") move("down");
+  });
+
+  resetBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* =========================
+   Whack-a-Emoji
+========================= */
+function initWhack(){
+  const arena = $("#whackArena");
+  const scoreEl = $("#whackScore");
+  const timerEl = $("#whackTimer");
+  const startBtn = $("#whackStart");
+  const resetBtn = $("#whackReset");
+
+  const pool = ["😂","🔥","💎","🧠","🎯","⚡","🟣","🍭","🪐","👑"];
+  let score=0, time=30, running=false, interval=null, popTimeout=null;
+  let activeIndex = -1;
+
+  function build(){
+    arena.innerHTML="";
+    for(let i=0;i<9;i++){
+      const hole = document.createElement("div");
+      hole.className="whackHole";
+      hole.textContent="·";
+      hole.addEventListener("click", ()=>{
+        if(!running) return;
+        if(i===activeIndex){
+          score++;
+          scoreEl.textContent="Score: " + score;
+          activeIndex=-1;
+          hole.textContent="·";
+        }
+      });
+      arena.appendChild(hole);
+    }
+  }
+
+  function pop(){
+    if(!running) return;
+    // clear old
+    if(activeIndex>=0){
+      arena.children[activeIndex].textContent="·";
+    }
+    activeIndex = (Math.random()*9)|0;
+    arena.children[activeIndex].textContent = pool[(Math.random()*pool.length)|0];
+
+    const life = 350 + Math.random()*450;
+    popTimeout = setTimeout(()=>{
+      if(activeIndex>=0){
+        arena.children[activeIndex].textContent="·";
+        activeIndex=-1;
+      }
+      pop();
+    }, life);
+  }
+
+  function start(){
+    if(running) return;
+    running=true;
+    score=0; time=30; activeIndex=-1;
+    scoreEl.textContent="Score: 0";
+    timerEl.textContent="Time: 30";
+
+    interval = setInterval(()=>{
+      time--;
+      timerEl.textContent="Time: " + time;
+      if(time<=0){
+        stop();
+      }
+    }, 1000);
+
+    pop();
+  }
+
+  function stop(){
+    running=false;
+    clearInterval(interval); interval=null;
+    clearTimeout(popTimeout); popTimeout=null;
+    if(activeIndex>=0) arena.children[activeIndex].textContent="·";
+    activeIndex=-1;
+  }
+
+  function reset(){
+    stop();
+    score=0; time=30;
+    scoreEl.textContent="Score: 0";
+    timerEl.textContent="Time: 30";
+  }
+
+  startBtn.addEventListener("click", start);
+  resetBtn.addEventListener("click", reset);
+  build();
+}
+
+/* =========================
+   Reaction Test
+========================= */
+function initReaction(){
+  const box = $("#reactBox");
+  const bestEl = $("#reactBest");
+  const startBtn = $("#reactStart");
+  const resetBtn = $("#reactReset");
+
+  let state="idle"; // idle -> waiting -> go -> done
+  let tStart=0, timeout=null;
+  let best = +localStorage.getItem("reactBest") || 0;
+  bestEl.textContent = best ? ("أفضل زمن: " + best + "ms") : "أفضل زمن: —";
+
+  function setBox(text, good=false){
+    box.textContent = text;
+    box.style.background = good
+      ? "color-mix(in srgb, var(--accentB) 22%, rgba(0,0,0,.22))"
+      : "rgba(0,0,0,.22)";
+    box.style.borderColor = good
+      ? "color-mix(in srgb, var(--accentB) 55%, rgba(255,255,255,.14))"
+      : "rgba(255,255,255,.14)";
+  }
+
+  function start(){
+    if(state==="waiting") return;
+    state="waiting";
+    setBox("استنى…", false);
+
+    const delay = 900 + Math.random()*2200;
+    clearTimeout(timeout);
+    timeout = setTimeout(()=>{
+      state="go";
+      setBox("اضغط!", true);
+      tStart = performance.now();
+    }, delay);
+  }
+
+  box.addEventListener("click", ()=>{
+    if(state==="go"){
+      const ms = Math.round(performance.now() - tStart);
+      state="done";
+      setBox("زمنك: " + ms + "ms", true);
+      if(!best || ms<best){
+        best=ms;
+        localStorage.setItem("reactBest", best);
+        bestEl.textContent = "أفضل زمن: " + best + "ms";
+      }
+    } else if(state==="waiting"){
+      // too early
+      clearTimeout(timeout);
+      state="idle";
+      setBox("بدري! جرّب تاني.", false);
+    }
+  });
+
+  function reset(){
+    clearTimeout(timeout);
+    state="idle";
+    setBox("جاهز", false);
+  }
+
+  startBtn.addEventListener("click", start);
+  resetBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* =========================
+   Maze (10x10)
+========================= */
+function initMaze(){
+  const gridEl = $("#mazeGrid");
+  const movesEl = $("#mazeMoves");
+  const stateEl = $("#mazeState");
+  const btns = {
+    up: $("#mazeUp"), down: $("#mazeDown"),
+    left: $("#mazeLeft"), right: $("#mazeRight"),
+    reset: $("#mazeReset")
+  };
+
+  // 0 empty, 1 wall
+  const map = [
+    [0,1,0,0,0,0,1,0,0,0],
+    [0,1,0,1,1,0,1,0,1,0],
+    [0,0,0,0,1,0,0,0,1,0],
+    [1,1,1,0,1,1,1,0,1,0],
+    [0,0,0,0,0,0,0,0,1,0],
+    [0,1,1,1,1,1,0,1,1,0],
+    [0,0,0,0,0,1,0,0,0,0],
+    [0,1,1,1,0,1,1,1,1,0],
+    [0,0,0,1,0,0,0,0,1,0],
+    [0,1,0,0,0,1,1,0,0,0],
+  ];
+
+  let player = {r:0,c:0};
+  let goal = {r:9,c:9};
+  let moves=0;
+
+  function render(){
+    gridEl.innerHTML="";
+    for(let r=0;r<10;r++){
+      for(let c=0;c<10;c++){
+        const d=document.createElement("div");
+        d.className="mazeCell";
+        if(map[r][c]===1) d.classList.add("wall");
+        if(r===goal.r && c===goal.c) d.classList.add("goal");
+        if(r===player.r && c===player.c) d.classList.add("player");
+        gridEl.appendChild(d);
+      }
+    }
+    movesEl.textContent = "Moves: " + moves;
+  }
+
+  function canMove(r,c){
+    if(r<0||r>=10||c<0||c>=10) return false;
+    return map[r][c]===0;
+  }
+
+  function move(dr,dc){
+    const nr=player.r+dr, nc=player.c+dc;
+    if(canMove(nr,nc)){
+      player.r=nr; player.c=nc;
+      moves++;
+      if(player.r===goal.r && player.c===goal.c){
+        stateEl.textContent="✅ وصلت!";
+      } else {
+        stateEl.textContent="شغال…";
+      }
+      render();
+    }
+  }
+
+  function reset(){
+    player={r:0,c:0};
+    goal={r:9,c:9};
+    moves=0;
+    stateEl.textContent="جاهز";
+    render();
+  }
+
+  btns.up.addEventListener("click", ()=>move(-1,0));
+  btns.down.addEventListener("click", ()=>move(1,0));
+  btns.left.addEventListener("click", ()=>move(0,-1));
+  btns.right.addEventListener("click", ()=>move(0,1));
+  btns.reset.addEventListener("click", reset);
+
+  window.addEventListener("keydown",(e)=>{
+    if(routeFromHash()!=="g-maze") return;
+    if(e.key==="ArrowUp") move(-1,0);
+    if(e.key==="ArrowDown") move(1,0);
+    if(e.key==="ArrowLeft") move(0,-1);
+    if(e.key==="ArrowRight") move(0,1);
+  });
+
+  reset();
+}
+
+/* =========================
+   Typing Rush
+========================= */
+function initTypingRush(){
+  const scoreEl = $("#typeScore");
+  const timeEl = $("#typeTime");
+  const wordEl = $("#typeWord");
+  const input = $("#typeInput");
+  const startBtn = $("#typeStart");
+  const resetBtn = $("#typeReset");
+
+  const words = shuffle([
+    "رمضان","مذاكرة","مدرسة","نجاح","تفوق","سؤال","إجابة","تركيز","معلومة","اختبار",
+    "physics","science","history","capital","planet","matrix","function","grammar","reading","email"
+  ]);
+
+  let idx=0, score=0, time=30, running=false, timer=null;
+
+  function nextWord(){
+    wordEl.textContent = words[idx % words.length];
+    idx++;
+  }
+
+  function start(){
+    if(running) return;
+    running=true;
+    score=0; time=30; idx=0;
+    scoreEl.textContent="Score: 0";
+    timeEl.textContent="Time: 30";
+    input.value="";
+    input.focus();
+    nextWord();
+
+    timer = setInterval(()=>{
+      time--;
+      timeEl.textContent="Time: " + time;
+      if(time<=0){
+        stop();
+      }
+    }, 1000);
+  }
+
+  function stop(){
+    running=false;
+    clearInterval(timer); timer=null;
+    wordEl.textContent = "انتهى!";
+    input.blur();
+  }
+
+  function reset(){
+    stop();
+    score=0; time=30; idx=0;
+    scoreEl.textContent="Score: 0";
+    timeEl.textContent="Time: 30";
+    wordEl.textContent="—";
+    input.value="";
+  }
+
+  input.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"){
+      const target = wordEl.textContent;
+      const typed = input.value.trim();
+      if(!running) return;
+
+      if(typed.toLowerCase() === target.toLowerCase()){
+        score++;
+        scoreEl.textContent="Score: " + score;
+      }
+      input.value="";
+      nextWord();
+    }
+  });
+
+  startBtn.addEventListener("click", start);
+  resetBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* =========================
+   Dino (canvas)
+========================= */
+function initDino(){
+  const cvs = $("#dinoCanvas");
+  const ctx = cvs.getContext("2d");
+  const scoreEl = $("#dinoScore");
+  const stateEl = $("#dinoState");
+  const restartBtn = $("#dinoRestart");
+
+  let running=false, dead=false;
+  let t=0, score=0;
+  const g=0.75;
+  const ground=170;
+  const dino={x:70,y:ground,vy:0,w:24,h:30,jump:-12};
+  let obstacles=[];
+  let lastSpawn=0;
+
+  function reset(){
+    running=false; dead=false; t=0; score=0; obstacles=[]; lastSpawn=0;
+    dino.y=ground; dino.vy=0;
+    stateEl.textContent="اضغط/المس للقفز";
+    scoreEl.textContent="Score: 0";
+    draw();
+  }
+
+  function spawn(){
+    const h=18+(Math.random()*26|0);
+    const w=12+(Math.random()*18|0);
+    obstacles.push({x:cvs.width,y:ground+30-h,w,h});
+  }
+
+  function collide(a,b){
+    return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;
+  }
+
+  function jump(){
+    if(dead) return;
+    if(!running){ running=true; stateEl.textContent="شغال…"; loop(); }
+    if(dino.y>=ground-0.5){ dino.vy=dino.jump; }
+  }
+
+  function step(){
+    t++;
+    dino.vy += g;
+    dino.y += dino.vy;
+    if(dino.y>ground){ dino.y=ground; dino.vy=0; }
+
+    if(t-lastSpawn>70+(Math.random()*45|0)){ spawn(); lastSpawn=t; }
+
+    const speed=4.4+Math.min(4, score/220);
+    obstacles.forEach(o=>o.x-=speed);
+    obstacles=obstacles.filter(o=>o.x+o.w>-10);
+
+    score++;
+    scoreEl.textContent="Score: " + Math.floor(score/4);
+
+    const boxD={x:dino.x,y:dino.y,w:dino.w,h:dino.h};
+    for(const o of obstacles){
+      if(collide(boxD,o)){
+        dead=true; running=false;
+        stateEl.textContent="💥 خسرت! اضغط إعادة تشغيل";
+        break;
+      }
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+
+    ctx.globalAlpha=.8;
+    ctx.fillStyle="rgba(255,255,255,.18)";
+    ctx.fillRect(0,ground+30,cvs.width,2);
+    ctx.globalAlpha=1;
+
+    ctx.fillStyle="rgba(255,255,255,.86)";
+    ctx.fillRect(dino.x,dino.y,dino.w,dino.h);
+
+    ctx.fillStyle="rgba(255,214,102,.85)";
+    obstacles.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));
+  }
+
+  function loop(){
+    if(!running) return;
+    step(); draw();
+    requestAnimationFrame(loop);
+  }
+
+  cvs.addEventListener("pointerdown", jump);
+  window.addEventListener("keydown",(e)=>{ if(routeFromHash()==="g-dino" && e.code==="Space") jump(); });
+  restartBtn.addEventListener("click", reset);
+  reset();
+}
+
+/* =========================
+   Frog (3 lanes)
+========================= */
+function initFrog(){
+  const cvs=$("#frogCanvas");
+  const ctx=cvs.getContext("2d");
+  const scoreEl=$("#frogScore");
+  const stateEl=$("#frogState");
+  const upBtn=$("#frogUp");
+  const downBtn=$("#frogDown");
+  const restartBtn=$("#frogRestart");
+
+  let running=false, dead=false, score=0, frame=0;
+  const lanesY=[45,110,175];
+  const frog={lane:1,x:85,w:28,h:28};
+  let doors=[];
+
+  function reset(){
+    running=false; dead=false; score=0; frame=0; doors=[];
+    frog.lane=1;
+    stateEl.textContent="اضغط فوق/تحت للبدء";
+    scoreEl.textContent="Score: 0";
+    draw();
+  }
+
+  function start(){
+    if(dead) return;
+    if(!running){ running=true; stateEl.textContent="شغال…"; loop(); }
+  }
+
+  function spawnDoor(){
+    const lane=(Math.random()*3)|0;
+    const w=22+(Math.random()*22|0);
+    const h=36;
+    doors.push({x:cvs.width, lane, w, h});
+  }
+
+  function step(){
+    frame++;
+    if(frame%55===0) spawnDoor();
+    const speed=4.2+Math.min(4, score/220);
+    doors.forEach(d=>d.x-=speed);
+    doors=doors.filter(d=>d.x+d.w>-10);
+
+    score++;
+    scoreEl.textContent="Score: " + Math.floor(score/5);
+
+    const fy=lanesY[frog.lane];
+    const fbox={x:frog.x,y:fy,w:frog.w,h:frog.h};
+
+    for(const d of doors){
+      const dy=lanesY[d.lane]-3;
+      const db={x:d.x,y:dy,w:d.w,h:d.h};
+      if(fbox.x<db.x+db.w && fbox.x+fbox.w>db.x && fbox.y<db.y+db.h && fbox.y+fbox.h>db.y){
+        dead=true; running=false;
+        stateEl.textContent="🚪💥 خسرت! اضغط إعادة تشغيل";
+        break;
+      }
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+
+    for(let i=0;i<3;i++){
+      ctx.fillStyle="rgba(255,255,255,.07)";
+      ctx.fillRect(0,lanesY[i]-12,cvs.width,52);
+      ctx.fillStyle="rgba(255,255,255,.14)";
+      ctx.fillRect(0,lanesY[i]+34,cvs.width,2);
+    }
+
+    const y=lanesY[frog.lane];
+    ctx.fillStyle="rgba(44,255,159,.85)";
+    ctx.fillRect(frog.x,y,frog.w,frog.h);
+    ctx.fillStyle="rgba(0,0,0,.25)";
+    ctx.fillRect(frog.x+6,y+7,4,4);
+    ctx.fillRect(frog.x+18,y+7,4,4);
+
+    ctx.fillStyle="rgba(255,214,102,.85)";
+    doors.forEach(d=>{
+      const y2=lanesY[d.lane]-3;
+      ctx.fillRect(d.x,y2,d.w,d.h);
+      ctx.fillStyle="rgba(0,0,0,.22)";
+      ctx.fillRect(d.x+d.w-7,y2+d.h/2,3,3);
+      ctx.fillStyle="rgba(255,214,102,.85)";
+    });
+  }
+
+  function loop(){
+    if(!running) return;
+    step(); draw();
+    requestAnimationFrame(loop);
+  }
+
+  function move(delta){
+    start();
+    if(dead) return;
+    frog.lane=Math.max(0,Math.min(2,frog.lane+delta));
+    draw();
+  }
+
+  upBtn.addEventListener("click",()=>move(-1));
+  downBtn.addEventListener("click",()=>move(1));
+  window.addEventListener("keydown",(e)=>{
+    if(routeFromHash()!=="g-frog") return;
+    if(e.key==="ArrowUp") move(-1);
+    if(e.key==="ArrowDown") move(1);
+  });
+  restartBtn.addEventListener("click", reset);
+  reset();
+}
+</script>
+</body>
+</html>
+
 
