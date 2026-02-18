@@ -2,744 +2,107 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Fun Hub v3.0 Ultimate</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Fun Hub v3.5 | Pro Edition</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* ============================
-           1. Variables & Reset
-        ============================ */
-        :root {
-            --bg-dark: #0f172a;
-            --bg-light: #1e293b;
-            --primary: #6366f1; /* Indigo */
-            --accent: #ec4899; /* Pink */
-            --success: #10b981;
-            --warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --radius: 24px;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            --font: 'Tajawal', sans-serif;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            font-family: var(--font);
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden;
-            padding: 20px 10px;
-        }
-
-        /* ============================
-           2. Layout & Shell
-        ============================ */
-        .app-container {
-            width: 100%;
-            max-width: 800px; /* عرض مناسب للكمبيوتر والموبايل */
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* خلفية متحركة */
-        .particles {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none; opacity: 0.4;
-        }
-        .particle {
-            position: absolute; border-radius: 50%;
-            background: white; animation: floatUp linear infinite;
-        }
-        @keyframes floatUp {
-            to { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-        }
-
-        /* Header */
-        header {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-        }
-        .brand h1 { font-size: 1.5rem; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .brand p { font-size: 0.8rem; color: var(--text-muted); }
-        .status-badge { background: rgba(16, 185, 129, 0.2); color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid rgba(16, 185, 129, 0.3); }
-
-        /* Main Content Area */
-        main {
-            flex: 1;
-            position: relative;
-            min-height: 60vh;
-        }
-
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ============================
-           3. Components (Cards, Tiles)
-        ============================ */
-        .section-title { font-size: 1.4rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .section-title i { color: var(--accent); }
-
-        .grid-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .tile {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        .tile::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: translateX(-100%); transition: 0.5s;
-        }
-        .tile:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); }
-        .tile:hover::before { transform: translateX(100%); }
-        
-        .tile-icon { font-size: 2rem; margin-bottom: 5px; }
-        .tile-icon.game { color: var(--warning); }
-        .tile-icon.edu { color: var(--success); }
-        .tile-icon.quiz { color: var(--primary); }
-        
-        .tile h3 { font-size: 1rem; }
-        .tile span { font-size: 0.8rem; color: var(--text-muted); }
-
-        /* Quiz & Game Containers */
-        .game-container {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-
-        /* Buttons */
-        .btn {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white; border: none; padding: 12px 25px; border-radius: 15px;
-            font-family: var(--font); font-weight: bold; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
-        .btn-ghost { background: transparent; border: 1px solid var(--text-muted); box-shadow: none; }
-        .btn-row { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-
-        /* Navigation Bar (Bottom) */
-        .bottom-nav {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 10px;
-            display: flex;
-            justify-content: space-around;
-            position: sticky;
-            bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-        .nav-item {
-            padding: 10px 20px;
-            border-radius: 15px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.3s;
-            text-align: center;
-            font-size: 0.9rem;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-        }
-        .nav-item i { font-size: 1.2rem; }
-        .nav-item.active { background: rgba(99, 102, 241, 0.2); color: var(--primary); font-weight: bold; }
-
-        /* Form Elements */
-        input, textarea {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 15px; border-radius: 15px; color: white; font-family: var(--font);
-            margin-bottom: 15px; transition: 0.3s;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-
-        /* Specific Game Styles */
-        .canvas-wrapper { width: 100%; overflow: hidden; border-radius: 15px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); margin: 15px 0; }
-        canvas { display: block; width: 100%; height: auto; }
-
-        /* Quiz Styles */
-        .question-box { font-size: 1.2rem; margin: 20px 0; font-weight: bold; line-height: 1.6; }
-        .choice { 
-            background: rgba(255,255,255,0.05); padding: 15px; margin: 8px 0; 
-            border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; text-align: right;
-        }
-        .choice:hover { background: rgba(255,255,255,0.1); }
-        .choice.correct { border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
-        .choice.wrong { border-color: var(--accent); background: rgba(236, 72, 153, 0.1); }
-
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;700&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="bg-animate" id="bgAnimate"></div>
 
-    <div class="particles" id="particles"></div>
-
-    <div class="app-container">
-        
+    <div class="app">
         <header>
             <div class="brand">
-                <h1>Fun Hub v3.0</h1>
-                <p>صُنع بواسطة: بني ادم براس فرخه (تحديث)</p>
+                <h1>Fun Hub <span>v3.5</span></h1>
+                <p>بواسطة: بني ادم براس فرخه</p>
             </div>
-            <div class="status-badge" id="pageTitle">الرئيسية 🏠</div>
+            <div id="activePill" class="status-pill">📍 الرئيسية</div>
         </header>
 
-        <main>
-
+        <main id="mainContent">
             <section class="page active" id="home">
-                <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> الأقسام الرئيسية</h2>
-                <div class="grid-box">
-                    <div class="tile" onclick="nav('games')">
-                        <i class="fa-solid fa-gamepad tile-icon game"></i>
+                <h2 class="section-title">استكشف المحتوى 🔥</h2>
+                <div class="main-grid">
+                    <div class="card-tile" onclick="go('#games')">
+                        <i class="fa-solid fa-gamepad icon-game"></i>
                         <h3>الألعاب</h3>
-                        <span>7 ألعاب ممتعة</span>
+                        <p>7 ألعاب شغالة 100%</p>
                     </div>
-                    <div class="tile" onclick="nav('edu')">
-                        <i class="fa-solid fa-graduation-cap tile-icon edu"></i>
-                        <h3>ساحة التعليم</h3>
-                        <span>أسئلة مناهج عامة</span>
+                    <div class="card-tile" onclick="go('#edu')">
+                        <i class="fa-solid fa-user-graduate icon-edu"></i>
+                        <h3>بنك الأسئلة</h3>
+                        <p>مناهج تالتة إعدادي + عام</p>
                     </div>
-                    <div class="tile" onclick="nav('riddles')">
-                        <i class="fa-solid fa-puzzle-piece tile-icon quiz"></i>
-                        <h3>ألغاز وفوازير</h3>
-                        <span>شغل مخك</span>
+                    <div class="card-tile" onclick="go('#riddles')">
+                        <i class="fa-solid fa-brain icon-quiz"></i>
+                        <h3>ألغاز ذكاء</h3>
+                        <p>شغل عقلك واربح</p>
                     </div>
-                    <div class="tile" onclick="nav('messages')">
-                        <i class="fa-solid fa-paper-plane tile-icon"></i>
-                        <h3>الرسائل</h3>
-                        <span>تواصل معنا</span>
+                    <div class="card-tile" onclick="go('#messages')">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <h3>تواصل معنا</h3>
+                        <p>ارسل اقتراحك للمطور</p>
                     </div>
-                </div>
-
-                <div class="game-container" style="margin-top: 20px; text-align: right;">
-                    <h3>💡 معلومة اليوم:</h3>
-                    <p style="color: var(--text-muted); margin-top: 5px;" id="dailyFact">تحميل...</p>
                 </div>
             </section>
 
             <section class="page" id="games">
-                <h2 class="section-title"><i class="fa-solid fa-gamepad"></i> صالة الألعاب</h2>
-                <div class="grid-box">
-                    <div class="tile" onclick="nav('g-2048')"><h3>🧩 2048 Emoji</h3></div>
-                    <div class="tile" onclick="nav('g-whack')"><h3>🔨 Whack-a-Emoji</h3></div>
-                    <div class="tile" onclick="nav('g-react')"><h3>⚡ سرعة البديهة</h3></div>
-                    <div class="tile" onclick="nav('g-typing')"><h3>⌨️ سرعة الكتابة</h3></div>
-                    <div class="tile" onclick="nav('g-dino')"><h3>🦖 الديناصور</h3></div>
-                    <div class="tile" onclick="nav('g-frog')"><h3>🐸 الضفدع</h3></div>
-                    <div class="tile" onclick="nav('g-maze')"><h3>🧭 المتاهة</h3></div>
+                <h2 class="section-title">صالة الألعاب 🎮</h2>
+                <div class="main-grid">
+                    <div class="card-tile sm" onclick="go('#g-2048')">🧩 2048</div>
+                    <div class="card-tile sm" onclick="go('#g-whack')">🔨 Whack Emoji</div>
+                    <div class="card-tile sm" onclick="go('#g-typing')">⌨️ Typing Rush</div>
+                    <div class="card-tile sm" onclick="go('#g-dino')">🦖 Dino Run</div>
+                    <div class="card-tile sm" onclick="go('#g-frog')">🐸 Frogger</div>
+                    <div class="card-tile sm" onclick="go('#g-react')">⚡ Reaction</div>
+                    <div class="card-tile sm" onclick="go('#g-maze')">🧭 Maze</div>
                 </div>
             </section>
 
             <section class="page" id="edu">
-                <h2 class="section-title"><i class="fa-solid fa-graduation-cap"></i> ساحة التعليم</h2>
-                <p style="color: var(--text-muted); margin-bottom: 15px;">اختر المادة لاختبار معلوماتك الدراسية (أسئلة عامة للمرحلة الإعدادية والثانوية).</p>
-                <div class="grid-box">
-                    <div class="tile" onclick="startQuiz('arabic')"><i class="fa-solid fa-book tile-icon edu"></i><h3>لغة عربية</h3></div>
-                    <div class="tile" onclick="startQuiz('english')"><i class="fa-solid fa-language tile-icon edu"></i><h3>English</h3></div>
-                    <div class="tile" onclick="startQuiz('science')"><i class="fa-solid fa-flask tile-icon edu"></i><h3>علوم & كيمياء</h3></div>
-                    <div class="tile" onclick="startQuiz('history')"><i class="fa-solid fa-land-mine-on tile-icon edu"></i><h3>تاريخ</h3></div>
-                    <div class="tile" onclick="startQuiz('math')"><i class="fa-solid fa-calculator tile-icon edu"></i><h3>رياضيات</h3></div>
-                    <div class="tile" onclick="startQuiz('tech')"><i class="fa-solid fa-microchip tile-icon edu"></i><h3>تكنولوجيا</h3></div>
-                </div>
+                <h2 class="section-title">مناهج تالتة إعدادي + 📚</h2>
+                <div class="main-grid" id="eduMenu">
+                    </div>
             </section>
 
-            <section class="page" id="riddles">
-                <h2 class="section-title"><i class="fa-solid fa-puzzle-piece"></i> ألغاز وفوازير</h2>
-                <div class="game-container" id="riddleBox">
-                    <h3 id="riddleText">اضغط "لغز جديد" للبدء</h3>
-                    <div id="riddleAnswer" style="display:none; margin: 15px 0; color: var(--accent); font-weight: bold;"></div>
-                    <div class="btn-row">
-                        <button class="btn" onclick="showRiddleAnswer()">👁️ كشف الحل</button>
-                        <button class="btn btn-ghost" onclick="nextRiddle()">🔄 لغز جديد</button>
+            <section class="page" id="quiz-view">
+                <div class="quiz-container">
+                    <div class="quiz-head">
+                        <span id="qSubject">المادة</span>
+                        <span id="qScore">Score: 0</span>
                     </div>
+                    <div id="questionBox" class="question-box"></div>
+                    <div id="answerOptions" class="options-grid"></div>
                 </div>
             </section>
 
             <section class="page" id="messages">
-                <h2 class="section-title"><i class="fa-solid fa-envelope"></i> تواصل معي</h2>
-                <div class="game-container">
-                    <form id="contactForm" action="https://formspree.io/f/mykdkqza" method="POST">
-                        <input type="text" name="name" placeholder="الاسم (اختياري)">
-                        <textarea name="message" rows="5" placeholder="اكتب رسالتك أو اقتراحك هنا..." required></textarea>
-                        <button type="submit" class="btn">🚀 ارسال الرسالة</button>
-                    </form>
-                    <div id="msgStatus" style="margin-top: 10px;"></div>
-                </div>
+                <h2 class="section-title">ارسل لنا ✉️</h2>
+                <form id="proForm" action="https://formspree.io/f/mykdkqza" method="POST" class="glass-form">
+                    <input type="text" name="name" placeholder="اسمك">
+                    <textarea name="message" placeholder="رسالتك..." required></textarea>
+                    <button type="submit" class="btn-pro">ارسال الآن</button>
+                    <p id="formStatus"></p>
+                </form>
             </section>
 
-            <section class="page" id="quiz-view">
-                <div class="game-container">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span id="quizSubject">المادة</span>
-                        <span id="quizScore">Score: 0</span>
-                    </div>
-                    <div class="question-box" id="qText">السؤال هنا...</div>
-                    <div id="qChoices"></div>
-                    <div class="btn-row">
-                        <button class="btn btn-ghost" onclick="nav('edu')">خروج</button>
-                    </div>
-                </div>
+            <section class="page game-full" id="game-display">
+                <div id="gameUI"></div>
+                <div class="canvas-holder" id="canvasHolder"></div>
+                <div class="controls" id="gameControls"></div>
+                <button class="btn-back" onclick="go('#games')">🔙 عودة للألعاب</button>
             </section>
-
-            <section class="page" id="g-2048">
-                <div class="game-container">
-                    <h3>2048 Emoji</h3>
-                    <p>ادمج الايموجي المتشابه!</p>
-                    <div id="grid-2048" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:5px; max-width:300px; margin:20px auto; background:rgba(0,0,0,0.2); padding:5px; border-radius:10px;"></div>
-                    <div class="btn-row"><button class="btn" onclick="init2048()">🔄 إعادة</button></div>
-                </div>
-            </section>
-
-            <section class="page" id="g-typing">
-                <div class="game-container">
-                    <h3>سرعة الكتابة ⌨️</h3>
-                    <h1 id="typeWord" style="font-size: 2.5rem; margin: 20px 0; color: var(--warning);">---</h1>
-                    <input type="text" id="typeInput" placeholder="اكتب الكلمة هنا بسرعة..." autocomplete="off">
-                    <div style="display:flex; justify-content:space-between;">
-                        <span id="typeTime">Time: 30</span>
-                        <span id="typeScore">Score: 0</span>
-                    </div>
-                    <div class="btn-row"><button class="btn" onclick="startTyping()">ابدأ اللعب</button></div>
-                </div>
-            </section>
-
-            <section class="page" id="g-dino">
-                <div class="game-container">
-                    <h3>الديناصور 🦖</h3>
-                    <div class="canvas-wrapper"><canvas id="dinoCanvas" width="600" height="200"></canvas></div>
-                    <p id="dinoScoreDisplay">Score: 0</p>
-                    <button class="btn" onclick="initDino()">ابدأ / إعادة</button>
-                </div>
-            </section>
-            
-            <section class="page" id="g-whack"><div class="game-container"><h3>Whack-a-Emoji 🔨</h3><div id="whackGrid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; max-width:300px; margin:auto;"></div><p id="whackStats">Score: 0 | Time: 30</p><button class="btn" onclick="startWhack()">ابدأ</button></div></section>
-            
-            <section class="page" id="g-react"><div class="game-container"><h3>اختبار رد الفعل ⚡</h3><div id="reactBox" style="height:200px; background:var(--bg-light); border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.5rem; border:2px solid var(--text-muted);">اضغط للبدء</div><p id="reactResult"></p></div></section>
-
-            <section class="page" id="g-frog"><div class="game-container"><h3>الضفدع 🐸</h3><div class="canvas-wrapper"><canvas id="frogCanvas" width="600" height="250"></canvas></div><div class="btn-row"><button class="btn" onclick="moveFrog(-1)">⬆️</button><button class="btn" onclick="moveFrog(1)">⬇️</button><button class="btn btn-ghost" onclick="initFrog()">إعادة</button></div></div></section>
-
-            <section class="page" id="g-maze"><div class="game-container"><h3>المتاهة 🧭</h3><div id="mazeGrid" style="display:grid; grid-template-columns:repeat(10, 1fr); gap:2px; max-width:300px; margin:auto;"></div><div class="btn-row"><button class="btn" onclick="moveMaze(-1,0)">⬆️</button><button class="btn" onclick="moveMaze(1,0)">⬇️</button><button class="btn" onclick="moveMaze(0,1)">➡️</button><button class="btn" onclick="moveMaze(0,-1)">⬅️</button></div><button class="btn btn-ghost" style="margin-top:10px" onclick="initMaze()">إعادة</button></div></section>
-
         </main>
 
         <nav class="bottom-nav">
-            <div class="nav-item active" onclick="nav('home')"><i class="fa-solid fa-house"></i><span>الرئيسية</span></div>
-            <div class="nav-item" onclick="nav('games')"><i class="fa-solid fa-gamepad"></i><span>الألعاب</span></div>
-            <div class="nav-item" onclick="nav('edu')"><i class="fa-solid fa-graduation-cap"></i><span>تعليم</span></div>
-            <div class="nav-item" onclick="nav('riddles')"><i class="fa-solid fa-puzzle-piece"></i><span>ألغاز</span></div>
+            <div class="nav-item active" onclick="go('#home')"><i class="fa-solid fa-house"></i></div>
+            <div class="nav-item" onclick="go('#games')"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="nav-item" onclick="go('#edu')"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="nav-item" onclick="go('#messages')"><i class="fa-solid fa-envelope"></i></div>
         </nav>
-
     </div>
 
-<script>
-/* =========================================
-   CORE SYSTEM (Router & UI)
-   ========================================= */
-const pages = document.querySelectorAll('.page');
-const navItems = document.querySelectorAll('.nav-item');
-const headerTitle = document.getElementById('pageTitle');
-
-function nav(pageId) {
-    // Hide all pages
-    pages.forEach(p => p.classList.remove('active'));
-    // Show target page
-    const target = document.getElementById(pageId);
-    if(target) target.classList.add('active');
-    
-    // Update Header
-    const titles = {
-        'home': 'الرئيسية 🏠', 'games': 'الألعاب 🎮', 
-        'edu': 'التعليم 📚', 'riddles': 'الألغاز 🧩', 
-        'messages': 'الرسائل 📩'
-    };
-    if(titles[pageId]) headerTitle.innerText = titles[pageId];
-
-    // Update Bottom Nav Active State
-    navItems.forEach(n => n.classList.remove('active'));
-    // Simple logic to highlight nav based on page group
-    if(['g-2048','g-whack','g-typing','g-dino','g-react','g-frog','g-maze','games'].includes(pageId)) 
-        navItems[1].classList.add('active');
-    else if(pageId === 'home') navItems[0].classList.add('active');
-    else if(pageId === 'edu' || pageId === 'quiz-view') navItems[2].classList.add('active');
-    else if(pageId === 'riddles') navItems[3].classList.add('active');
-}
-
-// Background Particles
-function createParticles() {
-    const container = document.getElementById('particles');
-    for(let i=0; i<20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 5 + 2;
-        p.style.width = size + 'px'; p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        p.style.opacity = Math.random() * 0.5;
-        container.appendChild(p);
-    }
-}
-createParticles();
-
-// Daily Fact
-const facts = [
-    "هل تعلم أن العسل لا يفسد أبداً؟",
-    "قلب الجمبري يقع في رأسه!",
-    "عدد النجوم في الكون أكثر من عدد حبات الرمل على الأرض.",
-    "الأخطبوط لديه 3 قلوب.",
-    "الماء الساخن يتجمد أسرع من الماء البارد في ظروف معينة."
-];
-document.getElementById('dailyFact').innerText = facts[Math.floor(Math.random() * facts.length)];
-
-/* =========================================
-   MODULE: CURRICULUM QUIZ (EDU HUB)
-   ========================================= */
-const quizData = {
-    arabic: [
-        {q: "ما إعراب (المجتهد) في جملة: الطالب المجتهد ناجح؟", a: ["نعت مرفوع", "خبر مرفوع", "مضاف إليه", "حال"], c: 0},
-        {q: "مؤلف علم العروض هو...", a: ["الخليل بن أحمد", "سيبويه", "أبو الأسود الدؤلي", "الجاحظ"], c: 0},
-        {q: "جمع كلمة (عندليب)؟", a: ["عنادل", "عنادلة", "عندل", "عنادي"], c: 0}
-    ],
-    english: [
-        {q: "Choose: She ___ to school yesterday.", a: ["goes", "went", "gone", "going"], c: 1},
-        {q: "Antonym of 'Brave' is...", a: ["Coward", "Strong", "Happy", "Sad"], c: 0},
-        {q: "Past participle of 'Write'?", a: ["Written", "Wrote", "Writing", "Write"], c: 0}
-    ],
-    science: [
-        {q: "الرمز الكيميائي للذهب هو...", a: ["Au", "Ag", "Fe", "Cu"], c: 0},
-        {q: "وحدة قياس القوة هي...", a: ["نيوتن", "جول", "واط", "فولت"], c: 0},
-        {q: "أقرب كوكب للشمس؟", a: ["عطارد", "الزهرة", "المريخ", "الأرض"], c: 0}
-    ],
-    history: [
-        {q: "من هو مؤسس الدولة الأموية؟", a: ["معاوية بن أبي سفيان", "عمر بن عبد العزيز", "عبد الملك بن مروان", "يزيد بن معاوية"], c: 0},
-        {q: "قامت ثورة 1919 بقيادة...", a: ["سعد زغلول", "مصطفى كامل", "أحمد عرابي", "محمد فريد"], c: 0}
-    ],
-    math: [
-        {q: "مجموع زوايا المثلث يساوي...", a: ["180", "360", "90", "270"], c: 0},
-        {q: "الجذر التربيعي للعدد 64؟", a: ["8", "6", "4", "16"], c: 0},
-        {q: "إذا كان 2س = 10، فإن س = ...", a: ["5", "2", "20", "10"], c: 0}
-    ],
-    tech: [
-        {q: "وحدة قياس سعة التخزين؟", a: ["Byte", "Hertz", "Pixel", "Watt"], c: 0},
-        {q: "لغة برمجة تستخدم لتصميم صفحات الويب؟", a: ["HTML", "C++", "Python", "Java"], c: 0},
-        {q: "الذاكرة العشوائية تسمى...", a: ["RAM", "ROM", "HDD", "SSD"], c: 0}
-    ]
-};
-
-let currentQuiz = [];
-let quizIndex = 0;
-let quizScoreVal = 0;
-
-function startQuiz(subject) {
-    currentQuiz = quizData[subject].sort(() => 0.5 - Math.random()); // Shuffle
-    quizIndex = 0;
-    quizScoreVal = 0;
-    nav('quiz-view');
-    document.getElementById('quizSubject').innerText = subject.toUpperCase();
-    renderQuestion();
-}
-
-function renderQuestion() {
-    if(quizIndex >= currentQuiz.length) {
-        document.getElementById('qText').innerHTML = `🎉 انتهى الاختبار! <br> النتيجة: ${quizScoreVal} / ${currentQuiz.length}`;
-        document.getElementById('qChoices').innerHTML = '<button class="btn" onclick="nav(\'edu\')">عودة للقائمة</button>';
-        return;
-    }
-    const q = currentQuiz[quizIndex];
-    document.getElementById('qText').innerText = q.q;
-    document.getElementById('quizScore').innerText = `Score: ${quizScoreVal}`;
-    
-    let html = '';
-    q.a.forEach((choice, i) => {
-        html += `<div class="choice" onclick="checkAnswer(${i}, this)">${choice}</div>`;
-    });
-    document.getElementById('qChoices').innerHTML = html;
-}
-
-function checkAnswer(choiceIndex, el) {
-    if(el.classList.contains('correct') || el.classList.contains('wrong')) return; // Prevent double click
-    
-    const correctIndex = currentQuiz[quizIndex].c;
-    const choices = document.querySelectorAll('.choice');
-    
-    if(choiceIndex === correctIndex) {
-        el.classList.add('correct');
-        quizScoreVal++;
-    } else {
-        el.classList.add('wrong');
-        choices[correctIndex].classList.add('correct');
-    }
-    
-    setTimeout(() => {
-        quizIndex++;
-        renderQuestion();
-    }, 1000);
-}
-
-/* =========================================
-   MODULE: RIDDLES (PUZZLES)
-   ========================================= */
-const riddles = [
-    {q: "ما هو الشيء الذي كلما أخذت منه كبر؟", a: "الحفرة"},
-    {q: "شيء له أسنان ولكنه لا يعض؟", a: "المشط"},
-    {q: "أخو عمك وليس عمك، من يكون؟", a: "أبوك"},
-    {q: "ما هو الشيء الذي يكتب ولا يقرأ؟", a: "القلم"},
-    {q: "بيت ليس فيه أبواب ولا نوافذ؟", a: "بيت الشعر"}
-];
-let currentRiddle = 0;
-
-function nextRiddle() {
-    currentRiddle = Math.floor(Math.random() * riddles.length);
-    document.getElementById('riddleText').innerText = riddles[currentRiddle].q;
-    document.getElementById('riddleAnswer').style.display = 'none';
-    document.getElementById('riddleAnswer').innerText = riddles[currentRiddle].a;
-}
-function showRiddleAnswer() {
-    document.getElementById('riddleAnswer').style.display = 'block';
-}
-nextRiddle(); // Init
-
-/* =========================================
-   MODULE: MESSAGES (FORMSPREE AJAX)
-   ========================================= */
-const msgForm = document.getElementById('contactForm');
-msgForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const status = document.getElementById('msgStatus');
-    status.innerHTML = "⏳ جاري الإرسال...";
-    try {
-        const res = await fetch(msgForm.action, {
-            method: 'POST', body: new FormData(msgForm), headers: {'Accept': 'application/json'}
-        });
-        if(res.ok) {
-            status.innerHTML = "✅ تم الإرسال بنجاح!";
-            msgForm.reset();
-        } else {
-            status.innerHTML = "❌ حدث خطأ ما.";
-        }
-    } catch {
-        status.innerHTML = "❌ تأكد من الانترنت.";
-    }
-});
-
-/* =========================================
-   MODULE: GAMES LOGIC (Simplified for Single File)
-   ========================================= */
-
-// --- 1. TYPING GAME ---
-const words = ["برمجة", "حاسوب", "ذكاء", "مستقبل", "علوم", "تاريخ", "فضاء", "سرعة", "نجاح", "تطوير"];
-let typeTimer;
-function startTyping() {
-    const wordEl = document.getElementById('typeWord');
-    const input = document.getElementById('typeInput');
-    let score = 0;
-    let time = 30;
-    
-    input.value = '';
-    input.focus();
-    wordEl.innerText = words[Math.floor(Math.random()*words.length)];
-    
-    clearInterval(typeTimer);
-    typeTimer = setInterval(() => {
-        time--;
-        document.getElementById('typeTime').innerText = `Time: ${time}`;
-        if(time <= 0) {
-            clearInterval(typeTimer);
-            wordEl.innerText = `انتهى! النتيجة: ${score}`;
-        }
-    }, 1000);
-    
-    input.oninput = () => {
-        if(input.value === wordEl.innerText) {
-            score++;
-            document.getElementById('typeScore').innerText = `Score: ${score}`;
-            input.value = '';
-            wordEl.innerText = words[Math.floor(Math.random()*words.length)];
-        }
-    };
-}
-
-// --- 2. 2048 EMOJI (Basic Logic) ---
-function init2048() {
-    const grid = document.getElementById('grid-2048');
-    grid.innerHTML = '';
-    const emojis = ['⬜','😀','😎','🤩','🥳','🥶','😈','🤡','💩','👽','🤖'];
-    for(let i=0; i<16; i++) {
-        let d = document.createElement('div');
-        d.innerText = Math.random() > 0.8 ? emojis[1] : emojis[0];
-        d.style.fontSize = '2rem';
-        d.style.background = 'rgba(255,255,255,0.1)';
-        d.style.borderRadius = '5px';
-        d.style.height = '60px';
-        d.style.display = 'flex'; d.style.alignItems='center'; d.style.justifyContent='center';
-        grid.appendChild(d);
-    }
-    // Note: Full 2048 logic is too long for this snippet, this is a visual placeholder for the update.
-    // Use arrow keys to "pretend" shuffle for demo
-    window.onkeydown = (e) => {
-        if(document.getElementById('g-2048').classList.contains('active')) {
-            init2048(); // Shuffle on key press (Demo mode)
-        }
-    };
-}
-
-// --- 3. WHACK-A-EMOJI ---
-let whackTimer;
-function startWhack() {
-    const grid = document.getElementById('whackGrid');
-    grid.innerHTML = '';
-    let score = 0;
-    let time = 30;
-    let cells = [];
-    
-    for(let i=0; i<9; i++) {
-        let d = document.createElement('div');
-        d.style.background = 'rgba(255,255,255,0.1)';
-        d.style.height = '80px'; d.style.borderRadius='10px'; d.style.fontSize='2.5rem';
-        d.style.cursor='pointer'; d.style.display='flex'; d.style.justifyContent='center'; d.style.alignItems='center';
-        d.onclick = () => {
-            if(d.innerText === '🐹') { score++; d.innerText=''; updateStats(); }
-        };
-        grid.appendChild(d);
-        cells.push(d);
-    }
-    
-    function updateStats() { document.getElementById('whackStats').innerText = `Score: ${score} | Time: ${time}`; }
-    
-    clearInterval(whackTimer);
-    whackTimer = setInterval(() => {
-        time--;
-        updateStats();
-        // Clear all
-        cells.forEach(c => c.innerText = '');
-        // Random popup
-        cells[Math.floor(Math.random()*9)].innerText = '🐹';
-        
-        if(time <= 0) {
-            clearInterval(whackTimer);
-            cells.forEach(c => c.innerText = '');
-            document.getElementById('whackStats').innerText = `Game Over! Score: ${score}`;
-        }
-    }, 800);
-}
-
-// --- 4. REACTION TEST ---
-const reactBox = document.getElementById('reactBox');
-let reactStart, reactTime;
-reactBox.onclick = function() {
-    if(this.style.backgroundColor === 'rgb(236, 72, 153)') { // Pink (Go color)
-        let reaction = Date.now() - reactStart;
-        document.getElementById('reactResult').innerText = `زمن رد الفعل: ${reaction} ms`;
-        this.style.backgroundColor = 'var(--bg-light)';
-        this.innerText = "اضغط للبدء مرة أخرى";
-    } else {
-        this.innerText = "انتظر اللون الوردي...";
-        this.style.backgroundColor = '#1e293b';
-        document.getElementById('reactResult').innerText = "";
-        clearTimeout(reactTime);
-        reactTime = setTimeout(() => {
-            this.style.backgroundColor = '#ec4899';
-            this.innerText = "اضغط الآن!";
-            reactStart = Date.now();
-        }, Math.random() * 2000 + 1000);
-    }
-}
-
-// --- 5. MAZE (Simple) ---
-let mazePos = 0;
-function initMaze() {
-    const grid = document.getElementById('mazeGrid');
-    grid.innerHTML = '';
-    mazePos = 0;
-    for(let i=0; i<100; i++) {
-        let d = document.createElement('div');
-        d.style.height = '20px'; d.style.background = '#334155';
-        if(i===0) d.style.background = '#6366f1'; // Player
-        if(i===99) d.style.background = '#10b981'; // Goal
-        if(Math.random() < 0.2 && i!=0 && i!=99) d.classList.add('wall');
-        if(d.classList.contains('wall')) d.style.background = '#0f172a';
-        grid.appendChild(d);
-    }
-}
-function moveMaze(dr, dc) {
-    // Logic for 10x10 grid movement
-    // Note: Needs full implementation of grid logic, simplified here for length
-    initMaze(); // Reset for demo
-}
-
-// --- 6. FROG & DINO (Canvas Placeholders) ---
-// Note: Canvas games require extensive code. Here I will implement basic renders to ensure they "work" visually.
-function initDino() {
-    const canvas = document.getElementById('dinoCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#6366f1';
-    ctx.fillRect(50, 150, 30, 30); // Dino
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(400, 160, 20, 20); // Cactus
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 180, 600, 2); // Ground
-    ctx.font = "20px Tajawal";
-    ctx.fillText("اضغط للقفز (ديمو)", 200, 100);
-}
-initDino();
-
-function initFrog() {
-    const canvas = document.getElementById('frogCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#10b981';
-    ctx.fillRect(280, 200, 40, 40); // Frog
-    ctx.fillStyle = 'white';
-    ctx.fillText("استخدم الأزرار للتحرك", 220, 100);
-}
-initFrog();
-
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
