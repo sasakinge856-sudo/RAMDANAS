@@ -1,108 +1,182 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Fun Hub v3.5 | Pro Edition</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;700&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fun Hub v3</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-    <div class="bg-animate" id="bgAnimate"></div>
+  <div class="fx" aria-hidden="true" id="fx"></div>
 
-    <div class="app">
-        <header>
-            <div class="brand">
-                <h1>Fun Hub <span>v3.5</span></h1>
-                <p>بواسطة: بني ادم براس فرخه</p>
+  <div class="shell" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">FH</div>
+        <div>
+          <h1>Fun Hub v3</h1>
+          <p>ألعاب + أسئلة + ألغاز — نسخة احترافية</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="chip" id="themeBtn" type="button">🎨 ثيم</button>
+        <div class="pill" id="pill">✨ جاهز</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- HOME -->
+      <section class="page" data-route="home">
+        <div class="hero">
+          <div>
+            <h2>اختار قسم 👇</h2>
+            <p class="muted">موقع ألعاب + أسئلة + ألغاز. كل حاجة شغالة داخل نفس الواجهة.</p>
+          </div>
+
+          <div class="hero-card">
+            <div class="hero-stat">
+              <span class="k">أسئلة</span>
+              <span class="v" id="statQuestions">—</span>
             </div>
-            <div id="activePill" class="status-pill">📍 الرئيسية</div>
-        </header>
+            <div class="hero-stat">
+              <span class="k">ألغاز</span>
+              <span class="v" id="statPuzzles">—</span>
+            </div>
+            <div class="hero-stat">
+              <span class="k">ثيم</span>
+              <span class="v" id="statTheme">—</span>
+            </div>
+          </div>
+        </div>
 
-        <main id="mainContent">
-            <section class="page active" id="home">
-                <h2 class="section-title">استكشف المحتوى 🔥</h2>
-                <div class="main-grid">
-                    <div class="card-tile" onclick="go('#games')">
-                        <i class="fa-solid fa-gamepad icon-game"></i>
-                        <h3>الألعاب</h3>
-                        <p>7 ألعاب شغالة 100%</p>
-                    </div>
-                    <div class="card-tile" onclick="go('#edu')">
-                        <i class="fa-solid fa-user-graduate icon-edu"></i>
-                        <h3>بنك الأسئلة</h3>
-                        <p>مناهج تالتة إعدادي + عام</p>
-                    </div>
-                    <div class="card-tile" onclick="go('#riddles')">
-                        <i class="fa-solid fa-brain icon-quiz"></i>
-                        <h3>ألغاز ذكاء</h3>
-                        <p>شغل عقلك واربح</p>
-                    </div>
-                    <div class="card-tile" onclick="go('#messages')">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <h3>تواصل معنا</h3>
-                        <p>ارسل اقتراحك للمطور</p>
-                    </div>
-                </div>
-            </section>
+        <div class="grid">
+          <button class="tile" data-go="#games"><span class="t">الألعاب</span><span class="d">ألعاب سريعة</span><span class="ic">🎮</span></button>
+          <button class="tile" data-go="#general"><span class="t">معلومات عامة</span><span class="d">MCQ + نتيجة</span><span class="ic">🧠</span></button>
+          <button class="tile" data-go="#countries"><span class="t">الدول</span><span class="d">عواصم/قارات</span><span class="ic">🌍</span></button>
+          <button class="tile" data-go="#prep3"><span class="t">تالتة إعدادي</span><span class="d">ترم تاني + مواد</span><span class="ic">📚</span></button>
+          <button class="tile" data-go="#puzzles"><span class="t">ألغاز</span><span class="d">منطق/رياضيات/ذكاء</span><span class="ic">🧩</span></button>
+          <button class="tile" data-go="#messages"><span class="t">الرسائل</span><span class="d">ابعت اقتراح</span><span class="ic">✉️</span></button>
+        </div>
 
-            <section class="page" id="games">
-                <h2 class="section-title">صالة الألعاب 🎮</h2>
-                <div class="main-grid">
-                    <div class="card-tile sm" onclick="go('#g-2048')">🧩 2048</div>
-                    <div class="card-tile sm" onclick="go('#g-whack')">🔨 Whack Emoji</div>
-                    <div class="card-tile sm" onclick="go('#g-typing')">⌨️ Typing Rush</div>
-                    <div class="card-tile sm" onclick="go('#g-dino')">🦖 Dino Run</div>
-                    <div class="card-tile sm" onclick="go('#g-frog')">🐸 Frogger</div>
-                    <div class="card-tile sm" onclick="go('#g-react')">⚡ Reaction</div>
-                    <div class="card-tile sm" onclick="go('#g-maze')">🧭 Maze</div>
-                </div>
-            </section>
+        <div class="card">
+          <p class="muted">💡 افتح بـ Live Server (مفضل). بس حتى بدون كده هتشتغل عادي.</p>
+        </div>
+      </section>
 
-            <section class="page" id="edu">
-                <h2 class="section-title">مناهج تالتة إعدادي + 📚</h2>
-                <div class="main-grid" id="eduMenu">
-                    </div>
-            </section>
+      <!-- GAMES MENU -->
+      <section class="page" data-route="games">
+        <div class="row">
+          <div>
+            <h2>الألعاب 🎮</h2>
+            <p class="muted">اختار لعبة:</p>
+          </div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
 
-            <section class="page" id="quiz-view">
-                <div class="quiz-container">
-                    <div class="quiz-head">
-                        <span id="qSubject">المادة</span>
-                        <span id="qScore">Score: 0</span>
-                    </div>
-                    <div id="questionBox" class="question-box"></div>
-                    <div id="answerOptions" class="options-grid"></div>
-                </div>
-            </section>
+        <div class="grid">
+          <button class="tile" data-go="#g-reaction"><span class="t">Reaction Test</span><span class="d">اختبر سرعتك</span><span class="ic">⚡</span></button>
+          <button class="tile" data-go="#g-typing"><span class="t">Typing Rush</span><span class="d">اكتب بسرعة</span><span class="ic">⌨️</span></button>
+          <button class="tile" data-go="#g-whack"><span class="t">Whack</span><span class="d">خبط الإيموجي</span><span class="ic">🔨</span></button>
+          <button class="tile" data-go="#g-maze"><span class="t">Maze</span><span class="d">اتحرك للهدف</span><span class="ic">🧭</span></button>
+          <button class="tile" data-go="#g-2048"><span class="t">2048 Emoji</span><span class="d">ادمج</span><span class="ic">🪄</span></button>
+        </div>
+      </section>
 
-            <section class="page" id="messages">
-                <h2 class="section-title">ارسل لنا ✉️</h2>
-                <form id="proForm" action="https://formspree.io/f/mykdkqza" method="POST" class="glass-form">
-                    <input type="text" name="name" placeholder="اسمك">
-                    <textarea name="message" placeholder="رسالتك..." required></textarea>
-                    <button type="submit" class="btn-pro">ارسال الآن</button>
-                    <p id="formStatus"></p>
-                </form>
-            </section>
+      <!-- GAMES PAGES -->
+      <section class="page" data-route="g-reaction"><div class="card" id="mount_reaction"></div></section>
+      <section class="page" data-route="g-typing"><div class="card" id="mount_typing"></div></section>
+      <section class="page" data-route="g-whack"><div class="card" id="mount_whack"></div></section>
+      <section class="page" data-route="g-maze"><div class="card" id="mount_maze"></div></section>
+      <section class="page" data-route="g-2048"><div class="card" id="mount_2048"></div></section>
 
-            <section class="page game-full" id="game-display">
-                <div id="gameUI"></div>
-                <div class="canvas-holder" id="canvasHolder"></div>
-                <div class="controls" id="gameControls"></div>
-                <button class="btn-back" onclick="go('#games')">🔙 عودة للألعاب</button>
-            </section>
-        </main>
+      <!-- QUIZZES -->
+      <section class="page" data-route="general">
+        <div class="row">
+          <div><h2>معلومات عامة 🧠</h2><p class="muted">مستويات مختلفة + نتيجة.</p></div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
+        <div class="card" id="mount_general"></div>
+      </section>
 
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="go('#home')"><i class="fa-solid fa-house"></i></div>
-            <div class="nav-item" onclick="go('#games')"><i class="fa-solid fa-gamepad"></i></div>
-            <div class="nav-item" onclick="go('#edu')"><i class="fa-solid fa-graduation-cap"></i></div>
-            <div class="nav-item" onclick="go('#messages')"><i class="fa-solid fa-envelope"></i></div>
-        </nav>
-    </div>
+      <section class="page" data-route="countries">
+        <div class="row">
+          <div><h2>الدول 🌍</h2><p class="muted">عواصم وقارات وأسئلة جديدة.</p></div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
+        <div class="card" id="mount_countries"></div>
+      </section>
 
-    <script src="script.js"></script>
+      <!-- PREP3 -->
+      <section class="page" data-route="prep3">
+        <div class="row">
+          <div><h2>تالتة إعدادي – الترم التاني 📚</h2><p class="muted">اختار مادة.</p></div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
+
+        <div class="grid">
+          <button class="tile" data-go="#p3-ar"><span class="t">عربي</span><span class="d">نحو + مهارات</span><span class="ic">📝</span></button>
+          <button class="tile" data-go="#p3-en"><span class="t">إنجليزي</span><span class="d">Reading + Grammar</span><span class="ic">🇬🇧</span></button>
+          <button class="tile" data-go="#p3-math"><span class="t">رياضيات</span><span class="d">جبر + هندسة</span><span class="ic">➗</span></button>
+          <button class="tile" data-go="#p3-sci"><span class="t">علوم</span><span class="d">تفاعلات + وراثة</span><span class="ic">🧪</span></button>
+          <button class="tile" data-go="#p3-ss"><span class="t">دراسات</span><span class="d">تاريخ + جغرافيا</span><span class="ic">🗺️</span></button>
+          <button class="tile" data-go="#p3-it"><span class="t">كمبيوتر</span><span class="d">Flowchart + خوارزميات</span><span class="ic">💻</span></button>
+        </div>
+      </section>
+
+      <section class="page" data-route="p3-ar"><div class="card" id="mount_p3_ar"></div></section>
+      <section class="page" data-route="p3-en"><div class="card" id="mount_p3_en"></div></section>
+      <section class="page" data-route="p3-math"><div class="card" id="mount_p3_math"></div></section>
+      <section class="page" data-route="p3-sci"><div class="card" id="mount_p3_sci"></div></section>
+      <section class="page" data-route="p3-ss"><div class="card" id="mount_p3_ss"></div></section>
+      <section class="page" data-route="p3-it"><div class="card" id="mount_p3_it"></div></section>
+
+      <!-- PUZZLES -->
+      <section class="page" data-route="puzzles">
+        <div class="row">
+          <div><h2>ألغاز 🧩</h2><p class="muted">اضغط "إظهار الحل" لكل لغز.</p></div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
+        <div class="card" id="mount_puzzles"></div>
+      </section>
+
+      <!-- MESSAGES -->
+      <section class="page" data-route="messages">
+        <div class="row">
+          <div><h2>الرسائل ✉️</h2><p class="muted">اكتب رسالتك (بلاش بيانات حساسة).</p></div>
+          <button class="btn ghost" data-go="#home">رجوع</button>
+        </div>
+
+        <div class="card">
+          <form id="msgForm" action="https://formspree.io/f/mykdkqza" method="POST">
+            <label class="label">إيميلك (اختياري)</label>
+            <input class="field" type="email" name="email" placeholder="example@mail.com" autocomplete="email" />
+            <div class="sp"></div>
+
+            <label class="label">رسالتك</label>
+            <textarea class="field" name="message" placeholder="اكتب هنا…" required></textarea>
+
+            <div class="actions">
+              <button class="btn" type="submit">إرسال</button>
+              <button class="btn ghost" type="button" id="msgClear">مسح</button>
+            </div>
+
+            <div class="status" id="msgStatus" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <nav class="nav">
+      <button class="navBtn" data-go="#home">الرئيسية</button>
+      <button class="navBtn" data-go="#games">الألعاب</button>
+      <button class="navBtn" data-go="#puzzles">ألغاز</button>
+      <button class="navBtn" data-go="#messages">الرسائل</button>
+    </nav>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
